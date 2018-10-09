@@ -1,7 +1,7 @@
 module RVRP
 
 # using LightXML
-# using JSON2
+using JSON2
 
 include("RVRPIO.jl")
 
