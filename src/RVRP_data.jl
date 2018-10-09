@@ -69,7 +69,6 @@ end
 abstract type AbstractRequest end
 
 struct Service <: AbstractRequest
-    # serviceType::Int
     id::String
     node::Union{Pickup, Delivery, Operation}
 end    
@@ -105,3 +104,19 @@ struct RvrpProblem
     shipments::Array{Shipment,1}
     picked_shipments::Array{Shipment,1}
 end 
+
+function parse_to_json(data::RvrpProblem, file_path::String)
+    json_string = JSON2.write(data)
+    io = open(file_path, "w")
+    write(io, json_string)
+    write(io, "\n")
+    close(io)
+end
+
+function parse_from_jason(file_path::String)
+    io = open(file_path, "r")
+    s = read(io, String)
+    data = JSON2.read(s, RvrpProblem)
+    close(io)
+    return data
+end
