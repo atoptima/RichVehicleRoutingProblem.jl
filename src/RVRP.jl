@@ -1,7 +1,7 @@
 module RVRP
 
-using JSON2
-using JSON
+import JSON2
+import JSON
 
 include("RVRP_data.jl")
 include("data_gen.jl")
