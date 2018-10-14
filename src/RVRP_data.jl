@@ -68,9 +68,19 @@ end
 
 abstract type AbstractRequest end
 
-struct Service <: AbstractRequest
+struct PickupRequest <: AbstractRequest
     id::String
-    node::Union{Pickup, Delivery, Operation}
+    node::Pickup
+end    
+
+struct DeliveryRequest <: AbstractRequest
+    id::String
+    node::Delivery
+end    
+
+struct OperationRequest <: AbstractRequest
+    id::String
+    node::Operation
 end    
 
 struct Shipment <: AbstractRequest
@@ -95,12 +105,14 @@ end
 struct RvrpProblem
     problem_id::String
     problem_type::ProblemType
-    vehicles::Array{Vehicle,1}
-    vehicle_types::Array{VehicleType,1}
+    vehicles::Vector{Vehicle}
+    vehicle_types::Vector{VehicleType}
     distance_matrix::Array{Float64,2}
     travel_times_matrix::Array{Float64,2}
-
-    services::Array{Service,1}
-    shipments::Array{Shipment,1}
-    picked_shipments::Array{Shipment,1}
+    # Requests
+    pickups::Vector{PickupRequest}
+    deliveries::Vector{DeliveryRequest}
+    operations::Vector{OperationRequest}
+    shipments::Vector{Shipment}
+    picked_shipments::Vector{Shipment}
 end 

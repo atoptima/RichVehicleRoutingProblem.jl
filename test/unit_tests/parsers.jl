@@ -29,4 +29,13 @@ function parse_from_jason_tests()
     @test data == data2
     rm("../dump/dummy.json")
     @test isfile("../dump/dummy.json") == false
+
+    data = RVRP.generate_full_data_random(3)
+    @test isfile("../dump/dummy.json") == false
+    RVRP.parse_to_json(data, "../dump/dummy.json")
+    @test isfile("../dump/dummy.json") == true
+    data2 = RVRP.parse_from_jason("../dump/dummy.json")
+    @test data == data2
+    rm("../dump/dummy.json")
+    @test isfile("../dump/dummy.json") == false
 end
