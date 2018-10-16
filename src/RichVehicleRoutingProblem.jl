@@ -1,4 +1,4 @@
-module RVRP
+module RichVehicleRoutingProblem
 
 import JSON2
 import JSON

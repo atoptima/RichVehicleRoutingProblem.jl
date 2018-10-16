@@ -79,9 +79,9 @@ function generate_full_data_random(n::Int)
     problem_id = string("full_random_", rand(1:1000))
     problem_type = ProblemType("FINITE", "HETEROGENEOUS")
     vehicle_types = generate_random_vehicle_type(2)
-    v_types = RVRP.generate_random_vehicle_type(2)
-    depots = [RVRP.generate_random_depot() for i in 1:2]
-    vehicles = RVRP.generate_random_vehicles(3, v_types, depots)
+    v_types = generate_random_vehicle_type(2)
+    depots = [generate_random_depot() for i in 1:2]
+    vehicles = generate_random_vehicles(3, v_types, depots)
     distance_matrix = Array{Float64,2}(undef, 0, 0)
     travel_times_matrix = Array{Float64,2}(undef, 0, 0)
     ps = generate_random_pickups(n)
