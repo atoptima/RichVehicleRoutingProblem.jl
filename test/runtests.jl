@@ -1,4 +1,5 @@
-import RVRP
+import RichVehicleRoutingProblem
+const RVRP = RichVehicleRoutingProblem
 
 using Test
 
