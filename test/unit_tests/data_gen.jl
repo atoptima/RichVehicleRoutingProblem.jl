@@ -57,22 +57,32 @@ function generate_random_vehicle_type_tests()
 end
 
 function generate_random_depot_tests()
-    depot = RVRP.generate_random_depot()
+    depot = RVRP.generate_random_depot(3)
     @test typeof(depot) == RVRP.Depot
+    @test depot.location.index == 3
+    @test depot.location.id == "depot_3"
 end
 
 function generate_random_vehicles_tests()
     v_types = RVRP.generate_random_vehicle_type(2)
-    depots = [RVRP.generate_random_depot() for i in 1:2]
+    depots = [RVRP.generate_random_depot(i+1) for i in 1:2]
     vs = RVRP.generate_random_vehicles(3, v_types, depots)
     @test length(vs) == 3
     @test eltype(vs) == RVRP.Vehicle
+    for v in vs
+        @test v.depot.location.index >= 2
+        @test v.depot.location.index <= 3
+    end
 end
 
 function generate_random_pickups_tests()
-    ps = RVRP.generate_random_pickups(3)
+    ps = RVRP.generate_random_pickups(3, 2)
     @test length(ps) == 3
     @test eltype(ps) == RVRP.Pickup
+    for p in ps
+        @test p.location.index >= 2
+        @test p.location.index <= 5
+    end
 end
 
 function generate_full_data_tests()

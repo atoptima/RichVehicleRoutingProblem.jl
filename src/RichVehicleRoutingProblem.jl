@@ -17,6 +17,12 @@ Start the solution procedure.
 """
 function solve end
 
+"""
+    check_data(data::RvrpProblem, solver::AbstractSolver)
+
+Check if the date is compatible with the solver provided.
+"""
+function check_data end
 
 
 end

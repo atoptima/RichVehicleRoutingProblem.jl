@@ -39,19 +39,20 @@ function generate_random_vehicle_type(n::Int)
     vehicle_types = VehicleType[]
     costs = generate_random_costs()
     for i in 1:n
-        v_type = VehicleType(string("type_", i), rand(1:10), costs)
+        v_type = VehicleType(string("type_", i), rand(3:10), costs)
         push!(vehicle_types, v_type)
     end
     return vehicle_types
 end
 
-function generate_random_depot()
+function generate_random_depot(loc_idx::Int)
     coord = Coord(rand(1:20), rand(1:20))
-    return Depot(Location("depot", coord, 1),
+    return Depot(Location(string("depot_", loc_idx), coord, loc_idx),
                  [TimeWindow(rand(1:20), rand(1:20))])
 end
 
-function generate_random_vehicles(n::Int, types::Vector{VehicleType}, depots::Vector{Depot})
+function generate_random_vehicles(n::Int, types::Vector{VehicleType},
+                                  depots::Vector{Depot})
     vs = Vehicle[]
     for i in 1:n
         tw = TimeWindow(rand(1:20), rand(20:25))
@@ -63,14 +64,15 @@ function generate_random_vehicles(n::Int, types::Vector{VehicleType}, depots::Ve
     return vs
 end
 
-function generate_random_pickups(n::Int)
+function generate_random_pickups(n::Int, first_loc_idx::Int)
     pickups = Pickup[]
     for i in 1:n
         coord = Coord(rand(1:20), rand(1:20))
-        loc = Location(string("loc_", i+1), coord, i+1)
+        loc = Location(string("loc_", first_loc_idx), coord, first_loc_idx)
         tw = TimeWindow(rand(1:20), rand(1:20))
-        p = Pickup(loc, rand(1:5), [tw], rand(1:5), string("req_", i))
+        p = Pickup(loc, rand(1:3), [tw], rand(1:5), string("req_", i))
         push!(pickups, p)
+        first_loc_idx += 1
     end
     return pickups
 end
@@ -79,12 +81,11 @@ function generate_full_data_random(n::Int)
     problem_id = string("full_random_", rand(1:1000))
     problem_type = ProblemType("FINITE", "HETEROGENEOUS")
     vehicle_types = generate_random_vehicle_type(2)
-    v_types = generate_random_vehicle_type(2)
-    depots = [generate_random_depot() for i in 1:2]
-    vehicles = generate_random_vehicles(3, v_types, depots)
+    depots = [generate_random_depot(i) for i in 1:2]
+    vehicles = generate_random_vehicles(3, vehicle_types, depots)
     distance_matrix = Array{Float64,2}(undef, 0, 0)
     travel_times_matrix = Array{Float64,2}(undef, 0, 0)
-    ps = generate_random_pickups(n)
+    ps = generate_random_pickups(n, 3)
     pickups = [PickupRequest(string("p_",i), ps[i]) for i in 1:n]
     deliveries = DeliveryRequest[]
     operations = OperationRequest[]
