@@ -52,10 +52,14 @@ function generate_random_depot(loc_idx::Int)
 end
 
 function generate_random_vehicles(n::Int, types::Vector{VehicleType},
-                                  depots::Vector{Depot})
+                                  depots::Vector{Depot}; with_tw = false)
     vs = Vehicle[]
     for i in 1:n
-        tw = TimeWindow(rand(1:20), rand(20:25))
+        if !with_tw
+            tw = TimeWindow(0, typemax(Int32))
+        else
+            tw = TimeWindow(rand(1:20), rand(20:25))
+        end
         v = Vehicle(string("v_", i), depots[rand(1:length(depots))],
                     types[rand(1:length(types))], tw, rand(Bool),
                     rand(Bool), rand(1:2), Shipment[])
@@ -64,13 +68,16 @@ function generate_random_vehicles(n::Int, types::Vector{VehicleType},
     return vs
 end
 
-function generate_random_pickups(n::Int, first_loc_idx::Int)
+function generate_random_pickups(n::Int, first_loc_idx::Int; with_tw = false)
     pickups = Pickup[]
     for i in 1:n
         coord = Coord(rand(1:20), rand(1:20))
         loc = Location(string("loc_", first_loc_idx), coord, first_loc_idx)
-        tw = TimeWindow(rand(1:20), rand(1:20))
-        p = Pickup(loc, rand(1:3), [tw], rand(1:5), string("req_", i))
+        tws = TimeWindow[]
+        if with_tw
+            push!(tws, TimeWindow(rand(1:20), rand(20:25)))
+        end
+        p = Pickup(loc, rand(1:3), tws, rand(1:5), string("req_", i))
         push!(pickups, p)
         first_loc_idx += 1
     end
