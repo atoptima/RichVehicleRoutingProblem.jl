@@ -21,7 +21,8 @@ function generate_data_random_tsp(n::Int)
     vehicles = Vehicle[]
     vehicle_types = VehicleType[]
     travel_times_matrix = Array{Float64,2}(undef, 0, 0)
-    pickups = Pickup[]
+    ps = generate_random_pickups(n, 1)
+    pickups = [PickupRequest(string("p_",i), ps[i]) for i in 1:n]
     deliveries = Delivery[]
     operations = Operation[]
     shipments = Shipment[]

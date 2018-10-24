@@ -37,13 +37,13 @@ end
 
 struct Depot <: AbstractNode
     location::Location
-    time_windows::Array{TimeWindow,1} # optional
+    time_windows::Vector{TimeWindow} # optional
 end
 
 struct Pickup <: AbstractNode
     location::Location
     capacity_demand::Float64
-    time_windows::Array{TimeWindow,1} # optional
+    time_windows::Vector{TimeWindow} # optional
     duration::Float64 # optional      
     req_id::String
 end
@@ -51,7 +51,7 @@ end
 struct Delivery <: AbstractNode
     location::Location
     capacity_demand::Float64
-    time_windows::Array{TimeWindow,1} # optional
+    time_windows::Vector{TimeWindow} # optional
     duration::Float64 # optional
     req_id::String
 end
@@ -61,7 +61,7 @@ struct Operation <: AbstractNode
     end_location::Location
     required_capacity::Float64
     delta_capacity::Float64
-    time_windows::Array{TimeWindow,1} # optional
+    time_windows::Vector{TimeWindow} # optional
     duration::Float64 # optional      
     req_id::String
 end
@@ -99,7 +99,7 @@ struct Vehicle <: AbstractVehicle
     return_to_depot::Bool
     infinite_copies::Bool
     initial_load::Float64
-    picked_shipments::Array{Shipment,1}
+    picked_shipments::Vector{Shipment}
 end
 
 struct RvrpProblem

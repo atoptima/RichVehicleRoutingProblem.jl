@@ -30,7 +30,7 @@ function generate_data_random_tsp_tests()
     @test data.problem_type.fleet_composition == "HOMOGENEOUS"
     @test data.vehicles == RVRP.Vehicle[]
     @test data.vehicle_types == RVRP.VehicleType[]
-    @test data.pickups == RVRP.PickupRequest[]
+    @test length(data.pickups) == 5
     @test data.deliveries == RVRP.DeliveryRequest[]
     @test data.operations == RVRP.OperationRequest[]
     @test data.shipments == RVRP.Shipment[]
