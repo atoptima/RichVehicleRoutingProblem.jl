@@ -1,8 +1,14 @@
 abstract type AbstractNode end
-@enum RESOURCE Time TravelTime WaitingTime Distance TravelDistance Capacity
-@enum OPERATION Pickup Delivery Shipment Cleaning
-@enum REQUEST SingleOperation Shipment
 
+@enum RESOURCE FixedCost VariableCost ClockTime TravelTime WaitingTime RestTime TravelDistance Capacity
+@enum OPERATION Pickup Delivery Cleaning Parcking Setup 
+@enum REQUEST Pickup Delivery Shipment Cleaning Parcking Setup ComplexOperation
+
+struct ResourceDict
+    Dict{RESOURCE,Float64}
+end
+
+    
 struct ProblemType
     fleet_size::String # INFINITE or FINITE
     fleet_composition::String # HOMOGENEOUS or HETEROGENEOUS
@@ -37,54 +43,39 @@ struct Operation <: AbstractNode
     operation_type::OPERATION # Pickup, Delivery, Cleaning, ...
 end
 
-struct SimpleRequest
+struct Request
     id::String
     index::Int
-    operation::Operation # Single Requests have only one operation
     request_type::REQUEST # SingleOperation, Shipment, ...
+    operations::Vector{Operation} # a request can be a sequence of operations: f.i can be a pair of Pickup and Delivery, or a triplets including 
 end
 
-struct ComplexRequest
-    id::String
-    index::Int
-    operations::Vector{Operation} # Sequence of operations ; can be limited to one; can be a pair of Pickup and Delivery, or a triplets including a cleaning first, etc
-    request_type::REQUEST # SingleOperation, Shipment, ...
+
+struct VehicleBaseType
+    resource_prices::ResourceDict
+    resource_capacities::ResourceDict 
 end
 
-struct VehicleType
-    fixed_cost::Float64
-    resource_unit_prices::Dict{RESOURCE,Float64}
-    resource_capacities::Dict{RESOURCE,Float64}
-end
-
-struct InstanceVehicleType # vehicle type in optimization instance.
+struct VehicleType # vehicle type in optimization instance.
     id::String
     index::Int
     depot::Depot # optional
-    base_type::VehicleType
+    base_type::VehicleBaseType
     time_schedule::TimeWindow
     return_to_depot::Bool
     infinite_copies::Bool
     nb_of_copies::Int
-    resource_intial_states::Dict{RESOURCE,Float64}
+    resource_intial_states::ResourceDict
 end
 
 struct RvrpProblem
     problem_id::String
     problem_type::ProblemType
-    resources::Vector{RESOURCE}
+    resource_types::Vector{RESOURCE}
+    vehicle_base_types::Vector{VehicleBaseType}
     vehicles::Vector{VehicleType}
-    distance_matrix::Array{Float64,2}
-    travel_times_matrix::Array{Float64,2}
-
-    # Requests
-    # Requests with only one operation of type Pickup:
-    pickups::Vector{SimpleRequest}
-
-    # Requests with only one operation of type Delivery:
-    deliveries::Vector{SimpleRequest}
-
-    # Requests with two operatios: first a Pickup, then a Delivery
-    # with precedence between them, preemption is allowed:
-    shipments::Vector{ComplexRequest}
+    distance_matrix::Array{Float64,2} # optional; indexed by Location index
+    travel_times_matrix::Array{Float64,2} # optional; indexed by Location index
+    requests::Vector{Request}  # Requests aggregated into a single container
+    requestDict::Dict{REQUEST,Vector{Int}}  # Requests sorted by types pointing to position in the requets vector
 end
