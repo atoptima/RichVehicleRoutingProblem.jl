@@ -4,11 +4,8 @@ abstract type AbstractNode end
 @enum OPERATION Pickup Delivery Cleaning Parcking Setup 
 @enum REQUEST Pickup Delivery Shipment Cleaning Parcking Setup ComplexOperation
 
-struct ResourceDict
-    Dict{RESOURCE,Float64}
-end
+const ResourceDict = Dict{RESOURCE,Float64}
 
-    
 struct ProblemType
     fleet_size::String # INFINITE or FINITE
     fleet_composition::String # HOMOGENEOUS or HETEROGENEOUS
@@ -30,17 +27,28 @@ struct TimeWindow
     tw_end::Float64
 end
 
+struct Arc
+    index::Int
+    tail::AbstractNode
+    head::AbstractNode
+    resource_consumptions::ResourceDict
+end
+
 struct Depot <: AbstractNode
     location::Location
     time_windows::Vector{TimeWindow} # optional
+    inArcIndices::Vector{Int}
+    outArcIndices::Vector{Int}
 end
 
 struct Operation <: AbstractNode
     location::Location
-    resource_consumptions::Dict{RESOURCE,Float64}
+    resource_consumptions::ResourceDict
     time_windows::Vector{TimeWindow} # optional
     req_index::Int
     operation_type::OPERATION # Pickup, Delivery, Cleaning, ...
+    inArcIndices::Vector{Int}
+    outArcIndices::Vector{Int}
 end
 
 struct Request
@@ -49,7 +57,6 @@ struct Request
     request_type::REQUEST # SingleOperation, Shipment, ...
     operations::Vector{Operation} # a request can be a sequence of operations: f.i can be a pair of Pickup and Delivery, or a triplets including 
 end
-
 
 struct VehicleBaseType
     resource_prices::ResourceDict
@@ -68,14 +75,18 @@ struct VehicleType # vehicle type in optimization instance.
     resource_intial_states::ResourceDict
 end
 
+struct Network
+    nodes::Vector{AbstractNode}
+    arcs::Vector{Arc}
+end
+
 struct RvrpProblem
     problem_id::String
     problem_type::ProblemType
     resource_types::Vector{RESOURCE}
+    network::Network
     vehicle_base_types::Vector{VehicleBaseType}
     vehicles::Vector{VehicleType}
-    distance_matrix::Array{Float64,2} # optional; indexed by Location index
-    travel_times_matrix::Array{Float64,2} # optional; indexed by Location index
     requests::Vector{Request}  # Requests aggregated into a single container
-    requestDict::Dict{REQUEST,Vector{Int}}  # Requests sorted by types pointing to position in the requets vector
+    requestDict::Dict{REQUEST,Vector{Int}}  # Requests sorted by types pointing to positions in the request vector
 end
