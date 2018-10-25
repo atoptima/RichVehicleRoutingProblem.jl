@@ -51,13 +51,13 @@ struct ComplexRequest
     request_type::REQUEST # SingleOperation, Shipment, ...
 end
 
-struct VehicleBaseType
+struct VehicleType
     fixed_cost::Float64
-    resource_unit_prices::Vector{Float64}
-    resource_capacities::Vector{Float64}
+    resource_unit_prices::Dict{RESOURCE,Float64}
+    resource_capacities::Dict{RESOURCE,Float64}
 end
 
-struct VehicleType
+struct InstanceVehicleType # vehicle type in optimization instance.
     id::String
     index::Int
     depot::Depot # optional
@@ -66,13 +66,13 @@ struct VehicleType
     return_to_depot::Bool
     infinite_copies::Bool
     nb_of_copies::Int
-    resource_intial_states::Vector{Float64}
-    ongoing_requests::Vector{Pair{Request,Int}}
+    resource_intial_states::Dict{RESOURCE,Float64}
 end
 
 struct RvrpProblem
     problem_id::String
     problem_type::ProblemType
+    resources::Vector{RESOURCE}
     vehicles::Vector{VehicleType}
     distance_matrix::Array{Float64,2}
     travel_times_matrix::Array{Float64,2}
@@ -84,16 +84,7 @@ struct RvrpProblem
     # Requests with only one operation of type Delivery:
     deliveries::Vector{SimpleRequest}
 
-    # Requests with arbitrary number of operations of any OPERATION
-    # that must be done in the given sequence, by the same vehicle and
-    # preemption (between operations) is not allowed:
-    operations::Vector{ConplexRequest}
-
     # Requests with two operatios: first a Pickup, then a Delivery
     # with precedence between them, preemption is allowed:
     shipments::Vector{ComplexRequest}
-
-    # Requests that are ongoing, where the Int part represents the
-    # number of finished operations in the given request:
-    ongoing_requests::Vector{Pair{ComplexRequest,Int}}
 end
