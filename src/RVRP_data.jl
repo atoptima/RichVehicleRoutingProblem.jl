@@ -83,7 +83,7 @@ struct RvrpProblem
     distance_matrix::Array{Float64,2}
     travel_times_matrix::Array{Float64,2}
     # Requests
-    pickups::Vector{PickupRequest}
-    deliveries::Vector{DeliveryRequest}
+    pickups::Vector{Pickup}
+    deliveries::Vector{Delivery}
     shipments::Vector{Shipment}
 end
