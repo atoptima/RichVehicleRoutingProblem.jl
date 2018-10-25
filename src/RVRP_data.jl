@@ -28,7 +28,6 @@ end
 
 struct Operation <: AbstractNode
     location::Location
-    demand_variation::Float64 # positive when picking and negative when delivering
     resource_consumptions::Vector{Float64}
     time_windows::Vector{TimeWindow} # optional
     req_index::Int
@@ -38,13 +37,12 @@ end
 struct SimpleRequest
     id::String
     index::Int
-    operations::Vector{Operation} # Sequence of operations ; can be limited to one; can be a pair of Pickup and Delivery, or a triplets including a cleaning first, etc
+    operation::Operation # Single Requests have only one operation
 end
 
 struct ComplexRequest
     id::String
     index::Int
-    demand_intial_state::Float64 # to model for example pickups that have occured before starting
     operations::Vector{Operation} # Sequence of operations ; can be limited to one; can be a pair of Pickup and Delivery, or a triplets including a cleaning first, etc
 end
 
@@ -63,7 +61,6 @@ struct VehicleType
     return_to_depot::Bool
     infinite_copies::Bool
     resource_intial_states::Vector{Float64}
-    ongoing_complex_requests::Vector{ComplexRequest}
 end
 
 struct RvrpProblem
