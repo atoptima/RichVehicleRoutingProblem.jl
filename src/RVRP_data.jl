@@ -95,5 +95,5 @@ struct RvrpProblem
 
     # Requests that are ongoing, where the Int part represents the
     # number of finished operations in the given request:
-    ongoing_requests::Vector{Pair{Request,Int}}
+    ongoing_requests::Vector{Pair{ComplexRequest,Int}}
 end
