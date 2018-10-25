@@ -18,8 +18,12 @@ function generate_data_random_tsp(n::Int)
     distance_matrix = generate_symmetric_distance_matrix(n)
     problem_id = string("tsp_random_", rand(1:1000))
     problem_type = ProblemType("FINITE", "HOMOGENEOUS")
-    vehicles = Vehicle[]
-    vehicle_types = VehicleType[]
+    vt = VehicleType("unique_type", 0, Costs(0.0, 1.0, 0.0, 0.0, 0.0))
+    v = Vehicle("unique_vehicle", Depot(Location("depot", Coord(0.0, 0.0), 1),
+        [TimeWindow(0.0, typemax(Int32))]), vt, TimeWindow(0.0, typemax(Int32)),
+        true, false, 0.0, Shipment[])
+    vehicles = [v]
+    vehicle_types = VehicleType[vt]
     travel_times_matrix = Array{Float64,2}(undef, 0, 0)
     ps = generate_random_pickups(n, 1)
     pickups = [PickupRequest(string("p_",i), ps[i]) for i in 1:n]

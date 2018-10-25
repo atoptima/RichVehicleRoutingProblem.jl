@@ -15,7 +15,8 @@ end
 struct RvrpSolution
     solution_id::String
     problem_id::String
+    cost::Float64
     routes::Vector{Route}
-    # unassigned::Vector{AbstractNode}
+    unassigned_ids::Vector{String}
     # OSRM segments
 end

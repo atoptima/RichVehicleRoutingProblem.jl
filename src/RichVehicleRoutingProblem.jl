@@ -14,14 +14,21 @@ abstract type AbstractSolver end
 """
     solve(data::RvrpProblem, solver::AbstractSolver)
 
-Start the solution procedure.
+Starts the solution procedure.
 """
 function solve end
 
 """
+    transform_solution(data::RvrpProblem, solver::AbstractSolver, solver_sol::Any)
+
+Transforms the solutin outputed by the solver to the RVRP format.
+"""
+function transform_solution end
+
+"""
     check_data(data::RvrpProblem, solver::AbstractSolver)
 
-Check if the date is compatible with the solver provided.
+Checks if the date is compatible with the solver provided.
 """
 function check_data end
 
