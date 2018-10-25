@@ -1,7 +1,7 @@
 abstract type AbstractNode end
 @enum RESOURCE Time TravelTime WaitingTime Distance TravelDistance Capacity
-@enum OPERATIONTYPE Pickup Delivery Shipment Cleaning
-@enum REQUESTTYPE SingleOperation Shipment
+@enum OPERATION Pickup Delivery Shipment Cleaning
+@enum REQUEST SingleOperation Shipment
 const ResourceValues = Dict{RESOURCE,Float64}
 
 
@@ -36,14 +36,14 @@ struct Operation <: AbstractNode
     consumption::ResourceValues
     time_windows::Vector{TimeWindow} # optional
     req_index::Int
-    operation_type::OPERATIONTYPE # Pickup, Delivery, Cleaning, ...
+    operation_type::OPERATION # Pickup, Delivery, Cleaning, ...
 end
 
 struct Request
     id::String
     index::Int
     operations::Vector{Operation} # Sequence of operations ; can be limited to one; can be a pair of Pickup and Delivery, or a triplets including a cleaning first, etc
-    request_type::REQUESTTYPE # SingleOperation, Shipment, ...
+    request_type::REQUEST # SingleOperation, Shipment, ...
 end
 
 struct VehicleType
@@ -72,7 +72,7 @@ struct RvrpProblem
     # Requests with only one operation of type Delivery:
     deliveries::Vector{Request}
 
-    # Requests with arbitrary number of operations of any OPERATIONTYPE
+    # Requests with arbitrary number of operations of any OPERATION
     # that must be done in the given sequence, by the same vehicle and
     # preemption (between operations) is not allowed:
     operations::Vector{Request}
@@ -83,5 +83,5 @@ struct RvrpProblem
 
     # Requests that are ongoing, where the Int part represents the
     # number of finished operations in the given request:
-    ongoing_operations::Vector{Pair{Request,Int}}
+    ongoing_requests::Vector{Pair{Request,Int}}
 end
