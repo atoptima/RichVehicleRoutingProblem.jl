@@ -33,7 +33,7 @@ end
 
 struct Pickup
     id::String
-    index::Int
+    index::Int # -1 if its the pickup of a shipment
     location::Location
     capacity_demand::Float64
     time_windows::Vector{TimeWindow} # optional
@@ -42,7 +42,7 @@ end
 
 struct Delivery
     id::String
-    index::Int
+    index::Int # -1 if its the delivery of a shipment
     location::Location
     capacity_demand::Float64
     time_windows::Vector{TimeWindow} # optional
