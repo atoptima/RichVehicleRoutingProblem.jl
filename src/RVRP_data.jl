@@ -26,14 +26,6 @@ struct UnitPricing
     wait_time_price::Float
 end
 
-struct Costs
-    fixed::Float64
-    distance::Float64
-    time::Float64
-    service::Float64
-    wait::Float64
-end
-
 struct Depot
     location::Location
     time_windows::Vector{TimeWindow} # optional
