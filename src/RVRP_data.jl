@@ -21,16 +21,6 @@ struct TimeWindow
     tw_end::Float64
 end
 
-struct ResourcePrices
-    names::Vector{String} # fixed_cost_coef, travel_dist_coef,  travel_time_coef, service_time_coef,  waiting_time_coef
-    coef::Vector{Float64}
-end
-
-struct ResourceConsumptions
-    names::Vector{String} #  travel_dist_conso,  travel_time_conso, service_time_conso,  waiting_time_conso, vehicle_type_id
-    conso::Vector{Float64}
-end
-
 struct Depot <: AbstractNode
     location::Location
     time_windows::Vector{TimeWindow} # optional
@@ -38,21 +28,30 @@ end
 
 struct Operation <: AbstractNode
     location::Location
-    conso::ResourceConsumptions
+    demand_variation::Float64 # positive when picking and negative when delivering
+    resource_consumptions::Vector{Float64}
     time_windows::Vector{TimeWindow} # optional
     req_index::Int
     operation_type::String # Pickup, Delivery, Shipment, Cleaning, ...
 end
 
-struct Request
+struct SimpleRequest
     id::String
     index::Int
     operations::Vector{Operation} # Sequence of operations ; can be limited to one; can be a pair of Pickup and Delivery, or a triplets including a cleaning first, etc
 end
 
+struct ComplexRequest
+    id::String
+    index::Int
+    demand_intial_state::Float64 # to model for example pickups that have occured before starting
+    operations::Vector{Operation} # Sequence of operations ; can be limited to one; can be a pair of Pickup and Delivery, or a triplets including a cleaning first, etc
+end
+
 struct VehicleBaseType
-    prices::ResourcePrices
-    capacity::ResourceConsumptions
+    fixed_cost::Float64
+    resource_unit_prices::Vector{Float64}
+    resource_capacities::Vector{Float64}
 end
 
 struct VehicleType
@@ -63,19 +62,18 @@ struct VehicleType
     time_schedule::TimeWindow
     return_to_depot::Bool
     infinite_copies::Bool
-    init_load::ResourceConsumptions
+    resource_intial_states::Vector{Float64}
+    ongoing_complex_requests::Vector{ComplexRequest}
 end
 
 struct RvrpProblem
     problem_id::String
     problem_type::ProblemType
+    resource_names::Vector{String}
     vehicles::Vector{VehicleType}
     distance_matrix::Array{Float64,2}
     travel_times_matrix::Array{Float64,2}
     # Requests
-    pickups::Vector{Request}
-    deliveries::Vector{Request}
-    operations::Vector{Request}
-    shipments::Vector{Request}
-    picked_shipments::Vector{Request}
+    simple_requests::Vector{SimpleRequest}
+    complex_requests::Vector{ComplexRequest}
 end
