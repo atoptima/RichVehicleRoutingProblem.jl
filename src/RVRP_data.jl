@@ -2,18 +2,18 @@ abstract type AbstractNode end
 
 struct ProblemType
     fleet_size::String # INFINITE or FINITE
-    fleet_composition::String # HOMOGENEOUS or HETEROGENEOUS  
+    fleet_composition::String # HOMOGENEOUS or HETEROGENEOUS
 end
 
 struct Coord
     x::Float64
     y::Float64
-end 
+end
 
 struct Location # define: index + distance matrix or Coord
     id::String # optional
+    index::int
     coord::Coord # optional
-    index::Int # optional
 end
 
 struct TimeWindow
@@ -21,18 +21,14 @@ struct TimeWindow
     tw_end::Float64
 end
 
-struct Costs
-    fixed::Float64
-    distance::Float64
-    time::Float64
-    service::Float64
-    wait::Float64
+struct ResourcePrices
+    names::Vector{String} # fixed_cost_coef, travel_dist_coef,  travel_time_coef, service_time_coef,  waiting_time_coef
+    coef::Vector{Float64}
 end
 
-struct VehicleType
-    id::String
-    capacity::Int
-    costs::Costs
+struct ResourceConsumptions
+    names::Vector{String} #  travel_dist_conso,  travel_time_conso, service_time_conso,  waiting_time_conso, vehicle_type_id
+    conso::Vector{Float64}
 end
 
 struct Depot <: AbstractNode
@@ -40,79 +36,46 @@ struct Depot <: AbstractNode
     time_windows::Vector{TimeWindow} # optional
 end
 
-struct Pickup <: AbstractNode
-    location::Location
-    capacity_demand::Float64
-    time_windows::Vector{TimeWindow} # optional
-    duration::Float64 # optional      
-    req_id::String
-end
-
-struct Delivery <: AbstractNode
-    location::Location
-    capacity_demand::Float64
-    time_windows::Vector{TimeWindow} # optional
-    duration::Float64 # optional
-    req_id::String
-end
-
 struct Operation <: AbstractNode
-    start_location::Location
-    end_location::Location
-    required_capacity::Float64
-    delta_capacity::Float64
+    location::Location
+    conso::ResourceConsumptions
     time_windows::Vector{TimeWindow} # optional
-    duration::Float64 # optional      
-    req_id::String
+    req_index::Int
+    operation_type::String # Pickup, Delivery, Shipment, Cleaning, ...
 end
 
-abstract type AbstractRequest end
-
-struct PickupRequest <: AbstractRequest
+struct Request
     id::String
-    node::Pickup
-end    
-
-struct DeliveryRequest <: AbstractRequest
-    id::String
-    node::Delivery
-end    
-
-struct OperationRequest <: AbstractRequest
-    id::String
-    node::Operation
-end    
-
-struct Shipment <: AbstractRequest
-    id::String
-    pickup::Pickup
-    delivery::Delivery
+    index::Int
+    operations::Vector{Operation} # Sequence of operations ; can be limited to one; can be a pair of Pickup and Delivery, or a triplets including a cleaning first, etc
 end
 
-abstract type AbstractVehicle end
+struct VehicleBaseType
+    prices::ResourcePrices
+    capacity::ResourceConsumptions
+end
 
-struct Vehicle <: AbstractVehicle
+struct VehicleType
     id::String
+    index::Int
     depot::Depot # optional
-    v_type::VehicleType
+    base_type::VehicleType
     time_schedule::TimeWindow
     return_to_depot::Bool
     infinite_copies::Bool
-    initial_load::Float64
-    picked_shipments::Vector{Shipment}
+    init_load::ResourceConsumptions
 end
 
 struct RvrpProblem
     problem_id::String
     problem_type::ProblemType
-    vehicles::Vector{Vehicle}
-    vehicle_types::Vector{VehicleType}
+    vehicles::Vector{VehicleType}
     distance_matrix::Array{Float64,2}
     travel_times_matrix::Array{Float64,2}
     # Requests
-    pickups::Vector{PickupRequest}
-    deliveries::Vector{DeliveryRequest}
-    operations::Vector{OperationRequest}
-    shipments::Vector{Shipment}
-    picked_shipments::Vector{Shipment}
-end 
+    pickups::Vector{Request}
+    deliveries::Vector{Request}
+    operations::Vector{Request}
+    shipments::Vector{Request}
+    picked_shipments::Vector{Request}
+end
