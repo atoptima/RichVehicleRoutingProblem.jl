@@ -27,6 +27,8 @@ struct UnitPricing
 end
 
 struct Depot
+    id::String
+    index::Int # there can be several depots
     location::Location
     time_windows::Vector{TimeWindow} # optional
 end
