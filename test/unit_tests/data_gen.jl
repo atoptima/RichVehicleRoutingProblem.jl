@@ -2,22 +2,27 @@ function data_gen_unit_tests()
 
     generate_symmetric_distance_matrix_tests()
     generate_data_random_tsp_tests()
-    generate_random_costs_tests()
-    generate_random_vehicle_type_tests()
+    generate_random_unit_pricing()
+    generate_random_vehicle_category_tests()
     generate_random_depot_tests()
-    generate_random_vehicles_tests()
+    generate_random_vehicle_sets_tests()
     generate_random_pickups_tests()
     generate_full_data_tests()
 
 end
 
 function generate_symmetric_distance_matrix_tests()
-    matrix = RVRP.generate_symmetric_distance_matrix(5)
-    @test size(matrix) == (5,5)
+    coords = [RVRP.Coord(rand(1:20), rand(1:20)) for i in 1:5]
+    matrix_1 = RVRP.generate_symmetric_distance_matrix(coords)
+    matrix_2 = RVRP.generate_symmetric_distance_matrix(5)
+    @test size(matrix_1) == (5,5)
+    @test size(matrix_2) == (5,5)
     for i in 1:5
-        @test matrix[i,i] == 0.0
+        @test matrix_1[i,i] == 0.0
+        @test matrix_2[i,i] == 0.0
         for j in i+1:5
-            @test matrix[i,j] == matrix[j,i]
+            @test matrix_1[i,j] == matrix_1[j,i]
+            @test matrix_2[i,j] == matrix_2[j,i]
         end
     end
 end
@@ -28,32 +33,31 @@ function generate_data_random_tsp_tests()
     @test data.problem_id[1:11] == "tsp_random_"
     @test data.problem_type.fleet_size == "FINITE"
     @test data.problem_type.fleet_composition == "HOMOGENEOUS"
-    @test length(data.vehicles) == 1
-    @test length(data.vehicle_types) == 1
+    @test length(data.vehicle_categories) == 1
+    @test length(data.vehicle_sets) == 1
+    @test length(data.depots) == 1
     @test length(data.pickups) == 5
-    @test data.deliveries == RVRP.DeliveryRequest[]
-    @test data.operations == RVRP.OperationRequest[]
+    @test data.deliveries == RVRP.Delivery[]
     @test data.shipments == RVRP.Shipment[]
-    @test data.picked_shipments == RVRP.Shipment[]
-    @test data.travel_times_matrix == Array{Float64,2}(undef, 0, 0)
-    @test size(data.distance_matrix) == (5,5)
+    @test data.travel_time_matrix == Array{Float64,2}(undef, 0, 0)
+    @test size(data.travel_distance_matrix) == (5,5)
     for i in 1:5
-        @test data.distance_matrix[i,i] == 0.0
+        @test data.travel_distance_matrix[i,i] == 0.0
         for j in i+1:5
-            @test data.distance_matrix[i,j] == data.distance_matrix[j,i]
+            @test data.travel_distance_matrix[i,j] == data.travel_distance_matrix[j,i]
         end
     end
 end
 
-function generate_random_costs_tests()
-    costs = RVRP.generate_random_costs()
-    @test typeof(costs) == RVRP.Costs
+function generate_random_unit_pricing()
+    costs = RVRP.generate_random_unit_pricing()
+    @test typeof(costs) == RVRP.UnitPricing
 end
 
-function generate_random_vehicle_type_tests()
-    v_types = RVRP.generate_random_vehicle_type(5)
-    @test eltype(v_types) == RVRP.VehicleType
-    @test length(v_types) == 5
+function generate_random_vehicle_category_tests()
+    v_cats = RVRP.generate_random_vehicle_category(5)
+    @test eltype(v_cats) == RVRP.VehicleCategory
+    @test length(v_cats) == 5
 end
 
 function generate_random_depot_tests()
@@ -63,20 +67,22 @@ function generate_random_depot_tests()
     @test depot.location.id == "depot_3"
 end
 
-function generate_random_vehicles_tests()
-    v_types = RVRP.generate_random_vehicle_type(2)
+function generate_random_vehicle_sets_tests()
+    v_cats = RVRP.generate_random_vehicle_category(2)
     depots = [RVRP.generate_random_depot(i+1) for i in 1:2]
-    vs = RVRP.generate_random_vehicles(3, v_types, depots)
+    vs = RVRP.generate_random_vehicle_sets(3, v_cats, depots)
     @test length(vs) == 3
-    @test eltype(vs) == RVRP.Vehicle
+    @test eltype(vs) == RVRP.HomogeneousVechicleSet
     for v in vs
-        @test v.depot.location.index >= 2
-        @test v.depot.location.index <= 3
+        @test v.departure_depot_index >= 1
+        @test v.departure_depot_index <= 2
+        @test length(v.arrival_depot_indices) == 1
+        @test v.departure_depot_index == v.arrival_depot_indices[1]
     end
 end
 
 function generate_random_pickups_tests()
-    ps = RVRP.generate_random_pickups(3, 2)
+    ps = RVRP.generate_random_pickups(3, 2, 1:5)
     @test length(ps) == 3
     @test eltype(ps) == RVRP.Pickup
     for p in ps
@@ -89,6 +95,6 @@ function generate_full_data_tests()
     data = RVRP.generate_full_data_random(3)
     @test length(data.pickups) == 3
     @test length(data.deliveries) == 0
-    @test length(data.operations) == 0
+    @test length(data.shipments) == 0
     @test typeof(data) == RVRP.RvrpProblem
 end

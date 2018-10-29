@@ -74,7 +74,7 @@ struct HomogeneousVechicleSet # vehicle type in optimization instance.
     working_time_window::TimeWindow
     min_nb_of_vehicles::Int
     max_nb_of_vehicles::Int
-    intial_load::Float64
+    initial_load::Float64
     max_travel_time::Float64
     max_travel_distance::Float64
 end
