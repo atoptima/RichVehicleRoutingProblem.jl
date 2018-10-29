@@ -26,13 +26,14 @@ end
 function ==(v1::RVRP.HomogeneousVehicleSet, v2::RVRP.HomogeneousVehicleSet)
     return (v1.id == v2.id
             && v1.index == v2.index
+            && v1.departure_depot_id == v2.departure_depot_id
+            && v1.arrival_depot_ids == v2.arrival_depot_ids
             && v1.departure_depot_index == v2.departure_depot_index
             && v1.arrival_depot_indices == v2.arrival_depot_indices
             && v1.vehicle_category == v2.vehicle_category
             && v1.working_time_window == v2.working_time_window
             && v1.min_nb_of_vehicles == v2.min_nb_of_vehicles
             && v1.max_nb_of_vehicles == v2.max_nb_of_vehicles
-            && v1.initial_load == v2.initial_load
             && v1.max_travel_time == v2.max_travel_time
             && v1.max_travel_distance == v2.max_travel_distance
             )

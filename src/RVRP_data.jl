@@ -70,13 +70,14 @@ end
 struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
     index::Int
+    departure_depot_id::String
+    arrival_depot_ids::Vector{String}
     departure_depot_index::Int # If -1 mentionned vehicle start from first action
     arrival_depot_indices::Vector{Int}
     vehicle_category::VehicleCategory
     working_time_window::TimeWindow
     min_nb_of_vehicles::Int
     max_nb_of_vehicles::Int
-    initial_load::Float64
     max_travel_time::Float64
     max_travel_distance::Float64
 end
