@@ -1,3 +1,4 @@
+# To use the solution, the input data is needed
 struct Action
     request_index::Int # -1 if depot
     node_type::Int # 0 - Depot, 1 - Pickup, 2 - Delivery, 3 - Operation
@@ -19,7 +20,7 @@ struct RvrpSolution
     problem_id::String
     cost::Float64
     routes::Vector{Route}
-    unassigned_pickup_indices::Vector{Pickup}
-    unassigned_delivery_indices::Vector{Delivery}
-    unassigned_shipment_indices::Vector{Shipment}
+    unassigned_pickup_indices::Vector{Int}
+    unassigned_delivery_indices::Vector{Int}
+    unassigned_shipment_indices::Vector{Int}
 end
