@@ -1,4 +1,4 @@
-# To use the solution, the input data is needed
+# To use the solution, the input data is required
 struct Action
     request_index::Int # -1 if depot
     node_type::Int # 0 - Depot, 1 - Pickup, 2 - Delivery, 3 - Operation
