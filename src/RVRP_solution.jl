@@ -1,4 +1,5 @@
 # To use the solution, the input data is required
+
 struct Action
     request_type::Int # 0 - Depot, 1 - Pickup, 2 - Delivery
     request_index::Int # index of the request in the associated vector depots pickups  deliveries or shipments
