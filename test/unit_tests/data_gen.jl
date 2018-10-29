@@ -72,7 +72,7 @@ function generate_random_vehicle_sets_tests()
     depots = [RVRP.generate_random_depot(i+1) for i in 1:2]
     vs = RVRP.generate_random_vehicle_sets(3, v_cats, depots)
     @test length(vs) == 3
-    @test eltype(vs) == RVRP.HomogeneousVechicleSet
+    @test eltype(vs) == RVRP.HomogeneousVehicleSet
     for v in vs
         @test v.departure_depot_index >= 1
         @test v.departure_depot_index <= 2

@@ -15,8 +15,8 @@ struct Location # define: index + distance matrix or Coord
 end
 
 struct TimeWindow
-    tw_start::Float64
-    tw_end::Float64
+    begin_time::Float64
+    end_time::Float64
 end
 
 struct UnitPricing
@@ -35,7 +35,7 @@ struct Pickup
     id::String
     index::Int # if its the pickup of a shipment, the index of the shipment
     location::Location
-    capacity_demand::Float64
+    capacity_request::Float64
     time_windows::Vector{TimeWindow} # optional
     service_time::Float64 # optional
 end
@@ -44,7 +44,7 @@ struct Delivery
     id::String
     index::Int # if its the delivery of a shipment, the index of the shipment
     location::Location
-    capacity_demand::Float64
+    capacity_request::Float64
     time_windows::Vector{TimeWindow} # optional
     service_time::Float64 # optional
 end
@@ -65,7 +65,7 @@ struct VehicleCategory
     capacity::Float64
 end
 
-struct HomogeneousVechicleSet # vehicle type in optimization instance.
+struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
     index::Int
     departure_depot_index::Int # If -1 mentionned vehicle start from first action
@@ -83,7 +83,7 @@ struct RvrpProblem
     problem_id::String
     problem_type::ProblemType
     vehicle_categories::Vector{VehicleCategory}
-    vehicle_sets::Vector{HomogeneousVechicleSet}
+    vehicle_sets::Vector{HomogeneousVehicleSet}
     travel_distance_matrix::Array{Float64,2}
     travel_time_matrix::Array{Float64,2}
     depots::Vector{Depot}

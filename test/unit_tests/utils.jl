@@ -23,7 +23,7 @@ function ==(vc1::RVRP.VehicleCategory, vc2::RVRP.VehicleCategory)
             )
 end
 
-function ==(v1::RVRP.HomogeneousVechicleSet, v2::RVRP.HomogeneousVechicleSet)
+function ==(v1::RVRP.HomogeneousVehicleSet, v2::RVRP.HomogeneousVehicleSet)
     return (v1.id == v2.id
             && v1.index == v2.index
             && v1.departure_depot_index == v2.departure_depot_index
@@ -42,7 +42,7 @@ function ==(n1::T, n2::T) where T <: Union{RVRP.Pickup, RVRP.Delivery}
     return (n1.id == n2.id
             && n1.index == n2.index
             && n1.location == n2.location
-            && n1.capacity_demand == n2.capacity_demand
+            && n1.capacity_request == n2.capacity_request
             && n1.time_windows == n2.time_windows
             && n1.service_time == n2.service_time
             )

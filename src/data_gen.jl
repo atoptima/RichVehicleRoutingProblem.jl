@@ -33,7 +33,7 @@ function generate_data_random_tsp(n::Int)
     tw = TimeWindow(0.0, typemax(Int32))
     vc = VehicleCategory("unique_category", 1, 0.0,
                          UnitPricing(1.0, 0.0, 0.0, 0.0), 0.0)
-    v = HomogeneousVechicleSet("unique_vehicle", 1, 1, [1], vc, tw,
+    v = HomogeneousVehicleSet("unique_vehicle", 1, 1, [1], vc, tw,
                                1, 1, 0.0, typemax(Int32), typemax(Int32))
     vehicle_categories = [vc]
     vehicle_sets = [v]
@@ -73,7 +73,7 @@ end
 
 function generate_random_vehicle_sets(n::Int, categs::Vector{VehicleCategory},
                                       depots::Vector{Depot}; with_tw = false)
-    vs = HomogeneousVechicleSet[]
+    vs = HomogeneousVehicleSet[]
     for i in 1:n
         if !with_tw
             tw = TimeWindow(0, typemax(Int32))
@@ -81,9 +81,9 @@ function generate_random_vehicle_sets(n::Int, categs::Vector{VehicleCategory},
             tw = TimeWindow(rand(1:20), rand(20:25))
         end
         depot_idx = rand(1:length(depots))
-        v = HomogeneousVechicleSet(string("set_", i), i, depot_idx, [depot_idx],
-                                   categs[rand(1:length(categs))], tw, 1, 1,
-                                   rand(1:2), typemax(Int32), typemax(Int32))
+        v = HomogeneousVehicleSet(string("set_", i), i, depot_idx, [depot_idx],
+                                  categs[rand(1:length(categs))], tw, 1, 1,
+                                  rand(1:2), typemax(Int32), typemax(Int32))
         push!(vs, v)
     end
     return vs
