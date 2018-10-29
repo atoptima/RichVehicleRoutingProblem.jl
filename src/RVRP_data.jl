@@ -20,10 +20,10 @@ struct TimeWindow
 end
 
 struct UnitPricing
-    travel_distance_price::Float
-    travel_time_price::Float
-    service_time_price::Float
-    wait_time_price::Float
+    travel_distance_price::Float64
+    travel_time_price::Float64
+    service_time_price::Float64
+    wait_time_price::Float64
 end
 
 struct Depot
@@ -42,7 +42,7 @@ end
 
 struct Delivery
     id::String
-    index::Int # if its the pickup of a shipment, the index of the shipment
+    index::Int # if its the delivery of a shipment, the index of the shipment
     location::Location
     capacity_demand::Float64
     time_windows::Vector{TimeWindow} # optional
