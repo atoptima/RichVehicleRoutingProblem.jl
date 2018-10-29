@@ -42,7 +42,7 @@ function generate_data_random_tsp(n::Int)
     coords = [pickups[i].location.coord for i in 1:length(pickups)]
     travel_distance_matrix = generate_symmetric_distance_matrix(coords)
     travel_time_matrix = Array{Float64,2}(undef, 0, 0)
-    depots = [Depot(locations[1], [tw])]
+    depots = [Depot("unique_depot", 1, locations[1], [tw])]
     deliveries = Delivery[]
     shipments = Shipment[]
 
@@ -65,9 +65,10 @@ function generate_random_vehicle_category(n::Int)
     return vehicle_categories
 end
 
-function generate_random_depot(loc_idx::Int)
+function generate_random_depot(loc_idx::Int, depot_idx::Int)
     coord = Coord(rand(1:20), rand(1:20))
-    return Depot(Location(string("depot_", loc_idx), loc_idx, coord),
+    return Depot(string("depot_", depot_idx), depot_idx,
+                 Location(string("depot_", loc_idx), loc_idx, coord),
                  [TimeWindow(rand(1:20), rand(1:20))])
 end
 
@@ -112,7 +113,7 @@ function generate_full_data_random(n::Int)
     problem_id = string("full_random_", rand(1:1000))
     problem_type = ProblemType("FINITE", "HETEROGENEOUS")
     vehicle_categories = generate_random_vehicle_category(2)
-    depots = [generate_random_depot(i) for i in 1:2]
+    depots = [generate_random_depot(i, i) for i in 1:2]
     vehicle_sets = generate_random_vehicle_sets(3, vehicle_categories, depots)
     travel_distance_matrix = Array{Float64,2}(undef, 0, 0)
     travel_time_matrix = Array{Float64,2}(undef, 0, 0)

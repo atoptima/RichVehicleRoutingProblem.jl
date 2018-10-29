@@ -61,15 +61,17 @@ function generate_random_vehicle_category_tests()
 end
 
 function generate_random_depot_tests()
-    depot = RVRP.generate_random_depot(3)
+    depot = RVRP.generate_random_depot(3, 2)
     @test typeof(depot) == RVRP.Depot
+    @test depot.id == "depot_2"
+    @test depot.index == 2
     @test depot.location.index == 3
     @test depot.location.id == "depot_3"
 end
 
 function generate_random_vehicle_sets_tests()
     v_cats = RVRP.generate_random_vehicle_category(2)
-    depots = [RVRP.generate_random_depot(i+1) for i in 1:2]
+    depots = [RVRP.generate_random_depot(i+1, i) for i in 1:2]
     vs = RVRP.generate_random_vehicle_sets(3, v_cats, depots)
     @test length(vs) == 3
     @test eltype(vs) == RVRP.HomogeneousVehicleSet
