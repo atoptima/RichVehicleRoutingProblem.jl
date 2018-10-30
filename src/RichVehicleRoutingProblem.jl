@@ -5,6 +5,7 @@ import JSON
 
 include("RVRP_data.jl")
 include("RVRP_solution.jl")
+include("utils.jl")
 include("data_gen.jl")
 include("parsers.jl")
 

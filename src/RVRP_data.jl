@@ -8,7 +8,7 @@ struct Coord
     y::Float64
 end
 
-struct Location # define: index + distance matrix or Coord
+mutable struct Location # define: index + distance matrix or Coord
     id::String
     index::Int # Not given in JSON
     coord::Coord # optional
@@ -26,14 +26,14 @@ struct UnitPricing
     wait_time_price::Float64
 end
 
-struct Depot
+mutable struct Depot
     id::String
     index::Int # Not given in JSON
     location::Location
     time_windows::Vector{TimeWindow} # optional
 end
 
-struct Pickup
+mutable struct Pickup
     id::String # If its part of a shipment, the id of the shipment
     index::Int # Not given in JSON. If its part of a shipment, the index of the shipment
     location::Location
@@ -42,7 +42,7 @@ struct Pickup
     service_time::Float64 # optional
 end
 
-struct Delivery
+mutable struct Delivery
     id::String # If it is part of a shipment, the id of the shipment
     index::Int # Not given in SON. if it is part of a shipment, the index of the shipment
     location::Location
@@ -51,7 +51,7 @@ struct Delivery
     service_time::Float64 # optional
 end
 
-struct Shipment
+mutable struct Shipment
     id::String
     index::Int # Not given in JSON
     pickup::Pickup
@@ -59,7 +59,7 @@ struct Shipment
     max_duration::Float64
 end
 
-struct VehicleCategory
+mutable struct VehicleCategory
     id::String
     index::Int # Not given in JSON
     fixed_cost::Float64
@@ -67,10 +67,10 @@ struct VehicleCategory
     capacity::Float64
 end
 
-struct HomogeneousVehicleSet # vehicle type in optimization instance.
+mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
     index::Int # Not given in JSON
-    departure_depot_id::String
+    departure_depot_id::String # "": mentionned vehicle start from first action
     arrival_depot_ids::Vector{String}
     departure_depot_index::Int # -1: mentionned vehicle start from first action
     arrival_depot_indices::Vector{Int}
