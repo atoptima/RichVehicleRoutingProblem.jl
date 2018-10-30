@@ -12,21 +12,21 @@ include("parsers.jl")
 abstract type AbstractSolver end
 
 """
-    solve(data::RvrpProblem, solver::AbstractSolver)
+    solve(data::RvrpInstance, solver::AbstractSolver)
 
 Starts the solution procedure.
 """
 function solve end
 
 """
-    transform_solution(data::RvrpProblem, solver::AbstractSolver, solver_sol::Any)
+    transform_solution(data::RvrpInstance, solver::AbstractSolver, solver_sol::Any)
 
 Transforms the solutin outputed by the solver to the RVRP format.
 """
 function transform_solution end
 
 """
-    check_data(data::RvrpProblem, solver::AbstractSolver)
+    check_data(data::RvrpInstance, solver::AbstractSolver)
 
 Checks if the date is compatible with the solver provided.
 """

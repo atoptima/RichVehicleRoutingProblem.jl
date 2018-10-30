@@ -29,8 +29,8 @@ end
 
 function generate_data_random_tsp_tests()
     data = RVRP.generate_data_random_tsp(5)
-    @test typeof(data) == RVRP.RvrpProblem
-    @test data.problem_id[1:11] == "tsp_random_"
+    @test typeof(data) == RVRP.RvrpInstance
+    @test data.id[1:11] == "tsp_random_"
     @test data.problem_type.fleet_size == "FINITE"
     @test data.problem_type.fleet_composition == "HOMOGENEOUS"
     @test length(data.vehicle_categories) == 1
@@ -98,5 +98,5 @@ function generate_full_data_tests()
     @test length(data.pickups) == 3
     @test length(data.deliveries) == 0
     @test length(data.shipments) == 0
-    @test typeof(data) == RVRP.RvrpProblem
+    @test typeof(data) == RVRP.RvrpInstance
 end

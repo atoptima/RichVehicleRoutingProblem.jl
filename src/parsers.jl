@@ -1,5 +1,5 @@
 ################################# JSON Parsers #################################
-function parse_to_json(data::RvrpProblem, file_path::String)
+function parse_to_json(data::RvrpInstance, file_path::String)
     json2_string = JSON2.write(data)
     io = open(file_path, "w")
     write(io, json2_string)
@@ -10,7 +10,7 @@ end
 function parse_from_jason(file_path::String)
     io = open(file_path, "r")
     s = read(io, String)
-    return JSON2.read(s, RvrpProblem)
+    return JSON2.read(s, RvrpInstance)
 end
 
 function parse_json_matrix(vec::Vector{Any})

@@ -58,9 +58,9 @@ function ==(s1::RVRP.Shipment, s2::RVRP.Shipment)
             )
 end
 
-function ==(data1::RVRP.RvrpProblem, data2::RVRP.RvrpProblem)
+function ==(data1::RVRP.RvrpInstance, data2::RVRP.RvrpInstance)
     return (
-        data1.problem_id == data2.problem_id
+        data1.id == data2.id
         && data1.problem_type == data2.problem_type
         && data1.vehicle_categories == data2.vehicle_categories
         && data1.vehicle_sets == data2.vehicle_sets

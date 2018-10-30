@@ -28,7 +28,7 @@ end
 
 function generate_data_random_tsp(n::Int)
     # Generate the points
-    problem_id = string("tsp_random_", rand(1:1000))
+    id = string("tsp_random_", rand(1:1000))
     problem_type = ProblemType("FINITE", "HOMOGENEOUS")
     tw = TimeWindow(0.0, typemax(Int32))
     vc = VehicleCategory("unique_category", 1, 0.0,
@@ -47,7 +47,7 @@ function generate_data_random_tsp(n::Int)
     deliveries = Delivery[]
     shipments = Shipment[]
 
-    return RvrpProblem(problem_id, problem_type, vehicle_categories,
+    return RvrpInstance(id, problem_type, vehicle_categories,
         vehicle_sets, travel_distance_matrix, travel_time_matrix, depots,
         pickups, deliveries, shipments)
 end
@@ -114,7 +114,7 @@ function generate_random_pickups(n::Int, first_loc_idx::Int,
 end
 
 function generate_full_data_random(n::Int)
-    problem_id = string("full_random_", rand(1:1000))
+    id = string("full_random_", rand(1:1000))
     problem_type = ProblemType("FINITE", "HETEROGENEOUS")
     vehicle_categories = generate_random_vehicle_category(2)
     depots = [generate_random_depot(i, i) for i in 1:2]
@@ -125,7 +125,7 @@ function generate_full_data_random(n::Int)
     deliveries = Delivery[]
     shipments = Shipment[]
 
-    return RvrpProblem(problem_id, problem_type, vehicle_categories,
+    return RvrpInstance(id, problem_type, vehicle_categories,
         vehicle_sets, travel_distance_matrix, travel_time_matrix, depots,
         pickups, deliveries, shipments)
 end
