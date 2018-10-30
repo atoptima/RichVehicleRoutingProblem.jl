@@ -9,8 +9,8 @@ struct Coord
 end
 
 struct Location # define: index + distance matrix or Coord
-    id::String # optional
-    index::Int # optional
+    id::String
+    index::Int # Not given in JSON
     coord::Coord # optional
 end
 
@@ -28,14 +28,14 @@ end
 
 struct Depot
     id::String
-    index::Int # there can be several depots
+    index::Int # Not given in JSON
     location::Location
     time_windows::Vector{TimeWindow} # optional
 end
 
 struct Pickup
-    id::String
-    index::Int # if its the pickup of a shipment, the index of the shipment
+    id::String # If its part of a shipment, the id of the shipment
+    index::Int # Not given in JSON. If its part of a shipment, the index of the shipment
     location::Location
     capacity_request::Float64
     time_windows::Vector{TimeWindow} # optional
@@ -43,8 +43,8 @@ struct Pickup
 end
 
 struct Delivery
-    id::String
-    index::Int # if its the delivery of a shipment, the index of the shipment
+    id::String # If it is part of a shipment, the id of the shipment
+    index::Int # Not given in SON. if it is part of a shipment, the index of the shipment
     location::Location
     capacity_request::Float64
     time_windows::Vector{TimeWindow} # optional
@@ -53,7 +53,7 @@ end
 
 struct Shipment
     id::String
-    index::Int
+    index::Int # Not given in JSON
     pickup::Pickup
     delivery::Delivery
     max_duration::Float64
@@ -61,7 +61,7 @@ end
 
 struct VehicleCategory
     id::String
-    index::Int
+    index::Int # Not given in JSON
     fixed_cost::Float64
     unit_pricing::UnitPricing
     capacity::Float64
@@ -69,10 +69,10 @@ end
 
 struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
-    index::Int
+    index::Int # Not given in JSON
     departure_depot_id::String
     arrival_depot_ids::Vector{String}
-    departure_depot_index::Int # If -1 mentionned vehicle start from first action
+    departure_depot_index::Int # -1: mentionned vehicle start from first action
     arrival_depot_indices::Vector{Int}
     vehicle_category::VehicleCategory
     working_time_window::TimeWindow
