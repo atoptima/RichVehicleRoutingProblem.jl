@@ -15,7 +15,7 @@ struct Route
     # path::Path
 end
 
-struct Solution
+struct RvrpSolution
     id::String
     instance_id::String
     cost::Float64
