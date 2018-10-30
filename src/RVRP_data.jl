@@ -82,8 +82,8 @@ struct HomogeneousVehicleSet # vehicle type in optimization instance.
     max_travel_distance::Float64
 end
 
-struct RvrpProblem
-    problem_id::String
+struct RvrpInstance
+    id::String
     problem_type::ProblemType
     vehicle_categories::Vector{VehicleCategory}
     vehicle_sets::Vector{HomogeneousVehicleSet}
