@@ -95,3 +95,11 @@ struct RvrpInstance
     deliveries::Vector{Delivery}
     shipments::Vector{Shipment}
 end
+
+
+mutable struct RvrpDataDicts
+    instance_id::String
+    pickupId2Index::Dict{String, Int}
+    deliveryId2Index::Dict{String, Int}
+    shipmentId2Index::Dict{String, Int}
+end
