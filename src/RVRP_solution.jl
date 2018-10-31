@@ -11,6 +11,7 @@ struct Route
     id::String
     vehicle_set_id::String
     sequence::Vector{Action}
+    end_status::Int # 0 returnToStartDepot, 1 returnToOtherDepot, 2 ongoing
     # TODO: add OSRM path here
     # path::Path
 end
@@ -23,4 +24,5 @@ struct RvrpSolution
     unassigned_pickup_ids::Vector{String}
     unassigned_delivery_ids::Vector{String}
     unassigned_shipment_ids::Vector{String}
+    uncompleted_shipment_ids::Vector{String} # the request is partially fulfilled 
 end

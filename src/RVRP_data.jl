@@ -1,6 +1,7 @@
 struct ProblemType
     fleet_size::String # INFINITE or FINITE
     fleet_composition::String # HOMOGENEOUS or HETEROGENEOUS
+    request_cover::String # PRICECOLLECTING or MANDATORY
 end
 
 struct Coord
@@ -34,18 +35,22 @@ mutable struct Depot
 end
 
 mutable struct Pickup
-    id::String # If its part of a shipment, the id of the shipment
+    id::String # If its part of a shipment, it has is own id anyway
     index::Int # Not given in JSON. If its part of a shipment, the index of the shipment
     location::Location
+    shipment_id::String # NULL if none
+    price_reward::Float64
     capacity_request::Float64
     time_windows::Vector{TimeWindow} # optional
     service_time::Float64 # optional
 end
 
 mutable struct Delivery
-    id::String # If it is part of a shipment, the id of the shipment
+    id::String # If it is part of a shipment,it has is own id anyway
     index::Int # Not given in SON. if it is part of a shipment, the index of the shipment
     location::Location
+    shipment_id::String # NULL if none
+    price_reward::Float64
     capacity_request::Float64
     time_windows::Vector{TimeWindow} # optional
     service_time::Float64 # optional
@@ -54,6 +59,7 @@ end
 mutable struct Shipment
     id::String
     index::Int # Not given in JSON
+    price_reward::Float64
     pickup::Pickup
     delivery::Delivery
     max_duration::Float64
@@ -97,7 +103,7 @@ struct RvrpInstance
 end
 
 
-mutable struct RvrpDataDicts
+mutable struct RvrpComputedData
     instance_id::String
     pickupId2Index::Dict{String, Int}
     deliveryId2Index::Dict{String, Int}
