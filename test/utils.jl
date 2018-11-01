@@ -37,6 +37,8 @@ end
 function ==(n1::T, n2::T) where T <: Union{RVRP.Pickup, RVRP.Delivery}
     return (n1.id == n2.id
             && n1.location == n2.location
+            && n1.shipment_id == n2.shipment_id
+            && n1.price_reward == n2.price_reward
             && n1.capacity_request == n2.capacity_request
             && n1.time_windows == n2.time_windows
             && n1.service_time == n2.service_time
@@ -45,6 +47,7 @@ end
 
 function ==(s1::RVRP.Shipment, s2::RVRP.Shipment)
     return (s1.id == s2.id
+            && s1.price_reward == s2.price_reward
             && s1.pickup == s2.pickup
             && s1.delivery == s2.delivery
             && s1.max_duration == s2.max_duration

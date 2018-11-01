@@ -29,7 +29,7 @@ end
 function generate_data_random_tsp(n::Int)
     # Generate the points
     id = string("tsp_random_", rand(1:1000))
-    problem_type = ProblemType("FINITE", "HOMOGENEOUS")
+    problem_type = ProblemType("FINITE", "HOMOGENEOUS", "MANDATORY")
     tw = TimeWindow(0.0, typemax(Int32))
     vc = VehicleCategory("unique_category", 1, 0.0,
                          UnitPricing(1.0, 0.0, 0.0, 0.0), 0.0)
@@ -105,8 +105,8 @@ function generate_random_pickups(n::Int, first_loc_idx::Int,
         if with_tw
             push!(tws, TimeWindow(rand(1:20), rand(20:25)))
         end
-        p = Pickup(string("pickup_", i), i, loc, rand(load_consumption_bounds),
-                   tws, rand(1:5))
+        p = Pickup(string("pickup_", i), i, loc, "", 0.0,
+                   rand(load_consumption_bounds), tws, rand(1:5))
         push!(pickups, p)
         first_loc_idx += 1
     end
@@ -115,7 +115,7 @@ end
 
 function generate_full_data_random(n::Int)
     id = string("full_random_", rand(1:1000))
-    problem_type = ProblemType("FINITE", "HETEROGENEOUS")
+    problem_type = ProblemType("FINITE", "HETEROGENEOUS", "MANDATORY")
     vehicle_categories = generate_random_vehicle_category(2)
     depots = [generate_random_depot(i, i) for i in 1:2]
     vehicle_sets = generate_random_vehicle_sets(3, vehicle_categories, depots)
