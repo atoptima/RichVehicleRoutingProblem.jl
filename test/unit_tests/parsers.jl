@@ -44,6 +44,8 @@ function parse_cvrplib_tests()
     @test data.vehicle_categories[1].fixed_cost == 0.0
     @test data.vehicle_categories[1].unit_pricing == RVRP.UnitPricing(1.0, 0.0,
                                                                       0.0, 0.0)
+    @test length(data.vehicle_sets) == 1
+    @test data.vehicle_sets[1].max_nb_of_vehicles == 16
     @test length(data.pickups) == 15
     @test length(data.depots) == 1
     @test length(data.deliveries) == 0

@@ -73,7 +73,7 @@ function parse_cvrplib(file_path::String)
                          UnitPricing(1.0, 0.0, 0.0, 0.0), capacity)
     v = HomogeneousVehicleSet("unique_vehicle", 1, "unique_depot",
                               ["unique_depot"], 1, [1], vc, tw,
-                              1, typemax(Int32), typemax(Int32),
+                              1, n, typemax(Int32),
                               typemax(Int32))
     vehicle_categories = [vc]
     vehicle_sets = [v]
