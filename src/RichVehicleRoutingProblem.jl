@@ -1,7 +1,7 @@
 module RichVehicleRoutingProblem
 
 import JSON2
-import JSON
+import Scanner
 
 include("RVRP_data.jl")
 include("RVRP_solution.jl")
