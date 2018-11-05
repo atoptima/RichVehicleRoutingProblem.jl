@@ -16,11 +16,18 @@ struct Route
     # path::Path
 end
 
+struct RVRPfinalState # received as the target end of period situation
+    id::String
+    ongoing_routes::Vector{Route} # holds the backlog of uncompleted requests
+    uncompleted_request_ids::Vector{String} # the request is partially fulfilled 
+end
+
+
 struct RvrpSolution
     id::String
     instance_id::String
     cost::Float64
     routes::Vector{Route}
     unassigned_request_ids::Vector{String}
-    uncompleted_request_ids::Vector{String} # the request is partially fulfilled 
+    final_state::RVRPfinalState  # the request is partially fulfilled 
 end
