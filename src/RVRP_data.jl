@@ -21,13 +21,6 @@ struct UnitPricing
     waiting_time_price::Float64
 end
 
-struct UnitPricing
-    travel_distance_price::Float64
-    travel_time_price::Float64
-    service_time_price::Float64
-    waiting_time_price::Float64
-end
-
 mutable struct Depot
     id::String
     index::Int # Not given in JSON
