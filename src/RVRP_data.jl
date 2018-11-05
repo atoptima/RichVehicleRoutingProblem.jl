@@ -56,8 +56,8 @@ mutable struct Commodity
     id::String 
     index::Int # Not given in JSON. 
     product_id::String
-    sources::Dict{PickupPoint,Float64} # available quantities; undefined if no restrictions, i.e, if available in any PickupPoint in large quantities
-    destinations::Dict{DeliveryPoint,Float64} # capacities; undefined if no restrictions, i.e, if can go to any DeliveryPoint in large quantities
+    sources::Dict{String,Float64} # link PickupPoint ids with available quantities; undefined if no restrictions, i.e, if available in any PickupPoint in large quantities
+    destinations::Dict{String,Float64} # link DeliveryPoint ids with available capacities; undefined if no restrictions, i.e, if can go to any DeliveryPoint in large quantities
 end
 
 mutable struct ShipmentRequest
@@ -67,15 +67,16 @@ mutable struct ShipmentRequest
     commodity_id::String  
     is_optional::Bool  # default is false
     price_reward::Float64 # if is_optional
-    quantity::Float64
+    quantity::Float64 # of the shipment/pickup/delivery
     split_fulfilment::Bool  # default is false
     precedence_restriction::Int # default is 0 = no restriction; 1 after all pure pickups, 2 after all pure deliveries, 3 if cannot follow a product that is in the prohibited predecessor list
-    pickup_points::Vector{PickupPoint} # defined only if it is a subset of commodity sources; singleton for request_type = pickup or pickup&delivery
-    delivery_points::Vector{DeliveryPoint} # defined only if it is a subset of commodity destinations; singleton for request_type = delivery or pickup&delivery
+    pickup_points::Vector{String} # provide the ids of PickupPoints; defined only if it is a subset of commodity sources; singleton for request_type = pickup or pickup&delivery
+    delivery_points::Vector{String} #  provide the ids of DeliveryPoints; defined only if it is a subset of commodity destinations; singleton for request_type = delivery or pickup&delivery
     setup_service_time::Float64 # optional; on top of PickupPoint service_time; used to measure pre-cleaning or loading time for instance
     setdown_service_time::Float64 # optional; on top of DeliveryPoint service_time; used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # used for the dail-a-ride model or similar applications
 end
+
 
 mutable struct VehicleCategory
     id::String
@@ -83,6 +84,7 @@ mutable struct VehicleCategory
     fixed_cost::Float64
     unit_pricing::UnitPricing
     compartment_capacities::Vector{Float64} # the santard case is to have a single compartment
+    prohibited_product_ids::Vector{String}  # if any
 end
 
 mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
