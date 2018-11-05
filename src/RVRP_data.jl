@@ -1,13 +1,3 @@
-struct ProblemType
-#    fleet_size::String # INFINITE or FINITE (=default)
-#    fleet_composition::String # HOMOGENEOUS or HETEROGENEOUS (=default)
-    request_cover::String # PRICECOLLECTING or MANDATORY (=default) or MIXED
-    shipment_model::String # SINGLECOMMODITY or MULTIPLECOMMODITY (=default);
-    # When the requests are only of one type: either all are pickups or all are deliveries; the problem  is a single commodity.
-    split_option::String # SPLITDELIVERY or MONODELIVERY (=default)
-    backhaul_option::String # WITHBACKHAUL or MIXINGPICKUPSANDDELIVERIES (=default)
-end
-
 struct Coord
     x::Float64
     y::Float64
@@ -31,6 +21,13 @@ struct UnitPricing
     waiting_time_price::Float64
 end
 
+struct UnitPricing
+    travel_distance_price::Float64
+    travel_time_price::Float64
+    service_time_price::Float64
+    waiting_time_price::Float64
+end
+
 mutable struct Depot
     id::String
     index::Int # Not given in JSON
@@ -38,41 +35,53 @@ mutable struct Depot
     time_windows::Vector{TimeWindow} # optional
 end
 
-mutable struct Pickup
+mutable struct PickupPoint
     id::String # If its part of a shipment, it has is own id anyway
-    index::Int # Not given in JSON. If its part of a shipment, the index of the shipment
+    index::Int # Not given in JSON. 
     location::Location
-    shipment_id::String # NULL if pure Pickup request
-    product_id::String # optional : required only to implement conflicts
-    conflicting_product_ids::Vector{String}  # optional : required only to implement conflicts
-    price_reward::Float64  # optional : required only to implement the price collection variant
-    quantity::Float64 # the available commodity quantity, or the requested quantity to pickup
     time_windows::Vector{TimeWindow} # optional
-    service_time::Float64 # optional
+    service_time::Float64 # optional; to measure access time for instance
 end
 
-mutable struct Delivery
+
+mutable struct DeliveryPoint
     id::String # If it is part of a shipment,it has is own id anyway
-    index::Int # Not given in SON. if it is part of a shipment, the index of the shipment
+    index::Int # Not given in JSON. 
     location::Location
-    shipment_id::String # NULL if pure Delivery request
-    product_id::String  # optional : required only to implement conflicts
-    conflicting_product_ids::Vector{String}  # optional : required only to implement conflicts
-    price_reward::Float64 # optional : required only to implement the price collection variant
-    quantity::Float64 # the requested commodity quantity, or the available capacity of the delivery point
     time_windows::Vector{TimeWindow} # optional
-    service_time::Float64 # optional
+    service_time::Float64 # optional; to measure access time for instance
 end
 
-mutable struct Shipment
+mutable struct Product
+    id::String 
+    index::Int # Not given in JSON. 
+    conflicting_product_ids::Vector{String} # if any
+    prohibited_predecessor_product_ids::Vector{String}  # if any
+end
+
+mutable struct Commodity
+    id::String 
+    index::Int # Not given in JSON. 
+    product_id::String
+    sources::Dict{PickupPoint,Float64} # available quantities; undefined if no restrictions, i.e, if available in any PickupPoint in large quantities
+    destinations::Dict{DeliveryPoint,Float64} # capacities; undefined if no restrictions, i.e, if can go to any DeliveryPoint in large quantities
+end
+
+mutable struct ShipmentRequest
     id::String
     index::Int # Not given in JSON
-    product_id::String  # optional : required only to implement conflicts
-    conflicting_product_ids::Vector{String}  # optional : required only to implement conflicts
-    price_reward::Float64 # for the PRICECOLLECTING variant
-    pickups::Vector{Pickup} # more than on pickup point is possible, for a single delivery
-    deliveries::Vector{Delivery} # more than on delivery point is possible, for a single pickup
-    max_duration::Float64
+    request_type::Int # 1 = pickup, 2 = delivery, 3 = pickup&delivery, 4 = complex request
+    commodity_id::String  
+    is_optional::Bool  # default is false
+    price_reward::Float64 # if is_optional
+    quantity::Float64
+    split_fulfilment::Bool  # default is false
+    precedence_restriction::Int # default is 0 = no restriction; 1 after all pure pickups, 2 after all pure deliveries, 3 if cannot follow a product that is in the prohibited predecessor list
+    pickup_points::Vector{PickupPoint} # defined only if it is a subset of commodity sources; singleton for request_type = pickup or pickup&delivery
+    delivery_points::Vector{DeliveryPoint} # defined only if it is a subset of commodity destinations; singleton for request_type = delivery or pickup&delivery
+    setup_service_time::Float64 # optional; on top of PickupPoint service_time; used to measure pre-cleaning or loading time for instance
+    setdown_service_time::Float64 # optional; on top of DeliveryPoint service_time; used to measure post-cleaning or unloading time for instance
+    max_duration::Float64 # used for the dail-a-ride model or similar applications
 end
 
 mutable struct VehicleCategory
@@ -94,7 +103,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     working_time_window::TimeWindow
     min_nb_of_vehicles::Int  
     max_nb_of_vehicles::Int
-    max_travel_time::Float64
+    max_working_time::Float64
     max_travel_distance::Float64
 end
 
@@ -106,11 +115,11 @@ struct RvrpInstance
     travel_distance_matrix::Array{Float64,2}
     travel_time_matrix::Array{Float64,2}
     depots::Vector{Depot}
-    # Single-Commodity Requests
-    pickups::Vector{Pickup}
-    deliveries::Vector{Delivery}
-    # Multi-Commodity Requests
-    shipments::Vector{Shipment}
+    pickup_points::Vector{PickupPoints}
+    delivery_points::Vector{DeliveryPoints}
+    products::Vector{Product}
+    commodities::Vector{Commodity}
+    requests::Vector{ShipmentRequest}
 end
 
 
