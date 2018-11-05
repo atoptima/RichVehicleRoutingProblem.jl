@@ -67,6 +67,8 @@ end
 mutable struct Shipment
     id::String
     index::Int # Not given in JSON
+    product_id::String  # optional : required only to implement conflicts
+    conflicting_product_ids::Vector{String}  # optional : required only to implement conflicts
     price_reward::Float64 # for the PRICECOLLECTING variant
     pickups::Vector{Pickup} # more than on pickup point is possible, for a single delivery
     deliveries::Vector{Delivery} # more than on delivery point is possible, for a single pickup
