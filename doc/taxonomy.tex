@@ -1,0 +1,116 @@
+\documentclass[12pt,a4paper]{article}
+%\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{eurosym}
+\usepackage[vlined,algoruled]{algorithm2e}
+%\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{lscape}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usetikzlibrary{arrows,calc,fit,backgrounds,matrix}
+\usetikzlibrary{shapes,positioning}
+%\usetikzlibrary{patterns,decorations.pathreplacing, decorations.pathmorphing}
+\usetikzlibrary{intersections}
+\usepackage{mathtools}
+
+%\newcommand{\N}{\mathbb{N}}
+%\newcommand{\R}{\mathbb{R}}
+\def\R{{\rm I\!R}}
+\def\N{{\rm I\!N}}
+\def\B{ \{0, 1\} }
+%\newcommand{\pkE}{\check{\mathcal{E}}}
+%\newcommand{\cvE}{\hat{\mathcal{E}}}
+%\newcommand{\elE}{\dot{\mathcal{E}}}
+\newcommand{\pkE}{\mathcal{E}^{\leq}}
+\newcommand{\cvE}{\mathcal{E}^{\geq}}
+\newcommand{\elE}{\mathcal{E}^{=}}
+\newcommand{\elEk}{\mathcal{E}^{=,k}}
+
+%\cev definition : \vec with reversed arrow
+\makeatletter
+\DeclareRobustCommand{\cev}[1]{%
+  \mathpalette\do@cev{#1}%
+}
+\newcommand{\do@cev}[2]{%
+  \fix@cev{#1}{+}%
+  \reflectbox{$\m@th#1\vec{\reflectbox{$\fix@cev{#1}{-}\m@th#1#2\fix@cev{#1}{+}$}}$}%
+  \fix@cev{#1}{-}%
+}
+\newcommand{\fix@cev}[2]{%
+  \ifx#1\displaystyle
+    \mkern#23mu
+  \else
+    \ifx#1\textstyle
+      \mkern#23mu
+    \else
+      \ifx#1\scriptstyle
+        \mkern#22mu
+      \else
+        \mkern#22mu
+      \fi
+    \fi
+  \fi
+}
+\makeatother
+\newcommand{\opp}[1]{\mathrlap{\cev{#1}}\vec{#1}}
+
+\newtheorem{observation}{Observation}
+\newtheorem{proposition}{Proposition}
+\newtheorem{Ass}{Assumption}
+\newenvironment{proof}{\paragraph{Proof:}}{\hfill$\square$}
+
+% \hoffset = -2cm
+% \voffset = -2cm
+% \textheight = 26cm
+% \textwidth = 17cm
+
+
+\title{A taxonomy for routing applications}
+
+\author{Atoptima}
+
+\begin{document}
+\maketitle
+
+Routing applications in logistics come in a rich panel of variations. Where possible we consider the most general case that can be accommodated in our generic data structure; for otherwise, we make restrictive assumptions on the problem variant. So, we consider
+\begin{itemize}
+\item a {\bf static and deterministic} problem as opposed to stochastic or with dynamically incoming data a multi period horizon;
+\item {\bf pure routing} decisions as opposed to integration with driver timetabling, stock management or production scheduling; in particular the framework does not implement restrictions due to driver regulations;
+\item a {\bf single route} or trip per period (the extension to the multiple route case is not straightforward);  but
+\item {\bf multiple depots} (single depot being a special case),
+\item {\bf heterogenous vehicle fleet} (a homogenous fleet being a special case),
+\item {\bf bounded number of vehicles} (the unbounded case  being  a special case where the bounds are large enough to induce no restrictions on the problem),
+\item {\bf multiple compartments} in the vehicle (single compartment being a special case).
+
+\end{itemize}
+
+\noindent Regarding the other features, our framework can accommodate several variants:
+\begin{itemize}
+\item \underline{Shipment model:} the transportation requests are  shipments for a origin to a destination; two cases need to be distinguished:
+\begin{enumerate}
+
+\item {\bf Single-commodity:} The goods that are transported are undistinguishable. So a delivery can be done from any pickup point.  When the requests are only of one type: either all are pickups or all are deliveries; then the problem should be understood as a single commodity problem, are there is no need to distinguish the goods.
+
+\item {\bf Multi-commodity:} each "Pickup and Delivery" request is associated with a distinguished commodity: simple deliveries to customers are shipments from a depot, while simple  pickups are shipments  from customer location  to a  depot. While some customer request a pickup, others may request a delivery; or  request a shipments from a specific pickup point and to a specific delivery point. There can be restrictions on the the time lag between pickup and delivery; this is the so dial-a-ride model. The special case where all pickup (resp. delivery) points are the depot, boils down to the simple delivery (resp. pickup) category that can be handled with the single commodity assumption. Unlike the other special case is when shipments come into two classes, either the pickup is at the depot or the delivery is at the depot. Then a  sequencing restriction may apply: all deliveries must be done before any pickup in any route or the other way around; this is the so-called backhauls model. When some goods are replaceable by others, then the associated delivery (resp. pickup) can have a choice of pickup (resp. delivery) points. In particular, in the multi depot case, goods can typically be delivered from (resp. delivered to) several of them.
+
+\end{enumerate}
+\item \underline{Side-features}
+\begin{enumerate}
+\item {\bf Time lag on shipments:}  this is modeled by a max duration for a  shipment as in dial a ride.
+\item {\bf Time Windows:}  can be defined on pickups, deliveries, vehicle availability (f.i. for  driver working day), 
+\item {\bf Sequencing:}  our framework recognize the  backhauls special case
+\item {\bf  Conflicts:}   our framework recognize forbidding products to share a route
+\item {\bf  Splitting-option:} it is on if requests can be fulfilled by different routes.
+\item {\bf  Request-cover:} All request can be mandatory, or they can be optional with a price reward for covering them, or we can mixe these two models.
+\end{enumerate}
+
+\end{itemize}
+
+
+
+
+\end{document} 
