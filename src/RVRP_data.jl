@@ -63,8 +63,8 @@ end
 mutable struct ShipmentRequest
     id::String
     index::Int # Not given in JSON
-    request_type::Int # 1 = pickup, 2 = delivery, 3 = pickup&delivery, 4 = complex_request
-    specific_product_id::String  
+    shipment_type::Int # 1 = pickup, 2 = delivery, 3 = pickup&delivery, 4 = complex_request
+    product_id::String  
     is_optional::Bool  # default is false
     price_reward::Float64 # if is_optional
     product_quantity::Float64 # of the shipment/pickup/delivery
@@ -114,8 +114,8 @@ struct RvrpInstance
     depots::Vector{Depot}
     pickup_points::Vector{PickupPoints}
     delivery_points::Vector{DeliveryPoints}
-    products::Vector{Product}
-    commodities::Vector{Commodity}
+    product_categories::Vector{ProductCategory}
+    products::Vector{SpecificProduct}
     requests::Vector{ShipmentRequest}
 end
 
