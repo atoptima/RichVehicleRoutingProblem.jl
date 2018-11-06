@@ -82,7 +82,7 @@ mutable struct VehicleCategory
     id::String
     index::Int # Not given in JSON
     fixed_cost::Float64
-    unit_pricing::UnitPricing
+    unit_pricing::UnitPrices
     compartment_capacities::Vector{Float64} # the santard case is to have a single compartment
     loading_option::Int # 0 = no restrictions, 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
     prohibited_productCategory_ids::Vector{String}  # if any
@@ -97,7 +97,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     arrival_depot_indices::Vector{Int}
     vehicle_category::VehicleCategory
     working_time_window::TimeWindow
-    min_nb_of_vehicles::Int  
+    min_nb_of_vehicles::Int
     max_nb_of_vehicles::Int
     max_working_time::Float64
     max_travel_distance::Float64
@@ -105,16 +105,15 @@ end
 
 struct RvrpInstance
     id::String
-    problem_type::ProblemType
     vehicle_categories::Vector{VehicleCategory}
     vehicle_sets::Vector{HomogeneousVehicleSet}
     travel_distance_matrix::Array{Float64,2}
     travel_time_matrix::Array{Float64,2}
     depots::Vector{Depot}
-    pickup_points::Vector{PickupPoints}
-    delivery_points::Vector{DeliveryPoints}
-    products::Vector{Product}
-    commodities::Vector{Commodity}
+    pickup_points::Vector{PickupPoint}
+    delivery_points::Vector{DeliveryPoint}
+    products::Vector{ProductCategory}
+    commodities::Vector{SpecificProduct}
     requests::Vector{ShipmentRequest}
 end
 
