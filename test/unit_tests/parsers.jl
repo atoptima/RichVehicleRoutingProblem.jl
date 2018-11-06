@@ -73,14 +73,14 @@ function parse_cvrplib_tests()
     @test data.delivery_points == RVRP.DeliveryPoint[]
 
     @test length(data.products) == 1
+    @test data.product_categories[1].index == 1
+    @test data.product_categories[1].conflicting_product_ids == String[]
+    @test data.product_categories[1].prohibited_predecessor_product_ids == String[]
+    @test length(data.products) == 1
     @test data.products[1].index == 1
-    @test data.products[1].conflicting_product_ids == String[]
-    @test data.products[1].prohibited_predecessor_product_ids == String[]
-    @test length(data.commodities) == 1
-    @test data.commodities[1].index == 1
-    @test data.commodities[1].product_category_id == data.products[1].id
-    @test data.commodities[1].stock_availabitilies_at_pickup_points == Dict{String,Float64}()
-    @test data.commodities[1].stock_capacities_at_delivery_points == Dict{String,Float64}()
+    @test data.products[1].product_category_id == data.product_categories[1].id
+    @test data.products[1].stock_availabitilies_at_pickup_points == Dict{String,Float64}()
+    @test data.products[1].stock_capacities_at_delivery_points == Dict{String,Float64}()
 
     @test length(data.pickup_points) == 15
     @test length(data.requests) == 15

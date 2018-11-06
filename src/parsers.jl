@@ -106,8 +106,10 @@ function parse_cvrplib(file_path::String)
     travel_time_matrix = Array{Float64,2}(undef, 0, 0)
     delivery_points = DeliveryPoint[]
 
-    products = [ProductCategory("unique_product", 1, String[], String[])]
-    commodities = [SpecificProduct(
+    product_categories = [ProductCategory(
+        "unique_product", 1, String[], String[]
+    )]
+    products = [SpecificProduct(
         "unique_specific_product", 1, "unique_product",
         Dict{String,Float64}(), Dict{String,Float64}()
     )]
@@ -120,7 +122,7 @@ function parse_cvrplib(file_path::String)
 
     return RvrpInstance(id, vehicle_categories, vehicle_sets,
            travel_distance_matrix, travel_time_matrix, depots,
-           pickup_points, delivery_points, products, commodities,
+           pickup_points, delivery_points, product_categories, products,
            requests)
 end
 

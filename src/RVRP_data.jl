@@ -113,8 +113,8 @@ struct RvrpInstance
     depots::Vector{Depot}
     pickup_points::Vector{PickupPoint}
     delivery_points::Vector{DeliveryPoint}
-    products::Vector{ProductCategory}
-    commodities::Vector{SpecificProduct}
+    product_categories::Vector{ProductCategory}
+    products::Vector{SpecificProduct}
     requests::Vector{ShipmentRequest}
 end
 

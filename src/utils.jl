@@ -24,11 +24,11 @@ function set_indices(data::RvrpInstance)
         data.depots[depot_idx].index = depot_idx
         depot_id_to_idx[data.depots[depot_idx].id] = depot_idx
     end
-    for pc_idx in 1:length(data.products)
-        data.products[pc_idx].index = pc_idx
+    for pc_idx in 1:length(data.product_categories)
+        data.product_categories[pc_idx].index = pc_idx
     end
-    for commodity_idx in 1:length(data.commodities)
-        data.commodities[commodity_idx].index = commodity_idx
+    for product_idx in 1:length(data.products)
+        data.products[product_idx].index = product_idx
     end
     for vc_idx in 1:length(data.vehicle_categories)
         data.vehicle_categories[vc_idx].index = vc_idx

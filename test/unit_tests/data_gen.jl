@@ -61,8 +61,8 @@ function generate_data_random_tsp_tests()
             @test data.travel_distance_matrix[i,j] == data.travel_distance_matrix[j,i]
         end
     end
+    @test length(data.product_categories) == 1
     @test length(data.products) == 1
-    @test length(data.commodities) == 1
 end
 
 function generate_random_unit_prices()

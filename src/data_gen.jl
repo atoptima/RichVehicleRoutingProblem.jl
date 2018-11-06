@@ -46,8 +46,13 @@ function generate_data_random_tsp(n::Int)
     depots = [Depot("unique_depot", 1, locations[1], [tw])]
     pickup_points = pickup_points[2:end] # the first client is fixed as depot
     delivery_points = DeliveryPoint[]
-    products = [ProductCategory("unique_product", 1, String[], String[])]
-    commodities = [SpecificProduct("unique_specific_product", 1, "unique_product", Dict{String,Float64}(), Dict{String,Float64}())]
+    product_categories = [ProductCategory(
+        "unique_product", 1, String[], String[]
+    )]
+    products = [SpecificProduct(
+        "unique_specific_product", 1, "unique_product",
+        Dict{String,Float64}(), Dict{String,Float64}()
+    )]
     requests = ShipmentRequest[]
     for i in 1:length(pickup_points)
         p = pickup_points[i]
@@ -60,7 +65,7 @@ function generate_data_random_tsp(n::Int)
 
     return RvrpInstance(id, vehicle_categories, vehicle_sets,
            travel_distance_matrix, travel_time_matrix, depots,
-           pickup_points, delivery_points, products, commodities,
+           pickup_points, delivery_points, product_categories, products,
            requests)
 end
 
@@ -135,8 +140,13 @@ function generate_full_data_random(n::Int)
     travel_time_matrix = Array{Float64,2}(undef, 0, 0)
     pickup_points = generate_random_pd_points(PickupPoint, n, 1)
     delivery_points = generate_random_pd_points(DeliveryPoint, n, 1)
-    products = [ProductCategory("unique_product", 1, String[], String[])]
-    commodities = [SpecificProduct("unique_specific_product", 1, "unique_product", Dict{String,Float64}(), Dict{String,Float64}())]
+    product_categories = [ProductCategory(
+        "unique_product", 1, String[], String[]
+    )]
+    products = [SpecificProduct(
+        "unique_specific_product", 1, "unique_product",
+        Dict{String,Float64}(), Dict{String,Float64}()
+    )]
     requests = ShipmentRequest[]
     for i in 1:length(pickup_points)
         p = pickup_points[i]
@@ -160,6 +170,6 @@ function generate_full_data_random(n::Int)
 
     return RvrpInstance(id, vehicle_categories, vehicle_sets,
            travel_distance_matrix, travel_time_matrix, depots,
-           pickup_points, delivery_points, products, commodities,
+           pickup_points, delivery_points, product_categories, products,
            requests)
 end

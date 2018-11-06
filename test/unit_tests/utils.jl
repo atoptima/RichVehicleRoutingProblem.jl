@@ -31,14 +31,16 @@ function set_indices_tests()
     for i in 1:length(data.pickup_points)
         data.pickup_points[i].index = rand(-20:-1)
     end
-    data.products[1] = RVRP.ProductCategory("", -12, String[], String[])
-    data.commodities[1] = RVRP.SpecificProduct("", -8192, "",
-                          Dict{String,Int}(), Dict{String,Int}())
+    data.product_categories[1] = RVRP.ProductCategory("", -12, String[]
+                                                      , String[])
+    data.products[1] = RVRP.SpecificProduct(
+        "", -8192, "", Dict{String,Int}(), Dict{String,Int}()
+    )
     # setting the correct indices back
     RVRP.set_indices(data)
 
+    @test data.product_categories[1].index == 1
     @test data.products[1].index == 1
-    @test data.commodities[1].index == 1
     for i in 1:length(data.pickup_points)
         @test data.pickup_points[i].index == i
     end

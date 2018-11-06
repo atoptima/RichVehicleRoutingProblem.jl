@@ -97,8 +97,8 @@ function ==(data1::RVRP.RvrpInstance, data2::RVRP.RvrpInstance)
         && data1.depots == data2.depots
         && data1.pickup_points == data2.pickup_points
         && data1.delivery_points == data2.delivery_points
+        && data1.product_categories == data2.product_categories
         && data1.products == data2.products
-        && data1.commodities == data2.commodities
         && data1.requests == data2.requests
     )
 end
