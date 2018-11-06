@@ -1,6 +1,6 @@
 function gather_all_locations(data::RvrpInstance)
     all_locations = Set{Location}()
-    for d in data.depots
+    for d in data.depot_points
         push!(all_locations, d.location)
     end
     for p in data.pickup_points
@@ -8,6 +8,9 @@ function gather_all_locations(data::RvrpInstance)
     end
     for d in data.delivery_points
         push!(all_locations, d.location)
+    end
+    for recharging_p in data.recharging_points
+        push!(all_locations, recharging_p.location)
     end
     return all_locations
 end
@@ -20,9 +23,9 @@ function set_indices(data::RvrpInstance)
         loc_idx += 1
     end
     depot_id_to_idx = Dict{String,Int}()
-    for depot_idx in 1:length(data.depots)
-        data.depots[depot_idx].index = depot_idx
-        depot_id_to_idx[data.depots[depot_idx].id] = depot_idx
+    for depot_idx in 1:length(data.depot_points)
+        data.depot_points[depot_idx].index = depot_idx
+        depot_id_to_idx[data.depot_points[depot_idx].id] = depot_idx
     end
     for pc_idx in 1:length(data.product_categories)
         data.product_categories[pc_idx].index = pc_idx
@@ -53,5 +56,8 @@ function set_indices(data::RvrpInstance)
     end
     for r_idx in 1:length(data.requests)
         data.requests[r_idx].index = r_idx
+    end
+    for recharging_p_idx in 1:length(data.recharging_points)
+        data.requests[recharging_p_idx].index = recharging_p_idx
     end
 end

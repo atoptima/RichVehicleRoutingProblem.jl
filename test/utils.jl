@@ -8,11 +8,12 @@ function ==(l1::RVRP.Location, l2::RVRP.Location)
     )
 end
 
-function ==(d1::RVRP.Depot, d2::RVRP.Depot)
+function ==(d1::RVRP.DepotPoint, d2::RVRP.DepotPoint)
     return (
         d1.id == d1.id
         && d1.location == d2.location
         && d1.opening_time_windows == d2.opening_time_windows
+        && d1.access_time == d2.access_time
     )
 end
 
@@ -22,6 +23,8 @@ function ==(vc1::RVRP.VehicleCategory, vc2::RVRP.VehicleCategory)
         && vc1.fixed_cost == vc2.fixed_cost
         && vc1.unit_pricing == vc2.unit_pricing
         && vc1.compartment_capacities == vc2.compartment_capacities
+        && vc1.fuel_capacity == vc2.fuel_capacity
+        && vc1.reloading_time == vc2.reloading_time
         && vc1.loading_option == vc2.loading_option
         && vc1.prohibited_product_category_ids == vc2.prohibited_product_category_ids
     )
@@ -47,7 +50,17 @@ function ==(n1::T, n2::T) where T <: Union{RVRP.PickupPoint, RVRP.DeliveryPoint}
         n1.id == n2.id
         && n1.location == n2.location
         && n1.opening_time_windows == n2.opening_time_windows
-        && n1.service_time == n2.service_time
+        && n1.access_time == n2.access_time
+    )
+end
+
+function ==(n1::RVRP.RechargingPoint, n2::RVRP.RechargingPoint)
+    return (
+        n1.id == n2.id
+        && n1.location == n2.location
+        && n1.opening_time_windows == n2.opening_time_windows
+        && n1.reloading_rate == n2.reloading_rate
+        && n1.access_time == n2.access_time
     )
 end
 
@@ -63,15 +76,14 @@ function ==(specific_p1::RVRP.SpecificProduct, specific_p2::RVRP.SpecificProduct
     return (
         specific_p1.id == specific_p2.id
         && specific_p1.product_category_id == specific_p2.product_category_id
-        && specific_p1.stock_availabitilies_at_pickup_points == specific_p2.stock_availabitilies_at_pickup_points
-        && specific_p1.stock_capacities_at_delivery_points == specific_p2.stock_capacities_at_delivery_points
+        && specific_p1.pickup_availabitilies_at_point_ids == specific_p2.pickup_availabitilies_at_point_ids
+        && specific_p1.delivery_capacities_at_point_ids == specific_p2.delivery_capacities_at_point_ids
     )
 end
 
-function ==(r1::RVRP.ShipmentRequest, r2::RVRP.ShipmentRequest)
+function ==(r1::RVRP.Request, r2::RVRP.Request)
     return (
         r1.id == r2.id
-        && r1.shipment_type == r2.shipment_type
         && r1.product_id == r2.product_id
         && r1.is_optional == r2.is_optional
         && r1.price_reward == r2.price_reward
@@ -81,8 +93,8 @@ function ==(r1::RVRP.ShipmentRequest, r2::RVRP.ShipmentRequest)
         && r1.precedence_restriction == r2.precedence_restriction
         && r1.alternative_pickup_point_ids == r2.alternative_pickup_point_ids
         && r1.alternative_delivery_point_ids == r2.alternative_delivery_point_ids
-        && r1.setup_service_time == r2.setup_service_time
-        && r1.setdown_service_time == r2.setdown_service_time
+        && r1.pickup_service_time == r2.pickup_service_time
+        && r1.delivery_service_time == r2.delivery_service_time
         && r1.max_duration == r2.max_duration
     )
 end
@@ -90,15 +102,17 @@ end
 function ==(data1::RVRP.RvrpInstance, data2::RVRP.RvrpInstance)
     return (
         data1.id == data2.id
-        && data1.vehicle_categories == data2.vehicle_categories
-        && data1.vehicle_sets == data2.vehicle_sets
         && data1.travel_distance_matrix == data2.travel_distance_matrix
         && data1.travel_time_matrix == data2.travel_time_matrix
-        && data1.depots == data2.depots
+        && data1.fuel_consumption_matrix == data2.fuel_consumption_matrix
         && data1.pickup_points == data2.pickup_points
         && data1.delivery_points == data2.delivery_points
+        && data1.depot_points == data2.depot_points
+        && data1.recharging_points == data2.recharging_points
         && data1.product_categories == data2.product_categories
         && data1.products == data2.products
         && data1.requests == data2.requests
+        && data1.vehicle_categories == data2.vehicle_categories
+        && data1.vehicle_sets == data2.vehicle_sets
     )
 end
