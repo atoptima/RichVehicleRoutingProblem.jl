@@ -56,8 +56,8 @@ mutable struct SpecificProduct # an entity to understand as a commodity in a mul
     id::String 
     index::Int # Not given in JSON. 
     product_category_id::String
-    pickup_availabitilies::Dict{String,Float64} # undefined if no restrictions, i.e, if available in any PickupPoint in large quantities
-    delivery_capacities::Dict{String,Float64} # undefined if no restrictions, i.e, if one can deliver to any DeliveryPoint in large quantities
+    stock_availabitilies_at_pickup_points::Dict{String,Float64} # undefined if no restrictions, i.e, if available in any PickupPoint in large quantities
+    stock_capacities_at_delivery_points::Dict{String,Float64} # undefined if no restrictions, i.e, if one can deliver to any DeliveryPoint in large quantities
 end
 
 mutable struct ShipmentRequest
@@ -67,9 +67,9 @@ mutable struct ShipmentRequest
     specific_product_id::String  
     is_optional::Bool  # default is false
     price_reward::Float64 # if is_optional
-    quantity::Float64 # of the shipment/pickup/delivery
-    load_capacity_conso::Float64 # portion of the vehicle load capacity used by the request (can be equal to the quantity)
-    split_fulfillment::Bool  # default is false
+    product_quantity::Float64 # of the shipment/pickup/delivery
+    load_capacity_conso::Float64 # portion of the vehicle load capacity used by the request (it can be equal to the quantity, or different even in terms of unit: volume versus weight for instance).
+    split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_restriction::Int # default is 0 = no restriction; 1 after all pure pickups, 2 after all pure deliveries, 3 if cannot follow a product that is in the prohibited predecessor list
     alternative_pickup_point_ids::Vector{String} # defined only if it is a subset of SpecificProduct pickup sources; it is a singleton for request_type = pickup or pickup&delivery
     alternative_delivery_point_ids::Vector{String} # defined only if it is a subset of SpecificProduct delivery destinations; it is a singleton for request_type = delivery or pickup&delivery
@@ -99,8 +99,9 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     working_time_window::TimeWindow
     min_nb_of_vehicles::Int  
     max_nb_of_vehicles::Int
-    max_working_time::Float64
+    max_working_time::Float64 
     max_travel_distance::Float64
+    allow_ongoing::Bool # true if the vehicle does not need to complete all his deliveries by the end of the time horizon, as they can be completed on the next period.
 end
 
 struct RvrpInstance
