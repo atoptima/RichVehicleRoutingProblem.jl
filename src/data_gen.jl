@@ -15,7 +15,7 @@ end
 
 function generate_symmetric_distance_matrix(locations::Vector{Coord})
     n = length(locations)
-    matrix = Matrix{Float64}(undef, n, n)
+     matrix = Matrix{Float64}(undef, n, n)
     for j in 1:n
         matrix[j,j] = 0.0
         for i in j+1:n
@@ -27,43 +27,45 @@ function generate_symmetric_distance_matrix(locations::Vector{Coord})
 end
 
 function generate_data_random_tsp(n::Int)
-    # Generate the points
     id = string("tsp_random_", rand(1:1000))
-    problem_type = ProblemType("FINITE", "HOMOGENEOUS", "MANDATORY")
     tw = TimeWindow(0.0, typemax(Int32))
-    vc = VehicleCategory("unique_category", 1, 0.0,
-                         UnitPricing(1.0, 0.0, 0.0, 0.0), 0.0)
+    vc = VehicleCategory("unique_category", 1, 0.0, UnitPrices(1.0,0.0,0.0,0.0),
+                         [typemax(Int32)], 0, String[])
     v = HomogeneousVehicleSet("unique_vehicle", 1, "unique_depot",
-                              ["unique_depot"], 1, [1], vc, tw,
-                              1, 1, typemax(Int32), typemax(Int32))
+                              ["unique_depot"], 1, [1], vc, tw, 1, 1,
+                              typemax(Int32), typemax(Int32), false)
     vehicle_categories = [vc]
     vehicle_sets = [v]
-    pickups = generate_random_pickups(n, 1, 0:0)
-    locations = [pickups[i].location for i in 1:length(pickups)]
-    coords = [pickups[i].location.coord for i in 1:length(pickups)]
+
+    pickup_points = generate_random_pd_points(PickupPoint, n, 1)
+
+    locations = [pickup_points[i].location for i in 1:length(pickup_points)]
+    coords = [pickup_points[i].location.coord for i in 1:length(pickup_points)]
     travel_distance_matrix = generate_symmetric_distance_matrix(coords)
     travel_time_matrix = Array{Float64,2}(undef, 0, 0)
     depots = [Depot("unique_depot", 1, locations[1], [tw])]
-    deliveries = Delivery[]
-    shipments = Shipment[]
-
-    return RvrpInstance(id, problem_type, vehicle_categories,
-        vehicle_sets, travel_distance_matrix, travel_time_matrix, depots,
-        pickups, deliveries, shipments)
-end
-
-function generate_random_unit_pricing()
-    return UnitPricing(rand(1:100, 4)...)
-end
-
-function generate_random_vehicle_category(n::Int)
-    vehicle_categories = VehicleCategory[]
-    pricing = generate_random_unit_pricing()
-    for i in 1:n
-        vc = VehicleCategory(string("cat_", i), i, rand(), pricing, rand(3:10))
-        push!(vehicle_categories, vc)
+    pickup_points = pickup_points[2:end] # the first client is fixed as depot
+    delivery_points = DeliveryPoint[]
+    products = [ProductCategory("unique_product", 1, String[], String[])]
+    commodities = [SpecificProduct("unique_specific_product", 1, "unique_product", Dict{String,Float64}(), Dict{String,Float64}())]
+    requests = ShipmentRequest[]
+    for i in 1:length(pickup_points)
+        p = pickup_points[i]
+        req = ShipmentRequest(string("client_", p.index), i, 1,
+              "unique_specific_product",
+              false, 0.0, 0.0, 0.0, false, 0, [string("PickupPoint_", p.index)],
+              String[], 0.0, 0.0, typemax(Int32))
+        push!(requests, req)
     end
-    return vehicle_categories
+
+    return RvrpInstance(id, vehicle_categories, vehicle_sets,
+           travel_distance_matrix, travel_time_matrix, depots,
+           pickup_points, delivery_points, products, commodities,
+           requests)
+end
+
+function generate_random_unit_prices()
+    return UnitPrices(rand(1:100, 4)...)
 end
 
 function generate_random_depot(loc_idx::Int, depot_idx::Int)
@@ -71,6 +73,17 @@ function generate_random_depot(loc_idx::Int, depot_idx::Int)
     return Depot(string("depot_", depot_idx), depot_idx,
                  Location(string("depot_", loc_idx), loc_idx, coord),
                  [TimeWindow(rand(1:20), rand(1:20))])
+end
+
+function generate_random_vehicle_category(n::Int)
+    vehicle_categories = VehicleCategory[]
+    price = generate_random_unit_prices()
+    for i in 1:n
+        vc = VehicleCategory(string("cat_", i), i, rand(), price,
+                             [typemax(Int32)], 0, String[])
+        push!(vehicle_categories, vc)
+    end
+    return vehicle_categories
 end
 
 function generate_random_vehicle_sets(n::Int, categs::Vector{VehicleCategory},
@@ -88,44 +101,65 @@ function generate_random_vehicle_sets(n::Int, categs::Vector{VehicleCategory},
                                   depot_id, [depot_id],
                                   depot_idx, [depot_idx],
                                   categs[rand(1:length(categs))], tw, 1, 1,
-                                  typemax(Int32), typemax(Int32))
+                                  typemax(Int32), typemax(Int32), false)
         push!(vs, v)
     end
     return vs
 end
 
-function generate_random_pickups(n::Int, first_loc_idx::Int,
-                                 load_consumption_bounds::UnitRange{Int64};
-                                 with_tw = false)
-    pickups = Pickup[]
+function generate_random_pd_points(point_type::T, n::Int, first_loc_idx::Int;
+         with_tw = false) where T <: Union{Type{PickupPoint}, Type{DeliveryPoint}}
+    points = point_type[]
+    prefix = string(point_type)
     for i in 1:n
         coord = Coord(rand(1:20), rand(1:20))
         loc = Location(string("loc_", first_loc_idx), first_loc_idx, coord)
-        tws = TimeWindow[]
-        if with_tw
-            push!(tws, TimeWindow(rand(1:20), rand(20:25)))
+        if !with_tw
+            tws = TimeWindow[TimeWindow(0, typemax(Int32))]
+        else
+            tws = TimeWindow[TimeWindow(rand(1:20), rand(20:25))]
         end
-        p = Pickup(string("pickup_", i), i, loc, "", 0.0,
-                   rand(load_consumption_bounds), tws, rand(1:5))
-        push!(pickups, p)
+        p = point_type(string(prefix, "_", i), i, loc, tws, 0.0)
+        push!(points, p)
         first_loc_idx += 1
     end
-    return pickups
+    return points
 end
 
 function generate_full_data_random(n::Int)
     id = string("full_random_", rand(1:1000))
-    problem_type = ProblemType("FINITE", "HETEROGENEOUS", "MANDATORY")
     vehicle_categories = generate_random_vehicle_category(2)
     depots = [generate_random_depot(i, i) for i in 1:2]
     vehicle_sets = generate_random_vehicle_sets(3, vehicle_categories, depots)
     travel_distance_matrix = Array{Float64,2}(undef, 0, 0)
     travel_time_matrix = Array{Float64,2}(undef, 0, 0)
-    pickups = generate_random_pickups(n, 3, 1:3)
-    deliveries = Delivery[]
-    shipments = Shipment[]
+    pickup_points = generate_random_pd_points(PickupPoint, n, 1)
+    delivery_points = generate_random_pd_points(DeliveryPoint, n, 1)
+    products = [ProductCategory("unique_product", 1, String[], String[])]
+    commodities = [SpecificProduct("unique_specific_product", 1, "unique_product", Dict{String,Float64}(), Dict{String,Float64}())]
+    requests = ShipmentRequest[]
+    for i in 1:length(pickup_points)
+        p = pickup_points[i]
+        req = ShipmentRequest(string("client_", p.index), i, 1,
+              "unique_specific_product",
+              false, 0.0, 0.0, 0.0, false, 0, [string("PickupPoint_", p.index)],
+              String[], 0.0, 0.0, typemax(Int32))
+        push!(requests, req)
+    end
+    for i in 1:length(delivery_points)
+        d = delivery_points[i]
+        req = ShipmentRequest(
+            string("client_", d.index + length(pickup_points)),
+            i + length(pickup_points), 2,
+            "unique_specific_product",
+            false, 0.0, 0.0, 0.0, false, 0, String[],
+            [string("DeliveryPoint_", d.index)],
+            0.0, 0.0, typemax(Int32))
+        push!(requests, req)
+    end
 
-    return RvrpInstance(id, problem_type, vehicle_categories,
-        vehicle_sets, travel_distance_matrix, travel_time_matrix, depots,
-        pickups, deliveries, shipments)
+    return RvrpInstance(id, vehicle_categories, vehicle_sets,
+           travel_distance_matrix, travel_time_matrix, depots,
+           pickup_points, delivery_points, products, commodities,
+           requests)
 end

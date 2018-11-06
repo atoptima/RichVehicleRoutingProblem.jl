@@ -3,15 +3,11 @@ function gather_all_locations(data::RvrpInstance)
     for d in data.depots
         push!(all_locations, d.location)
     end
-    for p in data.pickups
+    for p in data.pickup_points
         push!(all_locations, p.location)
     end
-    for d in data.deliveries
+    for d in data.delivery_points
         push!(all_locations, d.location)
-    end
-    for s in data.shipments
-        push!(all_locations, s.pickup.location)
-        push!(all_locations, s.delivery.location)
     end
     return all_locations
 end
@@ -28,6 +24,12 @@ function set_indices(data::RvrpInstance)
         data.depots[depot_idx].index = depot_idx
         depot_id_to_idx[data.depots[depot_idx].id] = depot_idx
     end
+    for pc_idx in 1:length(data.products)
+        data.products[pc_idx].index = pc_idx
+    end
+    for commodity_idx in 1:length(data.commodities)
+        data.commodities[commodity_idx].index = commodity_idx
+    end
     for vc_idx in 1:length(data.vehicle_categories)
         data.vehicle_categories[vc_idx].index = vc_idx
     end
@@ -43,13 +45,13 @@ function set_indices(data::RvrpInstance)
             push!(data.vehicle_sets[vs_idx].arrival_depot_indices, depot_id_to_idx[data.vehicle_sets[vs_idx].arrival_depot_ids[arrival_idx]])
         end
     end
-    for p_idx in 1:length(data.pickups)
-        data.pickups[p_idx].index = p_idx
+    for p_idx in 1:length(data.pickup_points)
+        data.pickup_points[p_idx].index = p_idx
     end
-    for d_idx in 1:length(data.deliveries)
-        data.deliveries[d_idx].index = d_idx
+    for d_idx in 1:length(data.delivery_points)
+        data.delivery_points[d_idx].index = d_idx
     end
-    for s_idx in 1:length(data.shipments)
-        data.shipments[s_idx].index = s_idx
+    for r_idx in 1:length(data.requests)
+        data.requests[r_idx].index = r_idx
     end
 end

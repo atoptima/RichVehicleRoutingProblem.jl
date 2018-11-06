@@ -63,8 +63,8 @@ end
 mutable struct ShipmentRequest
     id::String
     index::Int # Not given in JSON
-    request_type::Int # 1 = pickup, 2 = delivery, 3 = pickup&delivery, 4 = complex_request
-    specific_product_id::String  
+    shipment_type::Int # 1 = pickup, 2 = delivery, 3 = pickup&delivery, 4 = complex_request
+    product_id::String  
     is_optional::Bool  # default is false
     price_reward::Float64 # if is_optional
     product_quantity::Float64 # of the shipment/pickup/delivery
@@ -85,7 +85,7 @@ mutable struct VehicleCategory
     unit_pricing::UnitPrices
     compartment_capacities::Vector{Float64} # the santard case is to have a single compartment
     loading_option::Int # 0 = no restrictions, 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
-    prohibited_productCategory_ids::Vector{String}  # if any
+    prohibited_product_category_ids::Vector{String}  # if any
 end
 
 mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
