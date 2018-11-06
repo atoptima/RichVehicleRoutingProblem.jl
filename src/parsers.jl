@@ -36,13 +36,17 @@ function parse_to_json(data::RvrpInstance, file_path::String)
     close(io)
 end
 
+function parse_from_json_string(s::String)
+    data = JSON2.read(s, RvrpInstance)
+    set_indices(data)
+    return data
+end
+
 function parse_from_json(file_path::String)
     io = open(file_path, "r")
     s = read(io, String)
     close(io)
-    data = JSON2.read(s, RvrpInstance)
-    set_indices(data)
-    return data
+    return parse_from_json_string(s)
 end
 
 
