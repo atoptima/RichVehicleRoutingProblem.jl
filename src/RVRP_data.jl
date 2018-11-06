@@ -92,6 +92,7 @@ struct UnitPrices # cost per unit
     travel_time_price::Float64
     service_time_price::Float64
     waiting_time_price::Float64
+    recharging_time_price::Float64
 end
 
 mutable struct VehicleCategory
@@ -101,7 +102,7 @@ mutable struct VehicleCategory
     unit_pricing::UnitPrices
     compartment_capacities::Vector{Float64} # the santard case is to have a single compartment
     fuel_capacity::Float64
-    reloading_time::Float64
+    reloading_time::Float64 # note that the vehicle can cumulate several nominal reloading_time for a larger charge
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
     prohibited_product_category_ids::Vector{String}  # if any
 end
