@@ -1,80 +1,0 @@
-
-RVRP_data.jl,904
-struct CoordCoord1,0
-mutable struct LocationLocation6,48
-struct TimeWindowTimeWindow12,155
-mutable struct PickupPointPickupPoint17,224
-mutable struct DeliveryPointDeliveryPoint25,476
-mutable struct DepotPoint # location to start or end a route; a depot can also act as a Pickup oDepotPoint33,731
-mutable struct RechargingPointRechargingPoint41,1016
-mutable struct ProductCategoryProductCategory50,1368
-mutable struct SpecificProduct # an entity to understand as a commodity in a multi-commodity floSpecificProduct57,1575
-mutable struct Request # can beRequest65,2185
-struct UnitPrices # cost per unitUnitPrices90,4212
-mutable struct VehicleCategoryVehicleCategory97,4381
-mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.HomogeneousVehicleSet109,4923
-struct RvrpInstanceRvrpInstance126,5686
-mutable struct RvrpComputedDataRvrpComputedData142,6236
-
-RVRP_solution.jl,92
-struct ActionAction3,51
-struct RouteRoute10,256
-struct RvrpSolutionRvrpSolution18,473
-
-RichVehicleRoutingProblem.jl,250
-module RichVehicleRoutingProblemRichVehicleRoutingProblem1,0
-abstract type AbstractSolver endAbstractSolver13,182
-function solve endsolve20,310
-function transform_solution endtransform_solution27,489
-function check_data endcheck_data34,649
-
-data_gen.jl,842
-function generate_symmetric_distance_matrix(n::Int)generate_symmetric_distance_matrix1,0
-function generate_symmetric_distance_matrix(locations::Vector{Coord})generate_symmetric_distance_matrix16,418
-function generate_random_pd_points(point_type::T, n::Int, first_loc_idx::Int;generate_random_pd_points29,827
-function generate_data_random_tsp(n::Int)generate_data_random_tsp48,1504
-function generate_random_unit_prices()generate_random_unit_prices91,3540
-function generate_random_depot(loc_idx::Int, depot_idx::Int)generate_random_depot95,3625
-function generate_random_vehicle_category(n::Int)generate_random_vehicle_category102,3928
-function generate_random_vehicle_sets(n::Int, categs::Vector{VehicleCategory},generate_random_vehicle_sets113,4308
-function generate_full_data_random(n::Int)generate_full_data_random134,5046
-
-parsers.jl,150
-function parse_to_json(data::RvrpInstance, file_path::String)parse_to_json40,752
-function parse_from_json(file_path::String)parse_from_json47,935
-
-utils.jl,135
-function gather_all_locations(data::RvrpInstance)gather_all_locations1,0
-function set_indices(data::RvrpInstance)set_indices18,467
-
-../test/runtests.jl,0
-
-../test/unit_tests/RVRP_data.jl,57
-function rvrp_data_unit_tests()rvrp_data_unit_tests1,0
-
-../test/unit_tests/RVRP_solution.jl,65
-function rvrp_solution_unit_tests()rvrp_solution_unit_tests1,0
-
-../test/unit_tests/data_gen.jl,725
-function data_gen_unit_tests()data_gen_unit_tests1,0
-function generate_symmetric_distance_matrix_tests()generate_symmetric_distance_matrix_tests14,345
-function generate_random_pd_points_tests()generate_random_pd_points_tests30,882
-function generate_data_random_tsp_tests()generate_data_random_tsp_tests47,1388
-function generate_random_unit_prices()generate_random_unit_prices84,2890
-function generate_random_depot_tests()generate_random_depot_tests89,3024
-function generate_random_vehicle_category_tests()generate_random_vehicle_category_tests98,3292
-function generate_random_vehicle_sets_tests()generate_random_vehicle_sets_tests104,3480
-function generate_full_data_tests()generate_full_data_tests118,4028
-
-../test/unit_tests/parsers.jl,172
-function parsers_unit_tests()parsers_unit_tests1,0
-function parse_to_json_tests()parse_to_json_tests7,113
-function parse_from_json_tests()parse_from_json_tests16,416
-
-../test/unit_tests/unit_tests.jl,39
-function unit_tests()unit_tests8,141
-
-../test/unit_tests/utils.jl,173
-function utils_unit_tests()utils_unit_tests1,0
-function gather_all_locations_tests()gather_all_locations_tests6,90
-function set_indices_tests()set_indices_tests22,807

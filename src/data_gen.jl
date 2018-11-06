@@ -48,8 +48,9 @@ end
 function generate_data_random_tsp(n::Int)
     id = string("tsp_random_", rand(1:1000))
     tw = TimeWindow(0.0, typemax(Int32))
-    vc = VehicleCategory("unique_category", 1, 0.0, UnitPrices(1.0,0.0,0.0,0.0),
-                         [typemax(Int32)], typemax(Int32), 0.0, 0, String[])
+    vc = VehicleCategory(
+        "unique_category", 1, 0.0, UnitPrices(1.0, 0.0, 0.0, 0.0, 0.0),
+        [typemax(Int32)], typemax(Int32), 0.0, 0, String[])
     v = HomogeneousVehicleSet("unique_vehicle", 1, "unique_depot",
                               ["unique_depot"], 1, [1], vc, tw, 0.0, 1, 1,
                               typemax(Int32), typemax(Int32), false)
@@ -89,7 +90,7 @@ function generate_data_random_tsp(n::Int)
 end
 
 function generate_random_unit_prices()
-    return UnitPrices(rand(1:100, 4)...)
+    return UnitPrices(rand(1:100, 5)...)
 end
 
 function generate_random_depot(loc_idx::Int, depot_idx::Int)
