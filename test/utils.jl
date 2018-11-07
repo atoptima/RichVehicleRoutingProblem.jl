@@ -23,8 +23,8 @@ function ==(vc1::RVRP.VehicleCategory, vc2::RVRP.VehicleCategory)
         && vc1.fixed_cost == vc2.fixed_cost
         && vc1.unit_pricing == vc2.unit_pricing
         && vc1.compartment_capacities == vc2.compartment_capacities
-        && vc1.fuel_capacity == vc2.fuel_capacity
-        && vc1.reloading_time == vc2.reloading_time
+        && vc1.primary_energy_capacity == vc2.primary_energy_capacity
+        && vc1.secondary_energy_capacity == vc2.secondary_energy_capacity
         && vc1.loading_option == vc2.loading_option
         && vc1.prohibited_product_category_ids == vc2.prohibited_product_category_ids
     )
@@ -37,6 +37,7 @@ function ==(v1::RVRP.HomogeneousVehicleSet, v2::RVRP.HomogeneousVehicleSet)
         && v1.arrival_depot_ids == v2.arrival_depot_ids
         && v1.vehicle_category == v2.vehicle_category
         && v1.working_time_window == v2.working_time_window
+        && v1.initial_energy_charge == v2.initial_energy_charge
         && v1.min_nb_of_vehicles == v2.min_nb_of_vehicles
         && v1.max_nb_of_vehicles == v2.max_nb_of_vehicles
         && v1.max_working_time == v2.max_working_time
@@ -104,7 +105,7 @@ function ==(data1::RVRP.RvrpInstance, data2::RVRP.RvrpInstance)
         data1.id == data2.id
         && data1.travel_distance_matrix == data2.travel_distance_matrix
         && data1.travel_time_matrix == data2.travel_time_matrix
-        && data1.fuel_consumption_matrix == data2.fuel_consumption_matrix
+        && data1.energy_consumption_matrix == data2.energy_consumption_matrix
         && data1.pickup_points == data2.pickup_points
         && data1.delivery_points == data2.delivery_points
         && data1.depot_points == data2.depot_points

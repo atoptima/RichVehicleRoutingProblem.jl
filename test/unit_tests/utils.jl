@@ -11,7 +11,8 @@ function gather_all_locations_tests()
     p1 = RVRP.PickupPoint("", 1, l2, RVRP.TimeWindow[], 0.0)
     p2 = RVRP.PickupPoint("", 1, l1, RVRP.TimeWindow[], 0.0)
     d = RVRP.DeliveryPoint("", 1, l1, RVRP.TimeWindow[], 0.0)
-    recharging_p = RVRP.RechargingPoint("", 1, l3, 0.0, RVRP.TimeWindow[], 0.0)
+    recharging_p = RVRP.RechargingPoint("", 1, l3, 0.0, 0.0,
+                                        RVRP.TimeWindow[], 0.0)
     push!(data.pickup_points, p1)
     push!(data.pickup_points, p2)
     push!(data.delivery_points, d)
@@ -27,7 +28,8 @@ function set_indices_tests()
     p1 = RVRP.PickupPoint("", 1, l2, RVRP.TimeWindow[], 0.0)
     p2 = RVRP.PickupPoint("", 1, l1, RVRP.TimeWindow[], 0.0)
     d = RVRP.DeliveryPoint("", 1, l1, RVRP.TimeWindow[], 0.0)
-    recharging_p = RVRP.RechargingPoint("", 1, l3, 0.0, RVRP.TimeWindow[], 0.0)
+    recharging_p = RVRP.RechargingPoint("", 1, l3, 0.0, 0.0,
+                                        RVRP.TimeWindow[], 0.0)
     req = RVRP.Request(
         "", -13, "", false, 0.0, 0.0, 0.0, false, 0, String[], String[],
         0.0, 0.0, typemax(Int32)
