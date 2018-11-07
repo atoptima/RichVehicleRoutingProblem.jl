@@ -5,7 +5,7 @@ end
 
 mutable struct Location
     id::String
-    index::Int # Not given in JSON
+    index::Int # Not given in the JSON input, but internally defined by the algorithm
     coord::Coord # optional
 end
 
@@ -38,7 +38,9 @@ end
 mutable struct RechargingPoint
     id::String # If it is part of a shipment,it has is own id anyway
     location::Location
-    energy_recharging_times::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines times associated to primary, secondary, ... recharge doses; the vehicle can start directly with the secondary dose if his remaining charge is above the primary dose level. To model a concave function (as expected for battery charge), the primary charging is at a higher rate than the secondary, etc.
+    fixed_cost::Float64
+    energy_unit_cost::Float64
+    energy_recharging_rates::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines recharging-time rate associated to primary, secondary, ... recharge intervals; the vehicle can start directly with the secondary interval if his remaining charge is above the primary interval threshold. To model a concave function (as expected for battery charge), the primary charging rate is higher  than the secondary rate, etc.
     opening_time_windows::Vector{TimeWindow} # optional
     access_time::Float64 # optional 
 end
@@ -73,8 +75,8 @@ mutable struct Request # can be
     compartment_capacity_consumption::Float64 # portion of the vehicle compartment capacity used by the request (it can be equal to the quantity, or different even in terms of unit: volume versus weight for instance).
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_restriction::Int # default is 0 = no restriction; 1 after all pickups, 2 after all deliveries, 3 if cannot follow a product that is in the prohibited predecessor list; 
-    alternative_pickup_point_ids::Vector{String} # defined only if it is a subset of SpecificProduct pickup options; empty otherwise
-    alternative_delivery_point_ids::Vector{String} # defined only if it is a subset of SpecificProduct delivery options; empty otherwise
+    alternative_pickup_point_ids::Vector{String} # nonempty only if it defines the request; it is not supposed to duplicate the pickup options information contained in SpecificProduct
+    alternative_delivery_point_ids::Vector{String} # nonempty only if it defines the request; it is not supposed to duplicate the delivery options information contained in SpecificProduct
     pickup_service_time::Float64 # optional; on top of PickupPoint service_time; used to measure pre-cleaning or loading time for instance
     delivery_service_time::Float64 # optional; on top of DeliveryPoint service_time; used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # used for the dail-a-ride model or similar applications
@@ -92,7 +94,7 @@ mutable struct VehicleCategory
     fixed_cost::Float64
     unit_pricing::UnitPrices
     compartment_capacities::Vector{Float64} # the stantard case is to have a single compartment
-    energy_recharges::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines primary, secondary, .. recharges doses
+    energy_recharge_intervals::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines primary, secondary, ... recharge interval thresholds
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
     prohibited_product_category_ids::Vector{String}  # if any
 end
