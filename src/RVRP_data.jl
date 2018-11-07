@@ -82,17 +82,13 @@ mutable struct Request # can be
     max_duration::Float64 # used for the dail-a-ride model or similar applications
 end
 
-struct UnitPrices # cost per unit
-    travel_distance_price::Float64
-    travel_time_price::Float64
-    service_time_price::Float64
-    waiting_time_price::Float64
-end
-
 mutable struct VehicleCategory
     id::String
     fixed_cost::Float64
-    unit_pricing::UnitPrices
+    travel_distance_unit_price::Float64
+    travel_time_unit_price::Float64
+    service_time_unit_price::Float64
+    waiting_time_unit_price::Float64
     compartment_capacities::Vector{Float64} # the stantard case is to have a single compartment
     energy_recharge_intervals::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines primary, secondary, ... recharge interval thresholds
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
