@@ -72,11 +72,13 @@
 \title{A data-structure covering a large scope of \\ the taxonomy for routing applications}
 
 \author{Atoptima}
-
+\date{An open standard}
 \begin{document}
 \maketitle
 
 Routing applications in logistics come in a rich panel of variations. Where possible, we consider the most general case that can be accommodated in our generic data structure; for otherwise, we make restrictive assumptions on the problem variant. \\
+
+\section{Restrictive Assumptions}
 
 \noindent So, we make the following \underline{restrictions}, we consider:
 \begin{itemize}
@@ -84,6 +86,8 @@ Routing applications in logistics come in a rich panel of variations. Where poss
 \item {\bf pure routing} decisions as opposed to integration with driver timetabling, inventory-management, production scheduling; in particular the framework does not implement restrictions due to driver regulation or packing placement issues, such as  a 3D positioning in the vehicle (such issue are not trivial); in both suc case only surrogate relaxation of such constraint can be incorporated;
 \item a {\bf single route} within the time horizon (the extension to the multiple route case is not straightforward).
 \end{itemize}
+
+\section{A large scope of problem Variant}
 
 \noindent But our framework includes the following \underline{extentions} of the basic problem:
 \begin{itemize}
@@ -100,12 +104,207 @@ Routing applications in logistics come in a rich panel of variations. Where poss
 When some goods are replaceable by others, then the associated delivery (resp. pickup) can have a choice of pickup (resp. delivery) points. So a complex request may be defined that involves several alternative pickup-point and/or several alternative delivery points. This complexity can make specific sense along with the split quantity option. In particular, in the multi depot case, goods can typically be delivered from (resp. delivered to) several of them. Our shipment-request model allows us to mix single-commodity and multi-commodity types. 
 \item {\bf  service-times:} we distinguish access time and pickup or delivery points, pickup time and delivery time, the sum making up the service time.
 \item {\bf multiple compartments} in the vehicle (single compartment being a special case), with loading mode option. For instance, one can model a restriction of one request per compartment for liquid transportation; then, the request can be accommodated only if the compartment capacity is larger than the request capacity requirement. Or a vehicle can have a trailer; then both the vehicle and the trailer have a maximum weight capacity, while each request has its own weight. 
-\item {\bf Rechargeable vehicle} at recharging station (we assume a linear recharging rate).
+\item {\bf Rechargeable vehicle:} Recharging electric battery or any kind of fuel is possible at recharging stations. We assume a pice-wise linear concave recharging rate where the entry level depends on the remaining vehicle charge. To modle it, each vehicle has  	vector of charging doses (primary, secondary , etc);  while the charging station as a vector of charging times to achieve each of these doses; the primary charging being at a higher rate than the secondary etc.
 
 \end{itemize}
 
-\noindent 
 
+\appendix
+\section{Data Structure}
+
+\subsection{Inputs}
+
+\begin{verbatim}
+
+struct Coord
+    x::Float64
+    y::Float64
+end
+
+mutable struct Location
+    id::String
+    index::Int # Not given in JSON
+    coord::Coord # optional
+end
+
+struct TimeWindow
+    begin_time::Float64
+    end_time::Float64
+end
+
+mutable struct PickupPoint
+    id::String # If its part of a shipment, it has is own id anyway
+    index::Int # Not given in JSON. 
+    location::Location
+    opening_time_windows::Vector{TimeWindow} # optional
+    access_time::Float64 # optional
+end
+
+mutable struct DeliveryPoint
+    id::String # If it is part of a shipment,it has is own id anyway
+    index::Int # Not given in JSON. 
+    location::Location
+    opening_time_windows::Vector{TimeWindow} # optional
+    access_time::Float64 # optional
+end
+
+mutable struct DepotPoint # location to start or end a route; a depot can also act as a Pickup or a Delivery Point
+    id::String
+    index::Int # Not given in JSON
+    location::Location
+    opening_time_windows::Vector{TimeWindow} # optional
+    access_time::Float64 # optional
+end
+
+mutable struct RechargingPoint
+    id::String # If it is part of a shipment,it has is own id anyway
+    index::Int # Not given in JSON. 
+    location::Location
+    energy_recharging_times::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines times associated to primary, secondary, ... recharge doses; the vehicle can start directly with the secondary dose if his remaining charge is above the primary dose level. To model a concave function (as expected for battery charge), the primary charging is at a higher rate than the secondary, etc.
+    opening_time_windows::Vector{TimeWindow} # optional
+    access_time::Float64 # optional 
+end
+
+mutable struct ProductCategory
+    id::String 
+    index::Int # Not given in JSON. 
+    conflicting_product_ids::Vector{String} # if any
+    prohibited_predecessor_product_ids::Vector{String}  # if any
+end
+
+mutable struct SpecificProduct # an entity to understand as a commodity in a multi-commodity flow problem
+    id::String 
+    index::Int # Not given in JSON. 
+    product_category_id::String
+    pickup_availabitilies_at_point_ids::Dict{String,Float64} # pickups can be either at a PickupPoint or a DepotPoint; Dict undefined if no restriction, i.e, if available in large quantities at any point.
+    delivery_capacities_at_point_ids::Dict{String,Float64} # deliveries can be either at a DeliveryPoint or a DepotPoint; Dict undefined if no restriction, i.e, if can deliver to any point in large quantities
+end
+
+mutable struct Request # can be
+    # a specific product shipment from a depot to a DeliveryPoint, or
+    # a specific product shipment from a PickupPoint to a depot, or
+    # a delivery to a DeliveryPoint of a product that is not specific to this delivery and was loaded potentially from several different PickupPoints, or
+    # a pickup from a PickupPoint of a product that is not specific to this pickup and will be unloaded potentially at several different DeliveryPoints, or
+    # a specific product shipment from a specific PickupPoint to a specific DeliveryPoint, or
+    # a specific product shipment from one of several PickupPoints to a specific DeliveryPoint, or
+    # a specific product shipment from a specific PickupPoints to one of several DeliveryPoints, or
+    # a specific product shipment from one of several PickupPoints to one of several DeliveryPoints.
+    id::String
+    index::Int # Not given in JSON
+    product_id::String  
+    is_optional::Bool  # default is false
+    price_reward::Float64 # if is_optional
+    product_quantity::Float64 # of the shipment
+    compartment_capacity_conso::Float64 # portion of the vehicle compartment capacity used by the request (it can be equal to the quantity, or different even in terms of unit: volume versus weight for instance).
+    split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
+    precedence_restriction::Int # default is 0 = no restriction; 1 after all pickups, 2 after all deliveries, 3 if cannot follow a product that is in the prohibited predecessor list; 
+    alternative_pickup_point_ids::Vector{String} # defined only if it is a subset of SpecificProduct pickup options; empty otherwise
+    alternative_delivery_point_ids::Vector{String} # defined only if it is a subset of SpecificProduct delivery options; empty otherwise
+    pickup_service_time::Float64 # optional; on top of PickupPoint service_time; used to measure pre-cleaning or loading time for instance
+    delivery_service_time::Float64 # optional; on top of DeliveryPoint service_time; used to measure post-cleaning or unloading time for instance
+    max_duration::Float64 # used for the dail-a-ride model or similar applications
+end
+
+struct UnitPrices # cost per unit
+    travel_distance_price::Float64
+    travel_time_price::Float64
+    service_time_price::Float64
+    waiting_time_price::Float64
+    recharging_time_price::Float64
+end
+
+mutable struct VehicleCategory
+    id::String
+    index::Int # Not given in JSON
+    fixed_cost::Float64
+    unit_pricing::UnitPrices
+    compartment_capacities::Vector{Float64} # the stantard case is to have a single compartment
+    energy_recharges::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines primary, secondary, .. recharges doses
+    loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
+    prohibited_product_category_ids::Vector{String}  # if any
+end
+
+mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
+    id::String
+    index::Int # Not given in JSON
+    departure_depot_id::String # "": mentionned vehicle start from first action
+    arrival_depot_ids::Vector{String}
+    departure_depot_index::Int # -1: mentionned vehicle start from first action
+    arrival_depot_indices::Vector{Int}
+    vehicle_category::VehicleCategory
+    working_time_window::TimeWindow
+    initial_energy_charge::Float64
+    min_nb_of_vehicles::Int
+    max_nb_of_vehicles::Int
+    max_working_time::Float64 
+    max_travel_distance::Float64
+    allow_ongoing::Bool # true if these vehicles routes are open, and the vehicles do not need to complete all their requests by the end of the planning
+end
+
+struct RvrpInstance
+    id::String
+    travel_distance_matrix::Array{Float64,2}
+    travel_time_matrix::Array{Float64,2}
+    energy_consumption_matrix::Array{Float64,2}
+    pickup_points::Vector{PickupPoint}
+    delivery_points::Vector{DeliveryPoint}
+    depot_points::Vector{DepotPoint}
+    recharging_points::Vector{RechargingPoint}
+    product_categories::Vector{ProductCategory}
+    products::Vector{SpecificProduct}
+    requests::Vector{Request}
+    vehicle_categories::Vector{VehicleCategory}
+    vehicle_sets::Vector{HomogeneousVehicleSet}
+end
+\end{verbatim}
+
+
+
+
+\subsection{Computed auxiliary data}
+\begin{verbatim}
+mutable struct RvrpComputedData
+    instance_id::String
+    pickup_id2Index::Dict{String, Int}
+    delivery_id2Index::Dict{String, Int}
+    depot_id2Index::Dict{String, Int}
+    recharging_id2Index::Dict{String, Int}
+    product_category_id2Index::Dict{String, Int}
+    product_id2Index::Dict{String, Int}
+    request_id2Index::Dict{String, Int}
+    vehicle_category_id2Index::Dict{String, Int}
+    vehicle_set_id2Index::Dict{String, Int}
+end
+\end{verbatim}
+
+
+\subsection{output}
+
+\begin{verbatim}
+# To use the solution, the input data is required
+struct Action
+    id::String
+    action_type::Int # 0- Depot, 1 - Pickup, 2 - Delivery, 3 - otherOperation
+    operation_id::String #  associated request or depot id
+    scheduled_start_time::Float64
+end
+
+struct Route
+    id::String
+    vehicle_set_id::String
+    sequence::Vector{Action}
+    end_status::Int # 0 returnToStartDepot, 1 returnToOtherDepot, 2 ongoing
+    # path::OSRMpath     # TODO: add OSRM path here
+end
+
+struct RvrpSolution
+    id::String
+    instance_id::String
+    cost::Float64
+    routes::Vector{Route}
+    unassigned_request_ids::Vector{String}
+end
+\end{verbatim}
 
 
 \end{document} 

@@ -42,8 +42,7 @@ mutable struct RechargingPoint
     id::String # If it is part of a shipment,it has is own id anyway
     index::Int # Not given in JSON. 
     location::Location
-    recharging_time_to_first_level::Float64 # time it takes to recharge the energy from empty to first_level 
-    recharging_time_to_second_level::Float64 # time it takes to recharge the energy from first_level to second_level
+    energy_recharging_times::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines times associated to primary, secondary, ... recharge doses; the vehicle can start directly with the secondary dose if his remaining charge is above the primary dose level. To model a concave function (as expected for battery charge), the primary charging is at a higher rate than the secondary, etc.
     opening_time_windows::Vector{TimeWindow} # optional
     access_time::Float64 # optional 
 end
@@ -68,7 +67,7 @@ mutable struct Request # can be
     # a specific product shipment from a PickupPoint to a depot, or
     # a delivery to a DeliveryPoint of a product that is not specific to this delivery and was loaded potentially from several different PickupPoints, or
     # a pickup from a PickupPoint of a product that is not specific to this pickup and will be unloaded potentially at several different DeliveryPoints, or
-    # a specific product shipment for a specific PickupPoint to a  specific DeliveryPoint, or
+    # a specific product shipment from a specific PickupPoint to a specific DeliveryPoint, or
     # a specific product shipment from one of several PickupPoints to a specific DeliveryPoint, or
     # a specific product shipment from a specific PickupPoints to one of several DeliveryPoints, or
     # a specific product shipment from one of several PickupPoints to one of several DeliveryPoints.
@@ -78,7 +77,7 @@ mutable struct Request # can be
     is_optional::Bool  # default is false
     price_reward::Float64 # if is_optional
     product_quantity::Float64 # of the shipment
-    load_capacity_conso::Float64 # portion of the vehicle load capacity used by the request (it can be equal to the quantity, or different even in terms of unit: volume versus weight for instance).
+    compartment_capacity_conso::Float64 # portion of the vehicle compartment capacity used by the request (it can be equal to the quantity, or different even in terms of unit: volume versus weight for instance).
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_restriction::Int # default is 0 = no restriction; 1 after all pickups, 2 after all deliveries, 3 if cannot follow a product that is in the prohibited predecessor list; 
     alternative_pickup_point_ids::Vector{String} # defined only if it is a subset of SpecificProduct pickup options; empty otherwise
@@ -102,8 +101,7 @@ mutable struct VehicleCategory
     fixed_cost::Float64
     unit_pricing::UnitPrices
     compartment_capacities::Vector{Float64} # the stantard case is to have a single compartment
-    recharging_first_level::Float64 # amount of energy defining the first energy level of the energy capacity
-    recharging_second_level::Float64 # amount of energy defining the deltat between the first and the second energy level of the energy capacity
+    energy_recharges::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines primary, secondary, .. recharges doses
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
     prohibited_product_category_ids::Vector{String}  # if any
 end
