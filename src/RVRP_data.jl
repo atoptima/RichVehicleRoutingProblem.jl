@@ -14,7 +14,7 @@ struct TimeWindow
     end_time::Float64
 end
 
-mutable struct ActionPoint # can be a Depot, Pickup, Delivery, Recharging, or any other action
+mutable struct ActionAtPoint # can be a Depot, Pickup, Delivery, Recharging, or any other action
     id::String
     location::Location
     opening_time_windows::Vector{TimeWindow} # optional
@@ -24,9 +24,9 @@ mutable struct ActionPoint # can be a Depot, Pickup, Delivery, Recharging, or an
     energy_recharging_rates::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines recharging-time rate associated to primary, secondary, ... recharge intervals; the vehicle can start directly with the secondary interval if his remaining charge is above the primary interval threshold. To model a concave function (as expected for battery charge), the primary charging rate is higher  than the secondary rate, etc , if any recharging at the point
 end
 
-mutable struct PointsGroup # to identify a set of ActionPoints with some commonalities, such as all possible Pickups for a product.
+mutable struct PointsGroup # to identify a set of ActionAtPoints with some commonalities, such as all possible Pickups for a product.
     id::String
-    group::Vector{ActionPoint}
+    group::Vector{ActionAtPoint}
 end
 
 
@@ -39,8 +39,8 @@ end
 mutable struct SpecificProduct # an entity to understand as a commodity in a multi-commodity flow problem
     id::String 
     product_category_id::String
-    pickup_availabitilies_at_point_ids::Dict{String,Float64} # pickups are ActionPoint; Dict undefined if no restriction, i.e, if available in large quantities at any point.
-    delivery_capacities_at_point_ids::Dict{String,Float64} # deliveries are ActionPoint; Dict undefined if no restriction, i.e, if can deliver to any point in large quantities
+    pickup_availabitilies_at_point_ids::Dict{String,Float64} # pickups are ActionAtPoint; Dict undefined if no restriction, i.e, if available in large quantities at any point.
+    delivery_capacities_at_point_ids::Dict{String,Float64} # deliveries are ActionAtPoint; Dict undefined if no restriction, i.e, if can deliver to any point in large quantities
 end
 
 mutable struct Request # can be
@@ -60,8 +60,8 @@ mutable struct Request # can be
     compartment_capacity_consumption::Float64 # portion of the vehicle compartment capacity used by the request (it can be equal to the quantity, or different even in terms of unit: volume versus weight for instance).
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_restriction::Int # default is 0 = no restriction; 1 after all pickups, 2 after all deliveries, 3 if cannot follow a product that is in the prohibited predecessor list; 
-    pickup_id_or_group_of_alterantives::String # nonempty only if it defines the request, can be the id of a ActionPoint or a PointsGroup
-    delivery_id_or_group_of_alterantives::String # nonempty only if it defines the request, can be the id of a ActionPoint or a PointsGroup
+    pickup_id_or_group_of_alterantives::String # nonempty only if it defines the request, can be the id of a ActionAtPoint or a PointsGroup
+    delivery_id_or_group_of_alterantives::String # nonempty only if it defines the request, can be the id of a ActionAtPoint or a PointsGroup
     pickup_service_time::Float64 # optional; on top of PickupPoint service_time; used to measure pre-cleaning or loading time for instance
     delivery_service_time::Float64 # optional; on top of DeliveryPoint service_time; used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # used for the dail-a-ride model or similar applications
@@ -100,7 +100,7 @@ struct RvrpInstance
     travel_time_matrix::Array{Float64,2}
     energy_consumption_matrix::Array{Float64,2}
     locations::Vector{Location}
-    action_points::Vector{ActionPoint}
+    action_points::Vector{ActionAtPoint}
     product_categories::Vector{ProductCategory}
     products::Vector{SpecificProduct}
     requests::Vector{Request}
@@ -110,10 +110,10 @@ end
 
 mutable struct RvrpComputedData
     instance_id::String
-    pickup_points::Vector{ActionPoint}
-    delivery_points::Vector{ActionPoint}
-    depot_points::Vector{ActionPoint}
-    recharging_points::Vector{ActionPoint}
+    pickup_points::Vector{ActionAtPoint}
+    delivery_points::Vector{ActionAtPoint}
+    depot_points::Vector{ActionAtPoint}
+    recharging_points::Vector{ActionAtPoint}
     pickup_id2Index::Dict{String, Int}
     delivery_id2Index::Dict{String, Int}
     depot_id2Index::Dict{String, Int}
