@@ -23,8 +23,7 @@ function ==(vc1::RVRP.VehicleCategory, vc2::RVRP.VehicleCategory)
         && vc1.fixed_cost == vc2.fixed_cost
         && vc1.unit_pricing == vc2.unit_pricing
         && vc1.compartment_capacities == vc2.compartment_capacities
-        && vc1.primary_energy_capacity == vc2.primary_energy_capacity
-        && vc1.secondary_energy_capacity == vc2.secondary_energy_capacity
+        && vc1.energy_recharges == vc2.energy_recharges
         && vc1.loading_option == vc2.loading_option
         && vc1.prohibited_product_category_ids == vc2.prohibited_product_category_ids
     )
@@ -33,7 +32,7 @@ end
 function ==(v1::RVRP.HomogeneousVehicleSet, v2::RVRP.HomogeneousVehicleSet)
     return (
         v1.id == v2.id
-        && v1.departure_depot_id == v2.departure_depot_id
+        && v1.departure_depot_ids == v2.departure_depot_ids
         && v1.arrival_depot_ids == v2.arrival_depot_ids
         && v1.vehicle_category == v2.vehicle_category
         && v1.working_time_window == v2.working_time_window
@@ -60,7 +59,7 @@ function ==(n1::RVRP.RechargingPoint, n2::RVRP.RechargingPoint)
         n1.id == n2.id
         && n1.location == n2.location
         && n1.opening_time_windows == n2.opening_time_windows
-        && n1.reloading_rate == n2.reloading_rate
+        && n1.energy_recharging_times == n3.energy_recharging_times
         && n1.access_time == n2.access_time
     )
 end
@@ -89,7 +88,7 @@ function ==(r1::RVRP.Request, r2::RVRP.Request)
         && r1.is_optional == r2.is_optional
         && r1.price_reward == r2.price_reward
         && r1.product_quantity == r2.product_quantity
-        && r1.load_capacity_conso == r2.load_capacity_conso
+        && r1.compartment_capacity_consumption == r2.compartment_capacity_consumption
         && r1.split_fulfillment == r2.split_fulfillment
         && r1.precedence_restriction == r2.precedence_restriction
         && r1.alternative_pickup_point_ids == r2.alternative_pickup_point_ids
@@ -106,6 +105,7 @@ function ==(data1::RVRP.RvrpInstance, data2::RVRP.RvrpInstance)
         && data1.travel_distance_matrix == data2.travel_distance_matrix
         && data1.travel_time_matrix == data2.travel_time_matrix
         && data1.energy_consumption_matrix == data2.energy_consumption_matrix
+        && data1.locations == data2.locations
         && data1.pickup_points == data2.pickup_points
         && data1.delivery_points == data2.delivery_points
         && data1.depot_points == data2.depot_points

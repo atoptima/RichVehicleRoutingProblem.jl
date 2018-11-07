@@ -49,9 +49,9 @@ function generate_data_random_tsp(n::Int)
     id = string("tsp_random_", rand(1:1000))
     tw = TimeWindow(0.0, typemax(Int32))
     vc = VehicleCategory(
-        "unique_category", 1, 0.0, UnitPrices(1.0, 0.0, 0.0, 0.0, 0.0),
-        [typemax(Int32)], typemax(Int32), typemax(Int32), 0, String[])
-    v = HomogeneousVehicleSet("unique_vehicle", 1, "unique_depot",
+        "unique_category", 1, 0.0, UnitPrices(1.0, 0.0, 0.0, 0.0),
+        [typemax(Int32)], [typemax(Int32)], 0, String[])
+    v = HomogeneousVehicleSet("unique_vehicle", 1, ["unique_depot"],
                               ["unique_depot"], 1, [1], vc, tw, 0.0, 1, 1,
                               typemax(Int32), typemax(Int32), false)
     vehicle_categories = [vc]
@@ -84,14 +84,14 @@ function generate_data_random_tsp(n::Int)
     recharging_points = RechargingPoint[]
     return RvrpInstance(
         id, travel_distance_matrix, travel_time_matrix,
-        energy_consumption_matrix, pickup_points, delivery_points,
+        energy_consumption_matrix, locations, pickup_points, delivery_points,
         depot_points, recharging_points, product_categories, products,
         requests, vehicle_categories, vehicle_sets
     )
 end
 
 function generate_random_unit_prices()
-    return UnitPrices(rand(1:100, 5)...)
+    return UnitPrices(rand(1:100, 4)...)
 end
 
 function generate_random_depot(loc_idx::Int, depot_idx::Int)
@@ -105,9 +105,9 @@ function generate_random_vehicle_category(n::Int)
     vehicle_categories = VehicleCategory[]
     price = generate_random_unit_prices()
     for i in 1:n
-          vc = VehicleCategory(
-              string("cat_", i), i, rand(), price, [typemax(Int32)],
-              typemax(Int32), typemax(Int32), 0, String[])
+        vc = VehicleCategory(
+            string("cat_", i), i, rand(), price, [typemax(Int32)],
+            [typemax(Int32)], 0, String[])
         push!(vehicle_categories, vc)
     end
     return vehicle_categories
@@ -125,7 +125,7 @@ function generate_random_vehicle_sets(n::Int, categs::Vector{VehicleCategory},
         depot_idx = rand(1:length(depot_points))
         depot_id = depot_points[depot_idx].id
         v = HomogeneousVehicleSet(
-            string("set_", i), i, depot_id, [depot_id], depot_idx, [depot_idx],
+            string("set_", i), i, [depot_id], [depot_id], depot_idx, [depot_idx],
             categs[rand(1:length(categs))], tw, 0.0, 1, 1, typemax(Int32),
             typemax(Int32), false
         )
@@ -173,7 +173,7 @@ function generate_full_data_random(n::Int)
     recharging_points = RechargingPoint[]
     return RvrpInstance(
         id, travel_distance_matrix, travel_time_matrix, energy_consumption_matrix,
-        pickup_points, delivery_points, depot_points, recharging_points,
+        Location[], pickup_points, delivery_points, depot_points, recharging_points,
         product_categories, products, requests, vehicle_categories, vehicle_sets
     )
 end

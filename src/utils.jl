@@ -38,10 +38,10 @@ function set_indices(data::RvrpInstance)
     end
     for vs_idx in 1:length(data.vehicle_sets)
         data.vehicle_sets[vs_idx].index = vs_idx
-        if data.vehicle_sets[vs_idx].departure_depot_id == ""
+        if data.vehicle_sets[vs_idx].departure_depot_ids == Int[]
             data.vehicle_sets[vs_idx].departure_depot_index = -1
         else
-            data.vehicle_sets[vs_idx].departure_depot_index = depot_id_to_idx[data.vehicle_sets[vs_idx].departure_depot_id]
+            data.vehicle_sets[vs_idx].departure_depot_index = depot_id_to_idx[data.vehicle_sets[vs_idx].departure_depot_ids[1]]
         end
         for arrival_idx in 1:length(data.vehicle_sets[vs_idx].arrival_depot_ids)
             data.vehicle_sets[vs_idx].arrival_depot_indices = Int[]

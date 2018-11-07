@@ -42,17 +42,16 @@ function parse_cvrplib_tests()
     @test data.vehicle_categories[1].index == 1
     @test data.vehicle_categories[1].fixed_cost == 0.0
     @test data.vehicle_categories[1].unit_pricing == RVRP.UnitPrices(1.0, 0.0,
-                                                          0.0, 0.0, 0.0)
+                                                                     0.0, 0.0)
     @test data.vehicle_categories[1].compartment_capacities == [typemax(Int32)]
-    @test data.vehicle_categories[1].primary_energy_capacity == typemax(Int32)
-    @test data.vehicle_categories[1].secondary_energy_capacity == typemax(Int32)
+    @test data.vehicle_categories[1].energy_recharges == []
     @test data.vehicle_categories[1].loading_option == 0
     @test data.vehicle_categories[1].prohibited_product_category_ids == String[]
     @test length(data.vehicle_sets) == 1
     @test data.vehicle_sets[1].index == 1
     @test data.vehicle_sets[1].departure_depot_index == 1
     @test data.vehicle_sets[1].arrival_depot_indices == [1]
-    @test data.vehicle_sets[1].departure_depot_id == data.vehicle_sets[1].arrival_depot_ids[1]
+    @test data.vehicle_sets[1].departure_depot_ids == [data.vehicle_sets[1].arrival_depot_ids[1]]
     @test data.vehicle_sets[1].vehicle_category == data.vehicle_categories[1]
     @test data.vehicle_sets[1].working_time_window == tw
     @test data.vehicle_sets[1].min_nb_of_vehicles == 1
@@ -97,7 +96,7 @@ function parse_cvrplib_tests()
         @test p.access_time == 0.0
         @test r.is_optional == false
         @test r.price_reward == 0.0
-        @test r.product_quantity == r.load_capacity_conso
+        @test r.product_quantity == r.compartment_capacity_consumption
         @test r.split_fulfillment == false
         @test r.precedence_restriction == 0
         @test r.alternative_pickup_point_ids == [p.id]

@@ -59,7 +59,7 @@ function generate_data_random_tsp_tests()
         @test req.index == i
         @test req.is_optional == false
         @test req.price_reward == 0.0
-        @test req.load_capacity_conso == 0.0
+        @test req.compartment_capacity_consumption == 0.0
         @test req.split_fulfillment == false
         @test req.precedence_restriction == 0
         @test req.alternative_pickup_point_ids == [string("PickupPoint_", i+1)]

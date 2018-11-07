@@ -16,7 +16,6 @@ end
 
 mutable struct PickupPoint
     id::String # If its part of a shipment, it has is own id anyway
-    index::Int # Not given in JSON. 
     location::Location
     opening_time_windows::Vector{TimeWindow} # optional
     access_time::Float64 # optional
@@ -24,7 +23,6 @@ end
 
 mutable struct DeliveryPoint
     id::String # If it is part of a shipment,it has is own id anyway
-    index::Int # Not given in JSON. 
     location::Location
     opening_time_windows::Vector{TimeWindow} # optional
     access_time::Float64 # optional
@@ -32,7 +30,6 @@ end
 
 mutable struct DepotPoint # location to start or end a route; a depot can also act as a Pickup or a Delivery Point
     id::String
-    index::Int # Not given in JSON
     location::Location
     opening_time_windows::Vector{TimeWindow} # optional
     access_time::Float64 # optional
@@ -40,7 +37,6 @@ end
 
 mutable struct RechargingPoint
     id::String # If it is part of a shipment,it has is own id anyway
-    index::Int # Not given in JSON. 
     location::Location
     energy_recharging_times::Vector{Float64} # to model a piecewise linear recharging curve, this vector defines times associated to primary, secondary, ... recharge doses; the vehicle can start directly with the secondary dose if his remaining charge is above the primary dose level. To model a concave function (as expected for battery charge), the primary charging is at a higher rate than the secondary, etc.
     opening_time_windows::Vector{TimeWindow} # optional
@@ -49,14 +45,12 @@ end
 
 mutable struct ProductCategory
     id::String 
-    index::Int # Not given in JSON. 
     conflicting_product_ids::Vector{String} # if any
     prohibited_predecessor_product_ids::Vector{String}  # if any
 end
 
 mutable struct SpecificProduct # an entity to understand as a commodity in a multi-commodity flow problem
     id::String 
-    index::Int # Not given in JSON. 
     product_category_id::String
     pickup_availabitilies_at_point_ids::Dict{String,Float64} # pickups can be either at a PickupPoint or a DepotPoint; Dict undefined if no restriction, i.e, if available in large quantities at any point.
     delivery_capacities_at_point_ids::Dict{String,Float64} # deliveries can be either at a DeliveryPoint or a DepotPoint; Dict undefined if no restriction, i.e, if can deliver to any point in large quantities
@@ -72,12 +66,11 @@ mutable struct Request # can be
     # a specific product shipment from a specific PickupPoints to one of several DeliveryPoints, or
     # a specific product shipment from one of several PickupPoints to one of several DeliveryPoints.
     id::String
-    index::Int # Not given in JSON
     product_id::String  
     is_optional::Bool  # default is false
     price_reward::Float64 # if is_optional
     product_quantity::Float64 # of the shipment
-    compartment_capacity_conso::Float64 # portion of the vehicle compartment capacity used by the request (it can be equal to the quantity, or different even in terms of unit: volume versus weight for instance).
+    compartment_capacity_consumption::Float64 # portion of the vehicle compartment capacity used by the request (it can be equal to the quantity, or different even in terms of unit: volume versus weight for instance).
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_restriction::Int # default is 0 = no restriction; 1 after all pickups, 2 after all deliveries, 3 if cannot follow a product that is in the prohibited predecessor list; 
     alternative_pickup_point_ids::Vector{String} # defined only if it is a subset of SpecificProduct pickup options; empty otherwise
@@ -92,12 +85,10 @@ struct UnitPrices # cost per unit
     travel_time_price::Float64
     service_time_price::Float64
     waiting_time_price::Float64
-    recharging_time_price::Float64
 end
 
 mutable struct VehicleCategory
     id::String
-    index::Int # Not given in JSON
     fixed_cost::Float64
     unit_pricing::UnitPrices
     compartment_capacities::Vector{Float64} # the stantard case is to have a single compartment
@@ -108,11 +99,8 @@ end
 
 mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
-    index::Int # Not given in JSON
-    departure_depot_id::String # "": mentionned vehicle start from first action
-    arrival_depot_ids::Vector{String}
-    departure_depot_index::Int # -1: mentionned vehicle start from first action
-    arrival_depot_indices::Vector{Int}
+    departure_depot_ids::Vector{String} # []: Mentionned vehicle starts from first action
+    arrival_depot_ids::Vector{String} # []: Open routes
     vehicle_category::VehicleCategory
     working_time_window::TimeWindow
     initial_energy_charge::Float64
@@ -128,6 +116,7 @@ struct RvrpInstance
     travel_distance_matrix::Array{Float64,2}
     travel_time_matrix::Array{Float64,2}
     energy_consumption_matrix::Array{Float64,2}
+    locations::Vector{Location}
     pickup_points::Vector{PickupPoint}
     delivery_points::Vector{DeliveryPoint}
     depot_points::Vector{DepotPoint}
