@@ -42,8 +42,8 @@ mutable struct RechargingPoint
     id::String # If it is part of a shipment,it has is own id anyway
     index::Int # Not given in JSON. 
     location::Location
-    recharging_time_to_first_level::Float64 # time it takes to recharge the energy from empty to first_level 
-    recharging_time_to_second_level::Float64 # time it takes to recharge the energy from first_level to second_level
+    primary_recharging_time::Float64 # time it takes to recharge the energy from empty to first_level 
+    secondary_recharging_time::Float64 # time it takes to recharge the energy from first_level to second_level
     opening_time_windows::Vector{TimeWindow} # optional
     access_time::Float64 # optional 
 end
@@ -102,8 +102,8 @@ mutable struct VehicleCategory
     fixed_cost::Float64
     unit_pricing::UnitPrices
     compartment_capacities::Vector{Float64} # the stantard case is to have a single compartment
-    recharging_first_level::Float64 # amount of energy defining the first energy level of the energy capacity
-    recharging_second_level::Float64 # amount of energy defining the deltat between the first and the second energy level of the energy capacity
+    primary_energy_capacity::Float64 # amount of energy defining the first energy level of the energy capacity
+    secondary_energy_capacity::Float64 # amount of energy defining the delta between the first and the second energy level of the energy capacity
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
     prohibited_product_category_ids::Vector{String}  # if any
 end

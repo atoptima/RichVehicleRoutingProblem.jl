@@ -44,7 +44,8 @@ function parse_cvrplib_tests()
     @test data.vehicle_categories[1].unit_pricing == RVRP.UnitPrices(1.0, 0.0,
                                                           0.0, 0.0, 0.0)
     @test data.vehicle_categories[1].compartment_capacities == [typemax(Int32)]
-    @test data.vehicle_categories[1].reloading_time == 0.0
+    @test data.vehicle_categories[1].primary_energy_capacity == typemax(Int32)
+    @test data.vehicle_categories[1].secondary_energy_capacity == typemax(Int32)
     @test data.vehicle_categories[1].loading_option == 0
     @test data.vehicle_categories[1].prohibited_product_category_ids == String[]
     @test length(data.vehicle_sets) == 1

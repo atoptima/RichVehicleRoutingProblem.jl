@@ -78,7 +78,7 @@ function parse_cvrplib(file_path::String)
     tw = TimeWindow(0.0, typemax(Int32))
       vc = VehicleCategory(
           "unique_category", 1, 0.0, UnitPrices(1.0, 0.0, 0.0, 0.0, 0.0),
-          [typemax(Int32)], typemax(Int32), 0.0, 0, String[])
+          [typemax(Int32)], typemax(Int32), typemax(Int32), 0, String[])
     v = HomogeneousVehicleSet(
         "unique_vehicle", 1, "unique_depot", ["unique_depot"], 1, [1], vc, tw,
         0.0, 1, n, typemax(Int32), typemax(Int32), false
@@ -103,7 +103,7 @@ function parse_cvrplib(file_path::String)
         travel_distance_matrix[i,j] = round(travel_distance_matrix[i,j],
                                             RoundingMode{:Nearest}())
     end
-    travel_time_matrix = fuel_consumption_matrix = Array{Float64,2}(undef, 0, 0)
+    travel_time_matrix = energy_consumption_matrix = Array{Float64,2}(undef, 0, 0)
     delivery_points = DeliveryPoint[]
 
     product_categories = [ProductCategory(
@@ -122,7 +122,7 @@ function parse_cvrplib(file_path::String)
 
     recharging_points = RechargingPoint[]
     return RvrpInstance(
-        id, travel_distance_matrix, travel_time_matrix, fuel_consumption_matrix,
+        id, travel_distance_matrix, travel_time_matrix, energy_consumption_matrix,
         pickup_points, delivery_points, depot_points, recharging_points,
         product_categories, products, requests, vehicle_categories, vehicle_sets
     )
