@@ -10,12 +10,12 @@ mutable struct OperationPoint # can be a Depot, Pickup, Delivery, Recharging, ..
     y_coord::Float64
     opening_time_windows::Vector{TimeWindow}
     access_time::Float64
-    energy_fixed_cost::Float64 # for entry fee, if any
-    energy_unit_cost::Float64 # for recharging cost per unit of energy, if any<<<<<<< HEAD
-    energy_recharging_speeds::Vector{Float64} # at index i, the i-th energy interval recharging speed (energy_units per time_unit). Empty if no recharing in this point.
+    energy_fixed_cost::Float64 # an entry fee, if any
+    energy_unit_cost::Float64 # recharging cost per unit of energy, if any
+    energy_recharging_speeds::Vector{Float64} # if recharging in this point: the i-th seep is associted to the i^th energy interval defined for the vehicle
 end
 
-mutable struct OperationGroup # to identify a set of operation points with some commonalities, such as all possible Pickup Points for a product.
+mutable struct OperationGroup # to identify a set of operation points with some commonalities, such as all possible pickups for a request.
     id::String
     operation_point_ids::Vector{String}
 end
@@ -29,29 +29,30 @@ end
 mutable struct SpecificProduct
     id::String
     product_category_id::String
-    pickup_availabitilies_at_point_or_group_ids::Dict{String,Float64} # pickup capacity at OperationPoints; Dict undefined if no restriction, i.e, if available in large quantities at any point.
-    delivery_capacities_at_point_or_group_ids::Dict{String,Float64} # delivery capacity atOperationPoints; Dict undefined if no restriction, i.e, if can deliver to any point in large quantities
+    pickup_availabitilies_at_point_or_group_ids::Dict{String,Float64} # defined only if pickup points have a restricted capacity 
+    delivery_capacities_at_point_or_group_ids::Dict{String,Float64}  # defined only if delivery points have a restricted capacity 
 end
 
 mutable struct Request # can be
-    # a specific product shipment from a depot to a DeliveryPoint, or
-    # a specific product shipment from a PickupPoint to a depot, or
-    # a specific product delivery-only to one of several DeliveryPoints. Pickup is handled by another request(s).
-    # a specific product pickup-only from one of several PickupPoints. Delivery is handled by another request(s).
-    # a specific product shipment from a specific PickupPoint to a specific DeliveryPoint, or
-    # a specific product shipment from one of several PickupPoints to a specific DeliveryPoint, or
-    # a specific product shipment from a specific PickupPoints to one of several DeliveryPoints, or
-    # a specific product shipment from one of several PickupPoints to one of several DeliveryPoints.
+    # a shipment from a depot to a delivery point, or
+    # a shipment from a pickup point to a depot, or
+    # a delivery of a product that is shared by several requests, some of which are supplying the product while others a demanding the product, or
+    # a pickup of a product that is shared by several requests, some of which are supplying the product while others a demanding the product, or
+    # a shipment from a given pickup point to a given delivery point of a product that is specific to the request, or
+    # a shipment from a given pickup point to any point of a group delivery points of a product that is specific to the request, or
+    # a shipment from any point of a group pickup points to a given delivery point of a product that is specific to the request, or
+    # a shipment from any point of a group pickup points to any point of a group delivery points of a product that is specific to the request.
     id::String
     specific_product_id::String
-    is_optional::Bool  # default is false
-    price_reward::Float64 # if is_optional
-    product_quantity::Float64 # of the request
-    compartment_capacity_consumption::Float64 # portion of the vehicle compartment capacity used by the request (it can be equal to the quantity, or different even in terms of unit: volume versus weight for instance).
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
-    precedence_restriction::Int # default is 0 = only predecessor restrictions; 1 after all pickups, 2 after all deliveries.
-    pickup_point_or_group_id::String # empty string for delivery-only requests. id of the OperationPoint or id of an OperationGroup representing alternatives for pickup
-    delivery_point_or_group_id::String # empty string for pickup-only requests. id of the OperationPoint or id of a OperationGroup representing alternatives for delivery
+    precedence_status::Int # default = 0 = no restiction, 1 = product predecessor restrictions; 2= after all pickups,3=  after all deliveries.
+    mantadory_status::Int # default = 0 = mandatory, 1= semi_mandatory (must be covered in a feasible solution exists), 2 = optional
+    price_reward::Float64 # define if semi_mandatory or optional
+    product_quantity::Float64 # of the request
+    shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
+    shipment_measures::Vector{Float64} # can include several independant measures: as heigh, depth, width
+    pickup_point_or_group_id::String # empty string for delivery-only requests. id of the OperationPoint or of an OperationGroup representing alternatives for pickup
+    delivery_point_or_group_id::String # empty string for pickup-only requests. id of the OperationPoint or of a OperationGroup representing alternatives for delivery
     pickup_service_time::Float64 # used to measure pre-cleaning or loading time for instance
     delivery_service_time::Float64 # used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # used for the dial-a-ride model or similar applications
@@ -64,7 +65,8 @@ mutable struct VehicleCategory
     travel_time_unit_price::Float64
     service_time_unit_price::Float64
     waiting_time_unit_price::Float64
-    compartment_capacities::Vector{Float64} # the stantard case is to have a single compartment
+    compartment_capacities::Array{Float64,2} # matrix providing capacites for each compartment the additive measure: weight, value, volume
+    compartment_dimensions::Array{Float64,2} # matrix providing for each compartment their significant dimension measure: heigh, depth, width; used to test compatibility
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
     prohibited_product_category_ids::Vector{String}  # if any
