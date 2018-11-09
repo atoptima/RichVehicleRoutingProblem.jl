@@ -5,6 +5,7 @@ end
 
 mutable struct OperationPoint # can be a Depot, Pickup, Delivery, Recharging, or a combination of those
     id::String
+    index::Int # used for matrices such as travel distance, travel time ...
     x_coord::Float64
     y_coord::Float64
     opening_time_windows::Vector{TimeWindow}
