@@ -8,19 +8,20 @@ struct TimeWindow
     end_time::Float64
 end
 
-mutable struct Location # can be a Depot, Pickup, Delivery, Recharging, or a combination of those
+mutable struct OperationPoint # can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those
     id::String
+    index::Int
     coord::Coord
     opening_time_windows::Vector{TimeWindow}
     access_time::Float64
     energy_fixed_cost::Float64 # for entry fee, if any
     energy_unit_cost::Float64 # for recharging cost per unit of energy, if any
-    energy_recharging_speeds::Vector{Float64} # at index i, the i-th energy interval recharging speed (energy_units per time_unit). empty if no recharing in the location.
+    energy_recharging_speeds::Vector{Float64} # at index i, the i-th energy interval recharging speed (energy_units per time_unit). Empty if no recharing in this point.
 end
 
-mutable struct LocationGroup # to identify a set of Locations with some commonalities, such as all possible Pickup Locations for a product.
+mutable struct OperationPointsGroup # to identify a set of Locations with some commonalities, such as all possible Pickup Locations for a product.
     id::String
-    location_ids::Vector{String}
+    operation_point_ids::Vector{String}
 end
 
 mutable struct ProductCategory
@@ -32,10 +33,8 @@ end
 mutable struct SpecificProduct
     id::String
     product_category_id::String
-    pickup_locations_id::String # id of the single Location or id of a LocationGroup of pickup
-    pickup_availabitilies::Vector{Float64} # availabilities listed in the same order as pickup locations
-    delivery_locations_id::String # id of the single Location or id of a LocationGroup of delivery
-    delivery_capacities::Vector{Float64} # capacities listed in the same order as delivery locations
+    pickup_availabitilies_at_point_or_group_ids::Dict{String,Float64} # pickup capacity at OperationPoints; Dict undefined if no restriction, i.e, if available in large quantities at any point.
+    delivery_capacities_at_point_or_group_ids::Dict{String,Float64} # delivery capacity atOperationPoints; Dict undefined if no restriction, i.e, if can deliver to any point in large quantities
 end
 
 mutable struct Request # can be
@@ -55,8 +54,8 @@ mutable struct Request # can be
     compartment_capacity_consumption::Float64 # portion of the vehicle compartment capacity used by the request (it can be equal to the quantity, or different even in terms of unit: volume versus weight for instance).
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_restriction::Int # default is 0 = only predecessor restrictions; 1 after all pickups, 2 after all deliveries.
-    alternative_pickup_locations_id::String # empty string for delivery-only requests. id of the single Location or id of a LocationGroup of pickup
-    alternative_delivery_locations_id::String # empty string for pickup-only requests. id of the single Location or id of a LocationGroup of delivery
+    alternative_pickup_points_id::String # empty string for delivery-only requests. id of the single Location or id of a LocationGroup of pickup
+    alternative_delivery_points_id::String # empty string for pickup-only requests. id of the single Location or id of a LocationGroup of delivery
     pickup_service_duration::Float64 # used to measure pre-cleaning or loading time for instance
     delivery_service_duration::Float64 # used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # used for the dial-a-ride model or similar applications
