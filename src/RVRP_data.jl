@@ -35,14 +35,14 @@ mutable struct SpecificProduct
 end
 
 mutable struct Request # can be
-    # a specifi product shipment from a depot to a DeliveryPoint, or
-    # a specifi product shipment from a PickupPoint to a depot, or
-    # a specifi product delivery-only to one of several DeliveryPoints. Pickup is handled by another request(s).
-    # a specifi product pickup-only from one of several PickupPoints. Delivery is handled by another request(s).
-    # a specifi product shipment from a specific PickupPoint to a specific DeliveryPoint, or
-    # a specifi product shipment from one of several PickupPoints to a specific DeliveryPoint, or
-    # a specifi product shipment from a specific PickupPoints to one of several DeliveryPoints, or
-    # a specifi product shipment from one of several PickupPoints to one of several DeliveryPoints.
+    # a specific product shipment from a depot to a DeliveryPoint, or
+    # a specific product shipment from a PickupPoint to a depot, or
+    # a specific product delivery-only to one of several DeliveryPoints. Pickup is handled by another request(s).
+    # a specific product pickup-only from one of several PickupPoints. Delivery is handled by another request(s).
+    # a specific product shipment from a specific PickupPoint to a specific DeliveryPoint, or
+    # a specific product shipment from one of several PickupPoints to a specific DeliveryPoint, or
+    # a specific product shipment from a specific PickupPoints to one of several DeliveryPoints, or
+    # a specific product shipment from one of several PickupPoints to one of several DeliveryPoints.
     id::String
     specific_product_id::String
     is_optional::Bool  # default is false
