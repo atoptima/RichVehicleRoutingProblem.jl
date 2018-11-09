@@ -53,8 +53,8 @@ mutable struct Request # can be
     precedence_restriction::Int # default is 0 = only predecessor restrictions; 1 after all pickups, 2 after all deliveries.
     pickup_point_or_group_id::String # empty string for delivery-only requests. id of the OperationPoint or id of an OperationGroup representing alternatives for pickup
     delivery_point_or_group_id::String # empty string for pickup-only requests. id of the OperationPoint or id of a OperationGroup representing alternatives for delivery
-    pickup_service_duration::Float64 # used to measure pre-cleaning or loading time for instance
-    delivery_service_duration::Float64 # used to measure post-cleaning or unloading time for instance
+    pickup_service_time::Float64 # used to measure pre-cleaning or loading time for instance
+    delivery_service_time::Float64 # used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # used for the dial-a-ride model or similar applications
 end
 
