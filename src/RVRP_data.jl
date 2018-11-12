@@ -51,7 +51,7 @@ mutable struct Request # can be
     price_reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
     product_quantity::Float64 # of the request
     shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
-    incompatible_vehicles::Vector{Tuple{String,Int}} # list of Vehicle Category,  index of compartment
+    incompatible_vehicle_categories::Vector{Tuple{String,Int}} # list of Vehicle Category, index of compartment (use 0 for all compartments)
     pickup_location_or_group_ids::Vector{String}  # empty string for delivery-only requests. id of the Locations or of LocationGroups representing alternatives for pickup
     delivery_locations_or_group_ids::Vector{String}  # empty string for pickup-only requests. id of the Locations or of LocationGroups representing alternatives for delivery
     pickup_service_time::Float64 # used to measure pre-cleaning or loading time for instance
@@ -81,7 +81,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     lateness_unit_price::Float64 # to measure the cost of going beyond the soft_closing_date
     initial_energy_charge::Float64
     min_nb_of_vehicles::Int
-    soft_max_nb_of_vehicles::Int
+    soft_max_nb_of_vehicles::Int # must be greater or equal to min_nb_of_vehicles
     hard_max_nb_of_vehicles::Int # must be greater or equal to soft_max_nb_of_vehicles
     fixed_cost_below_soft_max_nb::Float64
     fixed_cost_above_soft_max_nb::Float64
