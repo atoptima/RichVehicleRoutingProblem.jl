@@ -51,7 +51,7 @@ mutable struct Request # can be
     price_reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
     product_quantity::Float64 # of the request
     shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
-    incompatible_vehicle_categories::Vector{Tuple{String,Int}} # list of Vehicle Category, index of compartment (use 0 for all compartments)
+    shipment_property_requirements::Vector{Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity
     pickup_location_or_group_ids::Vector{String}  # empty string for delivery-only requests. id of the Locations or of LocationGroups representing alternatives for pickup
     delivery_locations_or_group_ids::Vector{String}  # empty string for pickup-only requests. id of the Locations or of LocationGroups representing alternatives for delivery
     pickup_service_time::Float64 # used to measure pre-cleaning or loading time for instance
@@ -63,7 +63,8 @@ end
 
 mutable struct VehicleCategory
     id::String
-    compartment_capacities::Array{Float64,2} # matrix providing capacites for each compartment the additive measure: weight, value, volume
+    compartment_capacities::Array{Float64,2} # matrix providing capacites for each compartment the additive measures: weight, value, volume
+    compartment_properties::Array{Float64,2} # matrix providing capacites for each compartment the properties to check: max weight, max heid, capacity of carrying liquid, Refrigerated product, ...
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
 end
