@@ -29,7 +29,7 @@ end
 
 mutable struct SpecificProduct
     id::String
-    product_category_id::String
+    product_category_id::Stringvector
     pickup_availabitilies_at_location_or_group_ids::Dict{String,Float64} # defined only if pickup locations have a restricted capacity
     delivery_capacities_at_location_or_group_ids::Dict{String,Float64}  # defined only if delivery locations have a restricted capacity
 end
@@ -63,10 +63,6 @@ end
 
 mutable struct VehicleCategory
     id::String
-    travel_distance_unit_price::Float64
-    travel_time_unit_price::Float64
-    service_time_unit_price::Float64
-    waiting_time_unit_price::Float64
     compartment_capacities::Array{Float64,2} # matrix providing capacites for each compartment the additive measure: weight, value, volume
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
@@ -79,6 +75,10 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     arrival_location_or_group_ids::Vector{String} # Vehicle routes end at depot locations
     working_time_window::TimeWindow
     lateness_unit_price::Float64 # to measure the cost of going beyond the soft_closing_date
+    travel_distance_unit_price::Float64 # may depend on both driver and vehicle
+    travel_time_unit_price::Float64 # may depend on both driver and vehicle
+    service_time_unit_price::Float64
+    waiting_time_unit_price::Float64
     initial_energy_charge::Float64
     min_nb_of_vehicles::Int
     soft_max_nb_of_vehicles::Int # must be greater or equal to min_nb_of_vehicles
