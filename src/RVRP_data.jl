@@ -51,7 +51,7 @@ mutable struct Request # can be
     price_reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
     product_quantity::Float64 # of the request
     shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
-    incompatible_vehicles::Vector{{String,Int}} # list of Vehicle Category,  index of compartment
+    incompatible_vehicles::Vector{Tuple{String,Int}} # list of Vehicle Category,  index of compartment
     pickup_location_or_group_ids::Vector{String}  # empty string for delivery-only requests. id of the Locations or of LocationGroups representing alternatives for pickup
     delivery_locations_or_group_ids::Vector{String}  # empty string for pickup-only requests. id of the Locations or of LocationGroups representing alternatives for delivery
     pickup_service_time::Float64 # used to measure pre-cleaning or loading time for instance
