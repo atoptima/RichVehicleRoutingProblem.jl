@@ -52,7 +52,7 @@ mutable struct Request # can be
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     mantadory_status::Int # default = 0 = mandatory, 1= semi_mandatory (must be covered if a feasible solution exists), 2 = optional
     reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
-    product_quantity::Float64 # of the request
+    product_quantity_range::Range # of the request
     shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
     shipment_property_requirements::Dict{Int,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each index referenced requirement
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
@@ -89,7 +89,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     service_time_unit_cost::Float64
     waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
-    nb_of_vehicles::Range
+    nb_of_vehicles_range::Range
     max_working_time::Float64
     max_travel_distance::Float64
     allow_ongoing::Bool # true if these vehicles routes are open, and the vehicles do not need to complete all their requests by the end of the planning
