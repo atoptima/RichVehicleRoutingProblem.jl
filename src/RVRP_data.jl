@@ -3,6 +3,8 @@ struct TimeWindow
     soft_opening_date::Float64 # must be greater or equal to the hard_opening_date; can be undefined
     soft_closing_date::Float64 # must be greater or equal to the soft_opening_date; can be undefined
     hard_closing_date::Float64 # must be greater or equal to the soft_closing_date
+    earliness_unit_cost::Float64 # to measure the cost of using this time window earlier than the soft_opening_date
+    lateness_unit_cost::Float64 # to measure the cost of using this time window beyond the soft_closing_date
 end
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
@@ -49,7 +51,7 @@ mutable struct Request # can be
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     mantadory_status::Int # default = 0 = mandatory, 1= semi_mandatory (must be covered if a feasible solution exists), 2 = optional
-    price_reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
+    reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
     product_quantity::Float64 # of the request
     shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
     shipment_property_requirements::Dict{Int,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each index referenced requirement
@@ -60,13 +62,9 @@ mutable struct Request # can be
     pickup_service_time::Float64 # used to measure pre-cleaning or loading time for instance
     delivery_service_time::Float64 # used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # to enforce a maximum duration between pickup and delivery
-    duration_unit_price::Float64 # to measure the cost of the time spent between pickup and delivery
+    duration_unit_cost::Float64 # to measure the cost of the time spent between pickup and delivery
     pickup_time_windows::Vector{TimeWindow}
-    pickup_earliness_unit_price::Float64 # to measure the cost of being earlier than the soft_opening_dates
-    pickup_lateness_unit_price::Float64 # to measure the cost of going beyond the soft_closing_dates
     delivery_time_windows::Vector{TimeWindow}
-    delivery_earliness_unit_price::Float64 # to measure the cost of being earlier than the soft_opening_dates
-    delivery_lateness_unit_price::Float64 # to measure the cost of going beyond the soft_closing_dates
 end
 
 mutable struct VehicleCategory
@@ -86,12 +84,10 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
     arrival_location_id::String # To be used instead of the above if the vehicle routes must end at a single depot location
     working_time_window::TimeWindow
-    departure_earliness_unit_price::Float64 # to measure the cost of departing earlier than the soft_opening_date
-    arrival_lateness_unit_price::Float64 # to measure the cost of arriving  beyond the soft_closing_date
-    travel_distance_unit_price::Float64 # may depend on both driver and vehicle
-    travel_time_unit_price::Float64 # may depend on both driver and vehicle
-    service_time_unit_price::Float64
-    waiting_time_unit_price::Float64
+    travel_distance_unit_cost::Float64 # may depend on both driver and vehicle
+    travel_time_unit_cost::Float64 # may depend on both driver and vehicle
+    service_time_unit_cost::Float64
+    waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
     min_nb_of_vehicles::Int
     soft_max_nb_of_vehicles::Int # must be greater or equal to min_nb_of_vehicles
