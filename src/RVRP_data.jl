@@ -1,6 +1,7 @@
 struct TimeWindow
-    opening_date::Float64
-    soft_closing_date::Float64 # must be greater or equal to the opening_date
+    hard_opening_date::Float64
+    soft_opening_date::Float64 # must be greater or equal to the hard_opening_date; can be undefined
+    soft_closing_date::Float64 # must be greater or equal to the soft_opening_date; can be undefined
     hard_closing_date::Float64 # must be greater or equal to the soft_closing_date
 end
 
@@ -29,9 +30,9 @@ end
 
 mutable struct SpecificProduct
     id::String
-    product_category_id::Stringvector
-    pickup_availabitilies_at_location_or_group_ids::Dict{String,Float64} # defined only if pickup locations have a restricted capacity
-    delivery_capacities_at_location_or_group_ids::Dict{String,Float64}  # defined only if delivery locations have a restricted capacity
+    product_category_id::String
+    pickup_availabitilies_at_location_ids::Dict{String,Float64} # defined only if pickup locations have a restricted capacity; provides capcity for each pickup location where the product is avaiblable in restricted capacity
+    delivery_capacities_at_location_ids::Dict{String,Float64}  # defined only if delivery locations have a restricted capacity; provides capcity for each delivery location where the product can be delivered in restricted capacity
 end
 
 mutable struct Request # can be
@@ -46,25 +47,33 @@ mutable struct Request # can be
     id::String
     specific_product_id::String
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
-    precedence_status::Int # default = 0 = no restiction, 1 = product predecessor restrictions; 2= after all pickups,3=  after all deliveries.
+    precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     mantadory_status::Int # default = 0 = mandatory, 1= semi_mandatory (must be covered if a feasible solution exists), 2 = optional
     price_reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
     product_quantity::Float64 # of the request
     shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
-    shipment_property_requirements::Vector{Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity
-    pickup_location_or_group_ids::Vector{String}  # empty string for delivery-only requests. id of the Locations or of LocationGroups representing alternatives for pickup
-    delivery_locations_or_group_ids::Vector{String}  # empty string for pickup-only requests. id of the Locations or of LocationGroups representing alternatives for delivery
+    shipment_property_requirements::Dict{Int,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each index referenced requirement
+    pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
+    pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
+    delivery_location_group_id::String # empty string for pickup-only requests. LocationGroup representing alternatives for delivery, otherwise.
+    delivery_location_id::String # empty string for pickup-only requests. To be used instead of the above if there is a single delivery location
     pickup_service_time::Float64 # used to measure pre-cleaning or loading time for instance
     delivery_service_time::Float64 # used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # to enforce a maximum duration between pickup and delivery
     duration_unit_price::Float64 # to measure the cost of the time spent between pickup and delivery
-    lateness_unit_price::Float64 # to measure the cost of going beyond the soft_closing_dates
+    pickup_time_windows::Vector{TimeWindow}
+    pickup_earliness_unit_price::Float64 # to measure the cost of being earlier than the soft_opening_dates
+    pickup_lateness_unit_price::Float64 # to measure the cost of going beyond the soft_closing_dates
+    delivery_time_windows::Vector{TimeWindow}
+    delivery_earliness_unit_price::Float64 # to measure the cost of being earlier than the soft_opening_dates
+    delivery_lateness_unit_price::Float64 # to measure the cost of going beyond the soft_closing_dates
 end
 
 mutable struct VehicleCategory
     id::String
     compartment_capacities::Array{Float64,2} # matrix providing capacites for each compartment the additive measures: weight, value, volume
-    compartment_properties::Array{Float64,2} # matrix providing capacites for each compartment the properties to check: max weight, max heid, capacity of carrying liquid, Refrigerated product, ...
+    vehicle_properties::Dict{Int,Float64} # defined only for index key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
+    compartments_properties::Dict{Int,Vector{Float64}} # defined only for index key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Tuples specify a vector specifies the capacity for each compartment. 
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
 end
@@ -72,10 +81,13 @@ end
 mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
     vehicle_category_id::String
-    departure_location_or_group_ids::Vector{String} # Vehicle routes start from depot locations
-    arrival_location_or_group_ids::Vector{String} # Vehicle routes end at depot locations
+    departure_location_group_id::String # Vehicle routes start from one of the depot locations in the group
+    departure_location_id::String # To be used instead of the above if the vehicle routes must start from a single depot location
+    arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
+    arrival_location_id::String # To be used instead of the above if the vehicle routes must end at a single depot location
     working_time_window::TimeWindow
-    lateness_unit_price::Float64 # to measure the cost of going beyond the soft_closing_date
+    departure_earliness_unit_price::Float64 # to measure the cost of departing earlier than the soft_opening_date
+    arrival_lateness_unit_price::Float64 # to measure the cost of arriving  beyond the soft_closing_date
     travel_distance_unit_price::Float64 # may depend on both driver and vehicle
     travel_time_unit_price::Float64 # may depend on both driver and vehicle
     service_time_unit_price::Float64

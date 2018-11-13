@@ -2,8 +2,9 @@
 
 struct Action
     id::String
+    location_id::String
     operation_type::Int # 0- Depot, 1 - Pickup, 2 - Delivery, 3 - otherOperation
-    operation_point_id::String #  associated ActionAtPoint id
+    request_id::String # if any request is linked to a request the operation
     scheduled_start_time::Float64
 end
 
