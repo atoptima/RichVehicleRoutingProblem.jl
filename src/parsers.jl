@@ -1,6 +1,15 @@
 ################################# JSON Parsers #################################
+large_tw = TimeWindow(0.0, typemax(Int32), typemax(Int32))
+
 JSON2.@format Location begin
-    index => (default=0,)
+    index => (default=-1)
+    x_coord => (default=-1.0)
+    y_coord => (default=-1.0)
+    opening_time_windows => (default=large_tw())
+    access_time => (default=0.0)
+    energy_fixed_cost => (default=0.0)
+    energy_unit_cost => (default=0.0)
+    energy_recharging_speeds => (default=Int[])
 end
 
 JSON2.@format DepotPoint begin
