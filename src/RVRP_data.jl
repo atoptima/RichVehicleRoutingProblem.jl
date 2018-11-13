@@ -1,10 +1,10 @@
-struct TimeWindow
-    hard_opening_date::Float64
-    soft_opening_date::Float64 # must be greater or equal to the hard_opening_date; can be undefined
-    soft_closing_date::Float64 # must be greater or equal to the soft_opening_date; can be undefined
-    hard_closing_date::Float64 # must be greater or equal to the soft_closing_date
-    earliness_unit_cost::Float64 # to measure the cost of using this time window earlier than the soft_opening_date
-    lateness_unit_cost::Float64 # to measure the cost of using this time window beyond the soft_closing_date
+struct Range
+    hard_min::Float64
+    soft_min::Float64 # must be greater or equal to the hard_opening; can be undefined
+    soft_max::Float64 # must be greater or equal to the soft_opening; can be undefined
+    hard_max::Float64 # must be greater or equal to the soft_closing
+    shortage_extra_unit_price::Float64 # to measure the cost/reward of being below this range's soft_opening
+    excess_extra_unit_price::Float64 # to measure the cost/reward of being above this range's soft_closing
 end
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
@@ -12,7 +12,7 @@ mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recha
     index::Int # used for matrices such as travel distance, travel time ...
     x_coord::Float64
     y_coord::Float64
-    opening_time_windows::Vector{TimeWindow}
+    opening_time_windows::Vector{Range}
     access_time::Float64
     energy_fixed_cost::Float64 # an entry fee, if any
     energy_unit_cost::Float64 # recharging cost per unit of energy, if any
@@ -63,8 +63,8 @@ mutable struct Request # can be
     delivery_service_time::Float64 # used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # to enforce a maximum duration between pickup and delivery
     duration_unit_cost::Float64 # to measure the cost of the time spent between pickup and delivery
-    pickup_time_windows::Vector{TimeWindow}
-    delivery_time_windows::Vector{TimeWindow}
+    pickup_time_windows::Vector{Range}
+    delivery_time_windows::Vector{Range}
 end
 
 mutable struct VehicleCategory
@@ -83,17 +83,13 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     departure_location_id::String # To be used instead of the above if the vehicle routes must start from a single depot location
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
     arrival_location_id::String # To be used instead of the above if the vehicle routes must end at a single depot location
-    working_time_window::TimeWindow
+    working_time_window::Range
     travel_distance_unit_cost::Float64 # may depend on both driver and vehicle
     travel_time_unit_cost::Float64 # may depend on both driver and vehicle
     service_time_unit_cost::Float64
     waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
-    min_nb_of_vehicles::Int
-    soft_max_nb_of_vehicles::Int # must be greater or equal to min_nb_of_vehicles
-    hard_max_nb_of_vehicles::Int # must be greater or equal to soft_max_nb_of_vehicles
-    fixed_cost_below_soft_max_nb::Float64
-    fixed_cost_above_soft_max_nb::Float64
+    nb_of_vehicles::Range
     max_working_time::Float64
     max_travel_distance::Float64
     allow_ongoing::Bool # true if these vehicles routes are open, and the vehicles do not need to complete all their requests by the end of the planning
