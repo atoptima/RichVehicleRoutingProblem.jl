@@ -3,8 +3,11 @@ struct Range
     soft_min::Float64 # must be greater or equal to the hard_opening; can be undefined
     soft_max::Float64 # must be greater or equal to the soft_opening; can be undefined
     hard_max::Float64 # must be greater or equal to the soft_closing
+    nominal_unit_price::Float64 # to measure the cost/reward per unit 
     shortage_extra_unit_price::Float64 # to measure the cost/reward of being below this range's soft_opening
     excess_extra_unit_price::Float64 # to measure the cost/reward of being above this range's soft_closing
+    constraint_violation_status::Int # 0 means that hard bounds are mandatory, -1 means that even hardbounds are soft, a strictly positive values mean that harbounds are semi-mandatory, i.e. that they can be violated only if there does not exist any feasible solutions without violation. Then, the value of the constraint_violation_status defined a hierarchy of violation abong such constraint; the higher the value the most priority is put on enforcing them
+    outofbounds_extra_unit_price::Float64 # to measure the cost/reward of being outside the hard constraints when constraint_violation_status != 0
 end
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
@@ -50,9 +53,8 @@ mutable struct Request # can be
     specific_product_id::String
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
-    mantadory_status::Int # default = 0 = mandatory, 1= semi_mandatory (must be covered if a feasible solution exists), 2 = optional
-    reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
     product_quantity_range::Range # of the request
+    request_covering_range::Range # to specify if the request is mandatory, semi_mandatory (must be covered if a feasible solution exists), or optional
     shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
     shipment_property_requirements::Dict{Int,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each index referenced requirement
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
