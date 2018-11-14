@@ -5,6 +5,7 @@ struct Range
     hard_max::Float64 # must be greater or equal to the soft_closing
     shortage_extra_unit_price::Float64 # to measure the cost/reward of being below this range's soft_opening
     excess_extra_unit_price::Float64 # to measure the cost/reward of being above this range's soft_closing
+    priority::Int # 0 means only the extra costs matters for the soft min/max. Strictly positive values mean that the soft min/max of a range with priority i must be respected if it is possible to respect it for all ranges with priority i or above.
 end
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
@@ -50,8 +51,6 @@ mutable struct Request # can be
     specific_product_id::String
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
-    mantadory_status::Int # default = 0 = mandatory, 1= semi_mandatory (must be covered if a feasible solution exists), 2 = optional
-    reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
     product_quantity_range::Range # of the request
     shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
     shipment_property_requirements::Dict{Int,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each index referenced requirement
@@ -71,7 +70,7 @@ mutable struct VehicleCategory
     id::String
     compartment_capacities::Array{Float64,2} # matrix providing capacites for each compartment the additive measures: weight, value, volume
     vehicle_properties::Dict{Int,Float64} # defined only for index key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
-    compartments_properties::Dict{Int,Vector{Float64}} # defined only for index key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Tuples specify a vector specifies the capacity for each compartment. 
+    compartments_properties::Dict{Int,Vector{Float64}} # defined only for index key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Tuples specify a vector specifies the capacity for each compartment.
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
 end
