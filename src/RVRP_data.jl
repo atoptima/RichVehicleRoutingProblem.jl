@@ -5,7 +5,7 @@ struct Range
     hard_max::Float64 # must be greater or equal to the soft_closing
     shortage_extra_unit_price::Float64 # to measure the cost/reward of being below this range's soft_opening
     excess_extra_unit_price::Float64 # to measure the cost/reward of being above this range's soft_closing
-    soft_mode::Int # 0 means only the extra costs matters for the soft min/max. 1 means that the soft min/max must be respected if it is possible to respect them for all ranges with soft_mode = 1
+    priority::Int # 0 means only the extra costs matters for the soft min/max. Strictly positive values mean that the soft min/max of a range with priority i must be respected if it is possible to respect it for all ranges with priority i or above.
 end
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
