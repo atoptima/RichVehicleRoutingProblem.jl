@@ -3,9 +3,13 @@ struct Range
     soft_min::Float64 # must be greater or equal to the hard_opening; can be undefined
     soft_max::Float64 # must be greater or equal to the soft_opening; can be undefined
     hard_max::Float64 # must be greater or equal to the soft_closing
+    nominal_unit_price::Float64 # to measure the cost/reward per unit 
     shortage_extra_unit_price::Float64 # to measure the cost/reward of being below this range's soft_opening
     excess_extra_unit_price::Float64 # to measure the cost/reward of being above this range's soft_closing
+    constraint_violation_status::Int # 0 means that hard bounds are mandatory, -1 means that even hardbounds are soft, a strictly positive values mean that harbounds are semi-mandatory, i.e. that they can be violated only if there does not exist any feasible solutions without violation. Then, the value of the constraint_violation_status defined a hierarchy of violation abong such constraint; the higher the value the most priority is put on enforcing them
+    outofbounds_extra_unit_price::Float64 # to measure the cost/reward of being outside the hard constraints when constraint_violation_status != 0
 end
+
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
     id::String
@@ -50,10 +54,10 @@ mutable struct Request # can be
     specific_product_id::String
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
-    mantadory_status::Int # default = 0 = mandatory, 1= semi_mandatory (must be covered if a feasible solution exists), 2 = optional
-    reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
     product_quantity_range::Range # of the request
-    shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
+    request_covering_range::Range # to specify if the request is mandatory, semi_mandatory (must be covered if a feasible solution exists), or optional
+    shipment_lot_size::Float64
+    shipment_capacity_consumption::Dict{Int,Float64} # to quantify the vehicle capacity that is used for accomodatingpet lot of the request along several independant capacity measures whose key are indexed in the dictionaly: as weight, value, volume; for each such key, the capacity used is the float coef * roundup(quantity /  shipment_lot_size)
     shipment_property_requirements::Dict{Int,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each index referenced requirement
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
     pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
@@ -69,7 +73,7 @@ end
 
 mutable struct VehicleCategory
     id::String
-    compartment_capacities::Array{Float64,2} # matrix providing capacites for each compartment the additive measures: weight, value, volume
+    compartment_capacities::Dict{Int,Float64} # defined only for index key associated with propertiescapacity measures that need to be checked on the vehicle, as for instance weight, value, volume
     vehicle_properties::Dict{Int,Float64} # defined only for index key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
     compartments_properties::Dict{Int,Vector{Float64}} # defined only for index key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Tuples specify a vector specifies the capacity for each compartment. 
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
