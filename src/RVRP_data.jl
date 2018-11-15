@@ -56,9 +56,8 @@ mutable struct Request # can be
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     product_quantity_range::Range # of the request
     request_covering_range::Range # to specify if the request is mandatory, semi_mandatory (must be covered if a feasible solution exists), or optional
-    shipment_lot_size::Float64
-    shipment_capacity_consumption::Dict{Int,Float64} # to quantify the vehicle capacity that is used for accomodatingpet lot of the request along several independant capacity measures whose key are indexed in the dictionaly: as weight, value, volume; for each such key, the capacity used is the float coef * roundup(quantity /  shipment_lot_size)
-    shipment_property_requirements::Dict{Int,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each index referenced requirement
+    shipment_capacity_consumption::Dict{String,{Tuple{Float64,Float64}} # to quantify the vehicle capacity that is used for accomodating  lot-sizes of the request along several independant capacity measures whose string id key are in the dictionary: as weight, value, volume; for each such key, the capacity used is the float coef 2 * roundup(quantity /  shipment_lot_size = float coef 1)
+    shipment_property_requirements::Dict{String,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each string id referenced requirement
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
     pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
     delivery_location_group_id::String # empty string for pickup-only requests. LocationGroup representing alternatives for delivery, otherwise.
@@ -73,9 +72,9 @@ end
 
 mutable struct VehicleCategory
     id::String
-    compartment_capacities::Dict{Int,Float64} # defined only for index key associated with propertiescapacity measures that need to be checked on the vehicle, as for instance weight, value, volume
-    vehicle_properties::Dict{Int,Float64} # defined only for index key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
-    compartments_properties::Dict{Int,Vector{Float64}} # defined only for index key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Tuples specify a vector specifies the capacity for each compartment. 
+    compartment_capacities::Dict{Int,Float64} # defined only for string id key associated with propertiescapacity measures that need to be checked on the vehicle, as for instance weight, value, volume
+    vehicle_properties::Dict{String,Float64} # defined only for string id key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
+    compartments_properties::Dict{String,Vector{Float64}} # defined only for index key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Tuples specify a vector specifies the capacity for each compartment. 
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
 end
