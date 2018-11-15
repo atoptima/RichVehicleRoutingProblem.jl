@@ -6,8 +6,6 @@ struct Range
     nominal_unit_price::Float64 # to measure the cost/reward per unit 
     shortage_extra_unit_price::Float64 # to measure the cost/reward of being below this range's soft_opening
     excess_extra_unit_price::Float64 # to measure the cost/reward of being above this range's soft_closing
-    constraint_violation_status::Int # 0 means that hard bounds are mandatory, -1 means that even hardbounds are soft, a strictly positive values mean that harbounds are semi-mandatory, i.e. that they can be violated only if there does not exist any feasible solutions without violation. Then, the value of the constraint_violation_status defined a hierarchy of violation abong such constraint; the higher the value the most priority is put on enforcing them
-    outofbounds_extra_unit_price::Float64 # to measure the cost/reward of being outside the hard constraints when constraint_violation_status != 0
 end
 
 
@@ -39,7 +37,16 @@ mutable struct SpecificProduct
     product_category_id::String
     pickup_availabitilies_at_location_ids::Dict{String,Float64} # defined only if pickup locations have a restricted capacity; provides capcity for each pickup location where the product is avaiblable in restricted capacity
     delivery_capacities_at_location_ids::Dict{String,Float64}  # defined only if delivery locations have a restricted capacity; provides capcity for each delivery location where the product can be delivered in restricted capacity
+    vehicle_capacity_consumption::Dict{String,Tuple{Float64,Float64}} # to quantify the vehicle capacity that is used for accomodating  lot-sizes of the request along several independant capacity measures whose string id key are in the dictionary: as weight, value, volume; for each such key, the capacity used is the float coef 2 * roundup(quantity /  shipment_lot_size = float coef 1)
+    vehicle_property_requirements::Dict{String,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each string id referenced requirement
 end
+
+struct FlexibleConstraint
+    flexibility_status::Bool # true means optional constraint (i.e. to be statisfied only of it does not increase the solution cost; false means that the constraint is (semi-)mandatory
+    hierarchical_level::Int # for semi-mandatory constraints, level zero are mandatory, level k are constraints that can unsatisfyied if there was no feasbile solutions to the constraints of level 0 to k-1 that satisfy the set of cosntraint of level k.
+    violation_fixed_price::Float64 #if status is false to measure a fixed cost/reward of not satisfying the constraint 
+end
+
 
 mutable struct Request # can be
     # a shipment from a depot to a delivery location, or
@@ -53,11 +60,9 @@ mutable struct Request # can be
     id::String
     specific_product_id::String
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
+    request_flexibility::FlexibleConstraint # true is optional, false for (semi-)mandatory
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     product_quantity_range::Range # of the request
-    request_covering_range::Range # to specify if the request is mandatory, semi_mandatory (must be covered if a feasible solution exists), or optional
-    shipment_capacity_consumption::Dict{String,{Tuple{Float64,Float64}} # to quantify the vehicle capacity that is used for accomodating  lot-sizes of the request along several independant capacity measures whose string id key are in the dictionary: as weight, value, volume; for each such key, the capacity used is the float coef 2 * roundup(quantity /  shipment_lot_size = float coef 1)
-    shipment_property_requirements::Dict{String,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each string id referenced requirement
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
     pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
     delivery_location_group_id::String # empty string for pickup-only requests. LocationGroup representing alternatives for delivery, otherwise.
@@ -93,6 +98,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
     nb_of_vehicles_range::Range
+    max_nb_of_vehicles_flexibility::FlexibleConstraint
     max_working_time::Float64
     max_travel_distance::Float64
     allow_ongoing::Bool # true if these vehicles routes are open, and the vehicles do not need to complete all their requests by the end of the planning
