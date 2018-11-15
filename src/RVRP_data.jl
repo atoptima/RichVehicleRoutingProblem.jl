@@ -79,7 +79,7 @@ mutable struct VehicleCategory
     id::String
     compartment_capacities::Dict{Int,Float64} # defined only for string id key associated with propertiescapacity measures that need to be checked on the vehicle, as for instance weight, value, volume
     vehicle_properties::Dict{String,Float64} # defined only for string id key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
-    compartments_properties::Dict{String,Vector{Float64}} # defined only for index key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Tuples specify a vector specifies the capacity for each compartment. 
+    compartments_properties::Dict{String,Dict{String,Float64}} # defined only for string id key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Dictionary specifies the capacity for each compartment id key. 
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
 end
