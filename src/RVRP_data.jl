@@ -25,19 +25,17 @@ mutable struct LocationGroup # optionally defined to identify a set of locations
     location_ids::Vector{String}
 end
 
-mutable struct ProductCategory
+mutable struct ProductCategory # need to be defined only if there are preecedence or conflict restrictions
     id::String
     conflicting_product_ids::Vector{String} # if any
     prohibited_predecessor_product_ids::Vector{String} # if any
 end
 
-mutable struct SpecificProduct
+mutable struct SpecificProduct # need to be defined only if there are global availabitily restrictions
     id::String
     product_category_id::String
     pickup_availabitilies_at_location_ids::Dict{String,Float64} # defined only if pickup locations have a restricted capacity; provides capcity for each pickup location where the product is avaiblable in restricted capacity
     delivery_capacities_at_location_ids::Dict{String,Float64}  # defined only if delivery locations have a restricted capacity; provides capcity for each delivery location where the product can be delivered in restricted capacity
-    vehicle_or_compartment_capacity_consumptions::Dict{String,Tuple{Float64,Float64}} # to quantify the vehicle/compartment capacity that is used for accomodating  lot-sizes of the request along several independant capacity measures whose string id key are in the dictionary: as weight, value, volume; for each such key, the capacity used is the float coef 2 * roundup(quantity /  shipment_lot_size = float coef 1)
-    vehicle_or_compartment_property_requirements::Dict{String,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each string id referenced requirement
 end
 
 struct FlexibleConstraint
@@ -62,6 +60,8 @@ mutable struct Request # can be
     request_flexibility::FlexibleConstraint # true is optional, false for (semi-)mandatory
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     product_quantity_range::Range # of the request
+    vehicle_or_compartment_capacity_consumptions::Dict{String,Tuple{Float64,Float64}} # to quantify the vehicle/compartment capacity that is used for accomodating  lot-sizes of the request along several independant capacity measures whose string id key are in the dictionary: as weight, value, volume; for each such key, the capacity used is the float coef 2 * roundup(quantity /  shipment_lot_size = float coef 1)
+    vehicle_or_compartment_property_requirements::Dict{String,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each string id referenced requirement
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
     pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
     delivery_location_group_id::String # empty string for pickup-only requests. LocationGroup representing alternatives for delivery, otherwise.
@@ -97,7 +97,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     service_time_unit_cost::Float64
     waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
-    nb_of_vehicles_range::Range
+    nb_of_vehicles_range::Range # also includes the fixed cost per vehicle (in Range.nominal_unit_price)
     max_nb_of_vehicles_flexibility::FlexibleConstraint
     max_working_time::Float64
     max_travel_distance::Float64
