@@ -11,10 +11,11 @@ end
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
     id::String
     index::Int # used for matrices such as travel distance, travel time ...
-    x_coord::Float64
-    y_coord::Float64
+    latitude::Float64
+    longitude::Float64
     opening_time_windows::Vector{Range}
-    access_time::Float64
+    entry_time::Float64
+    exit_time::Float64
     energy_fixed_cost::Float64 # an entry fee, if any
     energy_unit_cost::Float64 # recharging cost per unit of energy, if any
     energy_recharging_speeds::Vector{Float64} # if recharging in this location: the i-th speep is associted to the i-th energy interval defined for the vehicle
@@ -101,11 +102,12 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     max_nb_of_vehicles_flexibility::FlexibleConstraint
     max_working_time::Float64
     max_travel_distance::Float64
-    allow_ongoing::Bool # true if these vehicles routes are open, and the vehicles do not need to complete all their requests by the end of the planning
+    allow_ongoing::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
 end
 
 struct RvrpInstance
     id::String
+    time_periods::Vector{Range} # to be defined if vehicles need to return to a depot by the end of each time periods.
     travel_distance_matrix::Array{Float64,2}
     travel_time_matrix::Array{Float64,2}
     energy_consumption_matrix::Array{Float64,2}
