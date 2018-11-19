@@ -2,13 +2,13 @@ import Base: ==
  
 function ==(r1::RVRP.Range, r2::RVRP.Range)
     return (
-    r1.hard_min == r2.hard_min
-    && r1.soft_min == r2.soft_min
-    && r1.soft_max == r2.soft_max
-    && r1.hard_max == r2.hard_max
-    && r1.flat_unit_price == r2.flat_unit_price
-    && r1.shortage_extra_unit_price == r2.shortage_extra_unit_price
-    && r1.excess_extra_unit_price == r2.excess_extra_unit_price
+        r1.hard_min == r2.hard_min
+        && r1.soft_min == r2.soft_min
+        && r1.soft_max == r2.soft_max
+        && r1.hard_max == r2.hard_max
+        && r1.nominal_unit_price == r2.nominal_unit_price
+        && r1.shortage_extra_unit_price == r2.shortage_extra_unit_price
+        && r1.excess_extra_unit_price == r2.excess_extra_unit_price
     )
 end
 

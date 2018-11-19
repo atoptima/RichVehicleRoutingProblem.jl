@@ -4,9 +4,11 @@ JSON2.@format Range begin
     soft_min => (default=0.0,)
     soft_max => (default=typemax(Int32),)
     hard_max => (default=typemax(Int32),)
-    flat_unit_price => (default=0.0,)
+    nominal_unit_price => (default=0.0,)
     shortage_extra_unit_price => (default=0.0,)
     excess_extra_unit_price => (default=0.0,)
+    constraint_violation_status => (default=0,)
+    outofbounds_extra_unit_price => (default=0.0,)
 end
 
 JSON2.@format Location begin

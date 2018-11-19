@@ -3,7 +3,7 @@ struct Range
     soft_min::Float64 # must be greater or equal to the hard_opening; can be undefined
     soft_max::Float64 # must be greater or equal to the soft_opening; can be undefined
     hard_max::Float64 # must be greater or equal to the soft_closing
-    flat_unit_price::Float64 # can be a cost or a reward
+    nominal_unit_price::Float64 # to measure the cost/reward per unit
     shortage_extra_unit_price::Float64 # to measure the cost/reward of being below this range's soft_opening
     excess_extra_unit_price::Float64 # to measure the cost/reward of being above this range's soft_closing
 end
@@ -112,9 +112,9 @@ end
 ################ Default-valued constructors #################
 function Range(
     ; hard_min = 0.0, soft_min = 0.0, soft_max = typemax(Int32),
-    hard_max = typemax(Int32), flat_unit_price = 0.0,
+    hard_max = typemax(Int32), nominal_unit_price = 0.0,
     shortage_extra_unit_price = 0.0, excess_extra_unit_price = 0.0)
-    return Range(hard_min, soft_min, soft_max, hard_max, flat_unit_price,
+    return Range(hard_min, soft_min, soft_max, hard_max, nominal_unit_price,
                  shortage_extra_unit_price, excess_extra_unit_price)
 end
 simple_range(v::Real) = Range(v, v, v, v, 0.0, 0.0, 0.0)
