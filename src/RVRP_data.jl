@@ -98,16 +98,16 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     service_time_unit_cost::Float64
     waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
-    nb_of_vehicles_range::Range # also includes the fixed cost per vehicle (in Range.nominal_unit_price)
-    max_nb_of_vehicles_flexibility::FlexibleConstraint
-    max_working_time::Float64
-    max_travel_distance::Float64
+    nb_of_vehicles_range::Range # also includes the fixed cost per vehicle  within each time period (in Range.nominal_unit_price)
+    max_nb_of_vehicles_flexibility::FlexibleConstraint # for each time period for which it is available (as specified in working_time_window)
+    max_working_time::Float64 # within each time period
+    max_travel_distance::Float64 # within each time period
     allow_ongoing::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
 end
 
 struct RvrpInstance
     id::String
-    time_periods::Vector{Range} # to be defined if vehicles need to return to a depot by the end of each time periods.
+    time_periods::Vector{Range} # Define a single period of for time horizon or several; vehicles need must return to a depot by the end of each time period if they cannot be ongoing.
     travel_distance_matrix::Array{Float64,2}
     travel_time_matrix::Array{Float64,2}
     energy_consumption_matrix::Array{Float64,2}
