@@ -1,71 +1,47 @@
 function utils_unit_tests()
-    gather_all_locations_tests()
+    generate_symmetric_distance_matrix_tests()
     set_indices_tests()
+    build_computed_data_tests()
 end
 
-function gather_all_locations_tests()
-    l1 = RVRP.Location("", 20, RVRP.Coord(0.0,0.0))
-    l2 = RVRP.Location("", 30, RVRP.Coord(0.0,0.0))
-    l3 = RVRP.Location("", -120, RVRP.Coord(0.0,0.0))
-    data = RVRP.generate_data_random_tsp(10)
-    p1 = RVRP.PickupPoint("", 1, l2, RVRP.TimeWindow[], 0.0)
-    p2 = RVRP.PickupPoint("", 1, l1, RVRP.TimeWindow[], 0.0)
-    d = RVRP.DeliveryPoint("", 1, l1, RVRP.TimeWindow[], 0.0)
-    recharging_p = RVRP.RechargingPoint("", 1, l3, [], RVRP.TimeWindow[], 0.0)
-    push!(data.pickup_points, p1)
-    push!(data.pickup_points, p2)
-    push!(data.delivery_points, d)
-    push!(data.recharging_points, recharging_p)
-    @test length(RVRP.gather_all_locations(data)) == 13
+function generate_symmetric_distance_matrix_tests()
+    xs = [rand(1:20) for i in 1:5]
+    ys = [rand(1:20) for i in 1:5]
+    matrix = RVRP.generate_symmetric_distance_matrix(xs, ys)
+    @test size(matrix) == (5,5)
+    for i in 1:5
+        @test matrix[i,i] == 0.0
+        for j in i+1:5
+            @test matrix[i,j] == matrix[j,i]
+        end
+    end
 end
 
 function set_indices_tests()
-    l1 = RVRP.Location("", 20, RVRP.Coord(0.0,0.0))
-    l2 = RVRP.Location("", 30, RVRP.Coord(0.0,0.0))
-    l3 = RVRP.Location("", -120, RVRP.Coord(0.0,0.0))
-    data = RVRP.generate_data_random_tsp(10)
-    p1 = RVRP.PickupPoint("", 1, l2, RVRP.TimeWindow[], 0.0)
-    p2 = RVRP.PickupPoint("", 1, l1, RVRP.TimeWindow[], 0.0)
-    d = RVRP.DeliveryPoint("", 1, l1, RVRP.TimeWindow[], 0.0)
-    recharging_p = RVRP.RechargingPoint("", 1, l3, [], RVRP.TimeWindow[], 0.0)
-    req = RVRP.Request(
-        "", -13, "", false, 0.0, 0.0, 0.0, false, 0, String[], String[],
-        0.0, 0.0, typemax(Int32)
-    )
-    push!(data.pickup_points, p1)
-    push!(data.pickup_points, p2)
-    push!(data.delivery_points, d)
-    push!(data.recharging_points, recharging_p)
-    push!(data.requests, req)
-
-    # Messing up with indices
-    data.depot_points[1].index = -32
-    for i in 1:length(data.pickup_points)
-        data.pickup_points[i].index = rand(-20:-1)
-    end
-    data.product_categories[1] = RVRP.ProductCategory("", -12, String[]
-                                                      , String[])
-    data.products[1] = RVRP.SpecificProduct(
-        "", -8192, "", Dict{String,Int}(), Dict{String,Int}()
-    )
-    # setting the correct indices back
+    data = RVRP.RvrpInstance()
+    data.locations = [RVRP.Location(index = rand(-100:-1)) for i in 1:10]
     RVRP.set_indices(data)
-
-    @test data.product_categories[1].index == 1
-    @test data.products[1].index == 1
-    for i in 1:length(data.pickup_points)
-        @test data.pickup_points[i].index == i
+    for loc_idx in 1:length(data.locations)
+        @test data.locations[loc_idx].index == loc_idx
     end
-    @test l1.index >= 1
-    @test l1.index <= 13
-    @test l2.index >= 1
-    @test l2.index <= 13
-    @test l3.index >= 1
-    @test l3.index <= 13
-    @test data.depot_points[1].index == 1
-    @test data.delivery_points[1].index == 1
-    @test data.requests[1].index == 1
-    @test data.recharging_points[1].index == 1
-    @test data.vehicle_sets[1].departure_depot_index == 1
-    @test data.vehicle_sets[1].arrival_depot_indices == [1]
+end
+
+function build_computed_data_tests()
+    data = RVRP.RvrpInstance()
+    data.locations = [RVRP.Location(
+        id = string("loc_", i), index = rand(-100:-1)
+    ) for i in 1:9]
+    data.vehicle_categories = [RVRP.VehicleCategory(
+        id = string("vc_", i)
+    ) for i in 1:9]
+    RVRP.set_indices(data)
+    computed_data = RVRP.build_computed_data(data)
+    for (k,v) in computed_data.location_id_2_index
+        @test v >= 1
+        @test v <= 9
+    end
+    for (k,v) in computed_data.vehicle_category_id_2_index
+        @test v >= 1
+        @test v <= 9
+    end
 end

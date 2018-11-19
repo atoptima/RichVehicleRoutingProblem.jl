@@ -4,10 +4,11 @@ import JSON2
 import Scanner
 
 include("RVRP_data.jl")
+include("RVRP_computed_data.jl")
 include("RVRP_solution.jl")
+include("parser_json.jl")
+include("parser_cvrplib.jl")
 include("utils.jl")
-include("data_gen.jl")
-include("parsers.jl")
 
 
 abstract type AbstractSolver end

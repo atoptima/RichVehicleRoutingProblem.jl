@@ -3,6 +3,7 @@ struct Range
     soft_min::Float64 # must be greater or equal to the hard_opening; can be undefined
     soft_max::Float64 # must be greater or equal to the soft_opening; can be undefined
     hard_max::Float64 # must be greater or equal to the soft_closing
+    flat_unit_price::Float64 # can be a cost or a reward
     shortage_extra_unit_price::Float64 # to measure the cost/reward of being below this range's soft_opening
     excess_extra_unit_price::Float64 # to measure the cost/reward of being above this range's soft_closing
 end
@@ -50,8 +51,7 @@ mutable struct Request # can be
     specific_product_id::String
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
-    mantadory_status::Int # default = 0 = mandatory, 1= semi_mandatory (must be covered if a feasible solution exists), 2 = optional
-    reward::Float64 # define if semi_mandatory or optional; reward for fulfilling the request
+    semi_mantadory::Bool # false (default, controlled by quantity range), true (= semi_mandatory) (must be covered if a feasible solution exists)
     product_quantity_range::Range # of the request
     shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
     shipment_property_requirements::Dict{Int,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each index referenced requirement
@@ -71,7 +71,7 @@ mutable struct VehicleCategory
     id::String
     compartment_capacities::Array{Float64,2} # matrix providing capacites for each compartment the additive measures: weight, value, volume
     vehicle_properties::Dict{Int,Float64} # defined only for index key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
-    compartments_properties::Dict{Int,Vector{Float64}} # defined only for index key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Tuples specify a vector specifies the capacity for each compartment. 
+    compartments_properties::Dict{Int,Vector{Float64}} # defined only for index key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Tuples specify a vector specifies the capacity for each compartment.
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
 end
@@ -95,7 +95,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     allow_ongoing::Bool # true if these vehicles routes are open, and the vehicles do not need to complete all their requests by the end of the planning
 end
 
-struct RvrpInstance
+mutable struct RvrpInstance
     id::String
     travel_distance_matrix::Array{Float64,2}
     travel_time_matrix::Array{Float64,2}
@@ -107,4 +107,112 @@ struct RvrpInstance
     requests::Vector{Request}
     vehicle_categories::Vector{VehicleCategory}
     vehicle_sets::Vector{HomogeneousVehicleSet}
+end
+
+################ Default-valued constructors #################
+function Range(
+    ; hard_min = 0.0, soft_min = 0.0, soft_max = typemax(Int32),
+    hard_max = typemax(Int32), flat_unit_price = 0.0,
+    shortage_extra_unit_price = 0.0, excess_extra_unit_price = 0.0)
+    return Range(hard_min, soft_min, soft_max, hard_max, flat_unit_price,
+                 shortage_extra_unit_price, excess_extra_unit_price)
+end
+simple_range(v::Real) = Range(v, v, v, v, 0.0, 0.0, 0.0)
+
+function Location(
+    ;id = "", index = -1, x_coord = -1.0, y_coord = -1.0,
+    opening_time_windows = [Range()], access_time = 0.0,
+    energy_fixed_cost = 0.0, energy_unit_cost = 0.0,
+    energy_recharging_speeds = Float64[])
+    return Location(
+        id, index, x_coord, y_coord, opening_time_windows, access_time,
+        energy_fixed_cost, energy_unit_cost, energy_recharging_speeds
+    )
+end
+
+function LocationGroup(; id = "", location_ids = String[])
+    return LocationGroup(id, location_ids)
+end
+
+function ProductCategory(; id = "", conflicting_product_ids = String[],
+                         prohibited_predecessor_product_ids = String[])
+    return ProductCategory(id, conflicting_product_ids,
+                           prohibited_predecessor_product_ids)
+end
+
+function SpecificProduct(
+    ; id = "", product_category_id = "",
+    pickup_availabitilies_at_location_ids = Dict{String,Float64}(),
+    delivery_capacities_at_location_ids = Dict{String,Float64}())
+    return SpecificProduct(id, product_category_id,
+                           pickup_availabitilies_at_location_ids,
+                           delivery_capacities_at_location_ids)
+end
+
+function Request(
+    ; id = "", specific_product_id = "",
+    split_fulfillment = false, precedence_status = 0,
+    semi_mantadory = false, product_quantity_range = Range(),
+    shipment_capacity_consumption = Float64[],
+    shipment_property_requirements = Dict{Int,Float64}(),
+    pickup_location_group_id = "", pickup_location_id = "",
+    delivery_location_group_id = "", delivery_location_id = "",
+    pickup_service_time = 0.0, delivery_service_time = 0.0,
+    max_duration = typemax(Int32), duration_unit_cost = 0.0,
+    pickup_time_windows = [Range()], delivery_time_windows = [Range()])
+    return Request(
+        id, specific_product_id, split_fulfillment, precedence_status,
+        semi_mantadory, product_quantity_range, shipment_capacity_consumption,
+        shipment_property_requirements, pickup_location_group_id,
+        pickup_location_id, delivery_location_group_id, delivery_location_id,
+        pickup_service_time, delivery_service_time, max_duration,
+        duration_unit_cost, pickup_time_windows, delivery_time_windows
+    )
+end
+
+function VehicleCategory(
+    ; id = "", compartment_capacities = Array{Float64,2}(undef, 0, 0),
+    vehicle_properties = Dict{Int,Float64}(),
+    compartments_properties = Dict{Int,Vector{Float64}}(),
+    energy_interval_lengths = Float64[], loading_option = 0)
+    return VehicleCategory(
+        id, compartment_capacities, vehicle_properties, compartments_properties,
+        energy_interval_lengths, loading_option
+    )
+end
+
+function HomogeneousVehicleSet(
+    ; id = "", vehicle_category_id = "", departure_location_group_id = "",
+    departure_location_id = "", arrival_location_group_id = "",
+    arrival_location_id = "", working_time_window = Range(),
+    travel_distance_unit_cost = 0.0, travel_time_unit_cost = 0.0,
+    service_time_unit_cost = 0.0, waiting_time_unit_cost = 0.0,
+    initial_energy_charge = typemax(Int32), nb_of_vehicles_range = Range(),
+    max_working_time = typemax(Int32), max_travel_distance = typemax(Int32),
+    allow_ongoing = false)
+    return HomogeneousVehicleSet(
+        id, vehicle_category_id, departure_location_group_id,
+        departure_location_id, arrival_location_group_id,
+        arrival_location_id, working_time_window, travel_distance_unit_cost,
+        travel_time_unit_cost, service_time_unit_cost, waiting_time_unit_cost,
+        initial_energy_charge, nb_of_vehicles_range, max_working_time,
+        max_travel_distance, allow_ongoing
+    )
+end
+
+function RvrpInstance(
+    ; id = "", travel_distance_matrix = Array{Float64,2}(undef,0,0),
+    travel_time_matrix = Array{Float64,2}(undef,0,0),
+    energy_consumption_matrix = Array{Float64,2}(undef,0,0),
+    locations = Location[], location_groups = LocationGroup[],
+    product_categories = ProductCategory[],
+    specific_products = SpecificProduct[], requests = Request[],
+    vehicle_categories = VehicleCategory[],
+    vehicle_sets = HomogeneousVehicleSet[])
+    return RvrpInstance(
+        id, travel_distance_matrix, travel_time_matrix,
+        energy_consumption_matrix, locations, location_groups,
+        product_categories, specific_products, requests, vehicle_categories,
+        vehicle_sets
+    )
 end
