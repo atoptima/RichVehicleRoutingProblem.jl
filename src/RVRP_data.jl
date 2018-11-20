@@ -31,8 +31,8 @@ end
 
 mutable struct ProductCategory # To define preecedence or conflict restrictions
     id::String
-    conflicting_product_ids::Vector{String} # if any
-    prohibited_predecessor_product_ids::Vector{String} # if any
+    conflicting_product_category_ids::Vector{String} # if any
+    prohibited_predecessor_product_category_ids::Vector{String} # if any
 end
 
 mutable struct SharedProduct # To define global availabitily restrictions fro a product shared between different requests
@@ -74,7 +74,7 @@ mutable struct Request # can be
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     product_quantity_range::Range # of the request
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
-y    pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
+    pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
     delivery_location_group_id::String # empty string for pickup-only requests. LocationGroup representing alternatives for delivery, otherwise.
     delivery_location_id::String # empty string for pickup-only requests. To be used instead of the above if there is a single delivery location
     pickup_service_time::Float64 # used to measure pre-cleaning or loading time for instance
