@@ -55,6 +55,8 @@ struct FlexibleConstraint
     violation_fixed_price::Float64 #if status is false to measure a fixed cost/reward of not satisfying the constraint 
 end
 
+mutable struct RequestExtraData
+end
 
 mutable struct Request # can be
     # a shipment from a depot to a delivery location, or
@@ -72,7 +74,7 @@ mutable struct Request # can be
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     product_quantity_range::Range # of the request
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
-    pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
+y    pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
     delivery_location_group_id::String # empty string for pickup-only requests. LocationGroup representing alternatives for delivery, otherwise.
     delivery_location_id::String # empty string for pickup-only requests. To be used instead of the above if there is a single delivery location
     pickup_service_time::Float64 # used to measure pre-cleaning or loading time for instance
@@ -81,6 +83,7 @@ mutable struct Request # can be
     duration_unit_cost::Float64 # to measure the cost of the time spent between pickup and delivery
     pickup_time_windows::Vector{Range}
     delivery_time_windows::Vector{Range}
+    extra_data::RequestExtraData
 end
 
 mutable struct VehicleCategory
