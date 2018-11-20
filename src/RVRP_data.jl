@@ -16,27 +16,37 @@ mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recha
     opening_time_windows::Vector{Range}
     entry_time::Float64
     exit_time::Float64
+    entry_location_group_id::String # to model and extra time when entering/exiting the group
     energy_fixed_cost::Float64 # an entry fee, if any
     energy_unit_cost::Float64 # recharging cost per unit of energy, if any
     energy_recharging_speeds::Vector{Float64} # if recharging in this location: the i-th speep is associted to the i-th energy interval defined for the vehicle
 end
 
-mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request.
+mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request, or joint entry/exit times.
     id::String
     location_ids::Vector{String}
+    entry_time::Float64
+    exit_time::Float64
 end
 
-mutable struct ProductCategory # need to be defined only if there are preecedence or conflict restrictions
+mutable struct ProductCategory # To define preecedence or conflict restrictions
     id::String
     conflicting_product_ids::Vector{String} # if any
     prohibited_predecessor_product_ids::Vector{String} # if any
 end
 
-mutable struct SpecificProduct # need to be defined only if there are global availabitily restrictions
+mutable struct SharedProduct # To define global availabitily restrictions fro a product shared between different requests
     id::String
     product_category_id::String
     pickup_availabitilies_at_location_ids::Dict{String,Float64} # defined only if pickup locations have a restricted capacity; provides capcity for each pickup location where the product is avaiblable in restricted capacity
     delivery_capacities_at_location_ids::Dict{String,Float64}  # defined only if delivery locations have a restricted capacity; provides capcity for each delivery location where the product can be delivered in restricted capacity
+end
+
+mutable struct SpecificProduct # To define capacity consumption
+    id::String
+    shared_product_id::String
+    vehicle_or_compartment_capacity_consumptions::Dict{String,Tuple{Float64,Float64}} # to quantify the vehicle/compartment capacity that is used for accomodating  lot-sizes of the request along several independant capacity measures whose string id key are in the dictionary: as weight, value, volume; for each such key, the capacity used is the float coef 2 * roundup(quantity /  shipment_lot_size = float coef 1)
+    vehicle_or_compartment_property_requirements::Dict{String,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each string id referenced requirement
 end
 
 struct FlexibleConstraint
@@ -61,8 +71,6 @@ mutable struct Request # can be
     request_flexibility::FlexibleConstraint # true is optional, false for (semi-)mandatory
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     product_quantity_range::Range # of the request
-    vehicle_or_compartment_capacity_consumptions::Dict{String,Tuple{Float64,Float64}} # to quantify the vehicle/compartment capacity that is used for accomodating  lot-sizes of the request along several independant capacity measures whose string id key are in the dictionary: as weight, value, volume; for each such key, the capacity used is the float coef 2 * roundup(quantity /  shipment_lot_size = float coef 1)
-    vehicle_or_compartment_property_requirements::Dict{String,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each string id referenced requirement
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
     pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
     delivery_location_group_id::String # empty string for pickup-only requests. LocationGroup representing alternatives for delivery, otherwise.
@@ -85,6 +93,9 @@ mutable struct VehicleCategory
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
 end
 
+struct HomogeneousVehicleSetExtraData
+end
+
 mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
     vehicle_category_id::String
@@ -102,20 +113,25 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     max_nb_of_vehicles_flexibility::FlexibleConstraint # for each time period for which it is available (as specified in working_time_window)
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
-    allow_ongoing::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
+    extra_data::HomogeneousVehicleSetExtraData
+end
+
+
+struct RvrpInstanceExtraData
 end
 
 struct RvrpInstance
     id::String
-    time_periods::Vector{Range} # Define a single period of for time horizon or several; vehicles need must return to a depot by the end of each time period if they cannot be ongoing.
     travel_distance_matrix::Array{Float64,2}
     travel_time_matrix::Array{Float64,2}
     energy_consumption_matrix::Array{Float64,2}
     locations::Vector{Location}
     location_groups::Vector{LocationGroup} # if any
     product_categories::Vector{ProductCategory}
+    shared_products::Vector{SharedProduct}
     specific_products::Vector{SpecificProduct}
     requests::Vector{Request}
     vehicle_categories::Vector{VehicleCategory}
     vehicle_sets::Vector{HomogeneousVehicleSet}
+    extra_data::RvrpInstanceExtraData
 end
