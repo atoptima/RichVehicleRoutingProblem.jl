@@ -83,6 +83,7 @@ mutable struct Request # can be
     duration_unit_cost::Float64 # to measure the cost of the time spent between pickup and delivery
     pickup_time_windows::Vector{Range}
     delivery_time_windows::Vector{Range}
+    delivery_time_flexibility::FlexibleConstraint # for semi-mandatory delivery time windows
     extra_data::Any
 end
 
@@ -104,6 +105,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
     arrival_location_id::String # To be used instead of the above if the vehicle routes must end at a single depot location
     working_time_window::Range
+    arrival_time_flexibility::FlexibleConstraint # for semi-mandatory  working_time_window hard_max
     travel_distance_unit_cost::Float64 # may depend on both driver and vehicle
     travel_time_unit_cost::Float64 # may depend on both driver and vehicle
     service_time_unit_cost::Float64
