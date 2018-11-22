@@ -97,7 +97,7 @@ end
 mutable struct RvrpInstance
     id::String
     travel_distance_matrix::Array{Float64,2}
-    travel_time_matrices::Dict{String{Array{Float64,2}}}
+    travel_time_matrices::Dict{String,Array{Float64,2}}
     period_to_travel_time_matrix_id::Dict{Tuple{Float64,Float64},String} # For time t s.t. travel_time_separators[i] <= t < travel_time_separators[i+1], use travel_time_matrices[i].
     energy_consumption_matrix::Array{Float64,2}
     locations::Vector{Location}
