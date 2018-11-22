@@ -19,7 +19,7 @@ mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recha
     energy_recharging_speeds::Vector{Float64} # if recharging in this location: the i-th speep is associted to the i-th energy interval defined for the vehicle
 end
 
-mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request, or joint entry/exit times.
+mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request
     id::String
     location_ids::Vector{String}
 end
@@ -97,7 +97,8 @@ end
 mutable struct RvrpInstance
     id::String
     travel_distance_matrix::Array{Float64,2}
-    travel_time_matrix::Array{Float64,2}
+    travel_time_matrices::Dict{String{Array{Float64,2}}}
+    period_to_travel_time_matrix_id::Dict{Tuple{Float64,Float64},String} # For time t s.t. travel_time_separators[i] <= t < travel_time_separators[i+1], use travel_time_matrices[i].
     energy_consumption_matrix::Array{Float64,2}
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
