@@ -14,12 +14,9 @@ mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recha
     latitude::Float64
     longitude::Float64
     opening_time_windows::Vector{Range}
-    energy_fixed_cost::Float64 # an entry fee, if any
-    energy_unit_cost::Float64 # recharging cost per unit of energy, if any
-    energy_recharging_speeds::Vector{Float64} # if recharging in this location: the i-th speep is associted to the i-th energy interval defined for the vehicle
 end
 
-mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request, or joint entry/exit times.
+mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request
     id::String
     location_ids::Vector{String}
 end
@@ -74,7 +71,6 @@ mutable struct VehicleCategory
     compartment_capacities::Dict{String,Dict{String,Float64}} # defined only if measured at the compartment level; for string id key associated with properties capacity measures that need to be checked on the vehicle, as for instance weight, value, volume, ... For each such property, the Dictionary specifies the capacity for each compartment id key.
     vehicle_properties::Dict{String,Float64} # defined only if measured at the vehicle level; for string id key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
     compartments_properties::Dict{String,Dict{String,Float64}} #  defined only if measured at the compartment level; for string id key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Dictionary specifies the capacity for each compartment id key.
-    energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
 end
 
@@ -98,7 +94,6 @@ mutable struct RvrpInstance
     id::String
     travel_distance_matrix::Array{Float64,2}
     travel_time_matrix::Array{Float64,2}
-    energy_consumption_matrix::Array{Float64,2}
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
     product_conflict_classes::Vector{ProductCategory}
@@ -110,23 +105,20 @@ mutable struct RvrpInstance
 end
 
 ################ Default-valued constructors #################
-function Range(
-    ; hard_min = 0.0, soft_min = 0.0, soft_max = typemax(Int32),
+function Range(; hard_min = 0.0, soft_min = 0.0, soft_max = typemax(Int32),
     hard_max = typemax(Int32), nominal_unit_price = 0.0,
     shortage_extra_unit_price = 0.0, excess_extra_unit_price = 0.0)
     return Range(hard_min, soft_min, soft_max, hard_max, nominal_unit_price,
                  shortage_extra_unit_price, excess_extra_unit_price)
 end
 simple_range(v::Real) = Range(v, v, v, v, 0.0, 0.0, 0.0)
+standard_range(l::Real, u::Real, price::Real = 0.0) = Range(l, l, u, u, price, 0.0, 0.0)
 
 function Location(
-    ;id = "", index = -1, x_coord = -1.0, y_coord = -1.0,
-    opening_time_windows = [Range()], access_time = 0.0,
-    energy_fixed_cost = 0.0, energy_unit_cost = 0.0,
-    energy_recharging_speeds = Float64[])
+    ;id = "", index = -1, longitude = -1.0, latitute = -1.0,
+    opening_time_windows = [Range()]
     return Location(
-        id, index, x_coord, y_coord, opening_time_windows, access_time,
-        energy_fixed_cost, energy_unit_cost, energy_recharging_speeds
+        id, index, longitude, latitute, opening_time_windows
     )
 end
 
