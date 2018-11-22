@@ -11,31 +11,35 @@ end
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
     id::String
     index::Int # used for matrices such as travel distance, travel time ...
-    x_coord::Float64
-    y_coord::Float64
+    latitude::Float64
+    longitude::Float64
     opening_time_windows::Vector{Range}
-    access_time::Float64
     energy_fixed_cost::Float64 # an entry fee, if any
     energy_unit_cost::Float64 # recharging cost per unit of energy, if any
     energy_recharging_speeds::Vector{Float64} # if recharging in this location: the i-th speep is associted to the i-th energy interval defined for the vehicle
 end
 
-mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request.
+mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request, or joint entry/exit times.
     id::String
     location_ids::Vector{String}
 end
 
-mutable struct ProductCategory
+mutable struct ProductConflictClass # To define preceedence or conflict restriction between requested products
     id::String
-    conflicting_product_ids::Vector{String} # if any
-    prohibited_predecessor_product_ids::Vector{String} # if any
+    simultaneous_conflict_class_ids::Vector{String}
+    predecessor_conflict_class_ids::Vector{String}
 end
 
-mutable struct SpecificProduct
+mutable struct ProductSharingClass # To define global availabitily restrictions for a product that is shared between different requests
     id::String
-    product_category_id::String
     pickup_availabitilies_at_location_ids::Dict{String,Float64} # defined only if pickup locations have a restricted capacity; provides capcity for each pickup location where the product is avaiblable in restricted capacity
     delivery_capacities_at_location_ids::Dict{String,Float64}  # defined only if delivery locations have a restricted capacity; provides capcity for each delivery location where the product can be delivered in restricted capacity
+end
+
+mutable struct ProductSpecificationClass # To define capacity consumption of a requested product
+    id::String
+    capacity_consumptions::Dict{String,Tuple{Float64,Float64}} # to quantify the vehicle/compartment capacity that is used for accomodating  lot-sizes of the request along several independant capacity measures whose string id key are in the dictionary: as weight, value, volume; for each such key, the capacity used is the float coef 2 * roundup(quantity /  shipment_lot_size = float coef 1)
+    property_requirements::Dict{String,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each string id referenced requirement
 end
 
 mutable struct Request # can be
@@ -48,20 +52,17 @@ mutable struct Request # can be
     # a shipment from any location of a group pickup locations to a given delivery location of a product that is specific to the request, or
     # a shipment from any location of a group pickup locations to any location of a group delivery locations of a product that is specific to the request.
     id::String
-    specific_product_id::String
+    product_conflict_class_id::String # if any
+    product_sharing_class_id::String # if any
+    product_specification_class_id::string
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
-    semi_mantadory::Bool # false (default, controlled by quantity range), true (= semi_mandatory) (must be covered if a feasible solution exists)
     product_quantity_range::Range # of the request
-    shipment_capacity_consumption::Vector{Float64} # can include several independant capacity consumptions: as weight, value, volume
-    shipment_property_requirements::Dict{Int,Float64} # to check if the vehicle has the property of accomodating the request: yes if request requirement <= vehicle property capacity for each index referenced requirement
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
-    pickup_location_id::String # empty string for delivery-only requests. To be used instead of the above if there is a single pickup location
     delivery_location_group_id::String # empty string for pickup-only requests. LocationGroup representing alternatives for delivery, otherwise.
-    delivery_location_id::String # empty string for pickup-only requests. To be used instead of the above if there is a single delivery location
     pickup_service_time::Float64 # used to measure pre-cleaning or loading time for instance
     delivery_service_time::Float64 # used to measure post-cleaning or unloading time for instance
-    max_duration::Float64 # to enforce a maximum duration between pickup and delivery
+    max_duration::Float64 # to enforce a max duration between pickup and delivery
     duration_unit_cost::Float64 # to measure the cost of the time spent between pickup and delivery
     pickup_time_windows::Vector{Range}
     delivery_time_windows::Vector{Range}
@@ -69,9 +70,10 @@ end
 
 mutable struct VehicleCategory
     id::String
-    compartment_capacities::Array{Float64,2} # matrix providing capacites for each compartment the additive measures: weight, value, volume
-    vehicle_properties::Dict{Int,Float64} # defined only for index key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
-    compartments_properties::Dict{Int,Vector{Float64}} # defined only for index key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Tuples specify a vector specifies the capacity for each compartment.
+    vehicle_capacities::Dict{String,Float64} # defined only if measured at the vehicle level; for string id key associated with properties capacity measures that need to be checked on the vehicle, as for instance weight, value, volume
+    compartment_capacities::Dict{String,Dict{String,Float64}} # defined only if measured at the compartment level; for string id key associated with properties capacity measures that need to be checked on the vehicle, as for instance weight, value, volume, ... For each such property, the Dictionary specifies the capacity for each compartment id key.
+    vehicle_properties::Dict{String,Float64} # defined only if measured at the vehicle level; for string id key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
+    compartments_properties::Dict{String,Dict{String,Float64}} #  defined only if measured at the compartment level; for string id key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Dictionary specifies the capacity for each compartment id key.
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
 end
@@ -80,19 +82,16 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
     vehicle_category_id::String
     departure_location_group_id::String # Vehicle routes start from one of the depot locations in the group
-    departure_location_id::String # To be used instead of the above if the vehicle routes must start from a single depot location
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
-    arrival_location_id::String # To be used instead of the above if the vehicle routes must end at a single depot location
     working_time_window::Range
     travel_distance_unit_cost::Float64 # may depend on both driver and vehicle
     travel_time_unit_cost::Float64 # may depend on both driver and vehicle
     service_time_unit_cost::Float64
     waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
-    nb_of_vehicles_range::Range
-    max_working_time::Float64
-    max_travel_distance::Float64
-    allow_ongoing::Bool # true if these vehicles routes are open, and the vehicles do not need to complete all their requests by the end of the planning
+    nb_of_vehicles_range::Range # also includes the fixed cost per vehicle  within each time period (in Range.nominal_unit_price)
+    max_working_time::Float64 # within each time period
+    max_travel_distance::Float64 # within each time period
 end
 
 mutable struct RvrpInstance
@@ -101,9 +100,10 @@ mutable struct RvrpInstance
     travel_time_matrix::Array{Float64,2}
     energy_consumption_matrix::Array{Float64,2}
     locations::Vector{Location}
-    location_groups::Vector{LocationGroup} # if any
-    product_categories::Vector{ProductCategory}
-    specific_products::Vector{SpecificProduct}
+    location_groups::Vector{LocationGroup}
+    product_conflict_classes::Vector{ProductCategory}
+    product_sharing_classes::Vector{SharedProduct}
+    product_specification_classes::Vector{SpecificProduct}
     requests::Vector{Request}
     vehicle_categories::Vector{VehicleCategory}
     vehicle_sets::Vector{HomogeneousVehicleSet}
