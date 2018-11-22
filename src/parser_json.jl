@@ -17,8 +17,6 @@ JSON2.@format Location begin
     latitude => (default=-1.0,)
     longitude => (default=-1.0,)
     opening_time_windows => (default=[Range()],)
-    entry_time => (default=0.0,)
-    exit_time => (default=0.0,)
     energy_fixed_cost => (default=0.0,)
     energy_unit_cost => (default=0.0,)
     energy_recharging_speeds => (default=Float64[],)
@@ -33,12 +31,6 @@ JSON2.@format ProductCategory begin
     id => (default="",)
     conflicting_product_ids => (default=String[],)
     prohibited_predecessor_product_ids => (default=String[],)
-end
-
-JSON2.@format FlexibleConstraint begin
-    flexibility_status => (default=false,)
-    hierarchical_level => (default=0,)
-    violation_fixed_price => (default=0.0,)
 end
 
 JSON2.@format SpecificProduct begin
@@ -92,7 +84,6 @@ JSON2.@format HomogeneousVehicleSet begin
     waiting_time_unit_cost => (default=0.0,)
     initial_energy_charge => (default=typemax(Int32),)
     nb_of_vehicles_range => (default=Range(),)
-    max_nb_of_vehicles_flexibility => (default=FlexibleConstraint())
     max_working_time => (default=typemax(Int32),)
     max_travel_distance => (default=typemax(Int32),)
     allow_ongoing => (default=false,)
