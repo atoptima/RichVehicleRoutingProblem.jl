@@ -121,10 +121,10 @@ end
 simple_range(v::Real) = Range(v, v, v, v, 0.0, 0.0, 0.0)
 standard_range(l::Real, u::Real, price::Real = 0.0) = Range(l, l, u, u, price, 0.0, 0.0)
 
-function Location(; id = "", index = -1, longitude = -1.0, latitute = -1.0,
+function Location(; id = "", index = -1, latitude = -1.0,  longitude = -1.0,
                   opening_time_windows = [Range()])
     return Location(
-        id, index, longitude, latitute, opening_time_windows
+        id, index,  latitude, longitude, opening_time_windows
     )
 end
 
