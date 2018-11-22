@@ -14,10 +14,9 @@ mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recha
     latitude::Float64
     longitude::Float64
     opening_time_windows::Vector{Range}
-    energy_fixed_cost::Float64 # an entry fee , if any
-    energy_unit_cost::Float64 # recharging cost per unit of energy, if any
+    energy_fixed_cost::Float64 # an entry fee
+    energy_unit_cost::Float64 # recharging cost per unit of energy
     energy_recharging_speeds::Vector{Float64} # if recharging in this location: the i-th speep is associted to the i-th energy interval defined for the vehicle
-
 end
 
 mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request
@@ -53,8 +52,8 @@ mutable struct Request # can be
     # a shipment from any location of a group pickup locations to a given delivery location of a product that is specific to the request, or
     # a shipment from any location of a group pickup locations to any location of a group delivery locations of a product that is specific to the request.
     id::String
-    product_Compatibility_class_id::String # if any
-    product_sharing_class_id::String # if any
+    product_Compatibility_class_id::String
+    product_sharing_class_id::String
     product_specification_class_id::string
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
@@ -97,9 +96,9 @@ end
 
 mutable struct RvrpInstance
     id::String
-    travel_time_periods::Vector{Range} # Define  periods of for over the time horizon to refine travel times
+    travel_time_matrices::Dict{String{Array{Float64,2}}}
+    time_interval_to_travel_time_matrix_id::Dict{Tuple{Float64,Float64},String} # For time t s.t. travel_time_separators[i] <= t < travel_time_separators[i+1], use travel_time_matrices[i].
     travel_distance_matrix::Array{Float64,2}
-    travel_time_matrix::Array{Int,3} # for each time preriod index, it provides the travel time in minutes (or any other time unit) for each pair of locations
     energy_consumption_matrix::Array{Float64,2}
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
@@ -145,7 +144,7 @@ function ProductSharingClass(; id = "",
                                delivery_capacities_at_location_ids)
 end
 
-function ProductSpecificationClass(; id = "", 
+function ProductSpecificationClass(; id = "",
                                    capacity_consumption = Dict{String,Tuple{Float64,Float64}}(),
                                    property_requirements = Dict{String,Float64}())
     return ProductSpecificationClass(id, capacity_consumption, property_requirements)
