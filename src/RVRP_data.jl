@@ -14,20 +14,20 @@ mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recha
     latitude::Float64
     longitude::Float64
     opening_time_windows::Vector{Range}
-    energy_fixed_cost::Float64 # an entry fee, if any
-    energy_unit_cost::Float64 # recharging cost per unit of energy, if any
+    energy_fixed_cost::Float64 # an entry fee
+    energy_unit_cost::Float64 # recharging cost per unit of energy
     energy_recharging_speeds::Vector{Float64} # if recharging in this location: the i-th speep is associted to the i-th energy interval defined for the vehicle
 end
 
-mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request, or joint entry/exit times.
+mutable struct LocationGroup # optionally defined to identify a set of locations with some commonalities, such as all possible pickups for a request
     id::String
     location_ids::Vector{String}
 end
 
-mutable struct ProductConflictClass # To define preceedence or conflict restriction between requested products
+mutable struct ProductCompatibilityClass # To define preceedence or conflict restriction between requested products
     id::String
-    simultaneous_conflict_class_ids::Vector{String}
-    predecessor_conflict_class_ids::Vector{String}
+    conflict_compatib_class_ids::Vector{String}
+    prohibited_predecessor_compatib_class_ids::Vector{String}
 end
 
 mutable struct ProductSharingClass # To define global availabitily restrictions for a product that is shared between different requests
@@ -52,8 +52,8 @@ mutable struct Request # can be
     # a shipment from any location of a group pickup locations to a given delivery location of a product that is specific to the request, or
     # a shipment from any location of a group pickup locations to any location of a group delivery locations of a product that is specific to the request.
     id::String
-    product_conflict_class_id::String # if any
-    product_sharing_class_id::String # if any
+    product_Compatibility_class_id::String
+    product_sharing_class_id::String
     product_specification_class_id::string
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
@@ -74,8 +74,8 @@ mutable struct VehicleCategory
     compartment_capacities::Dict{String,Dict{String,Float64}} # defined only if measured at the compartment level; for string id key associated with properties capacity measures that need to be checked on the vehicle, as for instance weight, value, volume, ... For each such property, the Dictionary specifies the capacity for each compartment id key.
     vehicle_properties::Dict{String,Float64} # defined only if measured at the vehicle level; for string id key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
     compartments_properties::Dict{String,Dict{String,Float64}} #  defined only if measured at the compartment level; for string id key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Dictionary specifies the capacity for each compartment id key.
-    energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
+    energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
 end
 
 mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
@@ -96,123 +96,160 @@ end
 
 mutable struct RvrpInstance
     id::String
+    travel_time_matrices::Dict{String{Array{Float64,2}}}
+    time_interval_to_travel_time_matrix_id::Dict{Tuple{Float64,Float64},String} # For time t s.t. travel_time_separators[i] <= t < travel_time_separators[i+1], use travel_time_matrices[i].
     travel_distance_matrix::Array{Float64,2}
-    travel_time_matrix::Array{Float64,2}
     energy_consumption_matrix::Array{Float64,2}
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
-    product_conflict_classes::Vector{ProductCategory}
-    product_sharing_classes::Vector{SharedProduct}
-    product_specification_classes::Vector{SpecificProduct}
+    product_compatibility_classes::Vector{ProductCompatibilityClass}
+    product_sharing_classes::Vector{ProductSharingClass}
+    product_specification_classes::Vector{ProductSpecificationClass}
     requests::Vector{Request}
     vehicle_categories::Vector{VehicleCategory}
     vehicle_sets::Vector{HomogeneousVehicleSet}
 end
 
 ################ Default-valued constructors #################
-function Range(
-    ; hard_min = 0.0, soft_min = 0.0, soft_max = typemax(Int32),
-    hard_max = typemax(Int32), nominal_unit_price = 0.0,
-    shortage_extra_unit_price = 0.0, excess_extra_unit_price = 0.0)
+function Range(; hard_min = 0.0, soft_min = 0.0, soft_max = typemax(Int32),
+               hard_max = typemax(Int32), nominal_unit_price = 0.0,
+               shortage_extra_unit_price = 0.0, excess_extra_unit_price = 0.0)
     return Range(hard_min, soft_min, soft_max, hard_max, nominal_unit_price,
                  shortage_extra_unit_price, excess_extra_unit_price)
 end
 simple_range(v::Real) = Range(v, v, v, v, 0.0, 0.0, 0.0)
+standard_range(l::Real, u::Real, price::Real = 0.0) = Range(l, l, u, u, price, 0.0, 0.0)
 
-function Location(
-    ;id = "", index = -1, x_coord = -1.0, y_coord = -1.0,
-    opening_time_windows = [Range()], access_time = 0.0,
-    energy_fixed_cost = 0.0, energy_unit_cost = 0.0,
-    energy_recharging_speeds = Float64[])
+function Location(; id = "", index = -1, latitude = -1.0,  longitude = -1.0,
+                  opening_time_windows = [Range()])
     return Location(
-        id, index, x_coord, y_coord, opening_time_windows, access_time,
-        energy_fixed_cost, energy_unit_cost, energy_recharging_speeds
+        id, index,  latitude, longitude, opening_time_windows
     )
 end
 
-function LocationGroup(; id = "", location_ids = String[])
+function LocationGroup(;id = "", location_ids = String[])
     return LocationGroup(id, location_ids)
 end
 
-function ProductCategory(; id = "", conflicting_product_ids = String[],
-                         prohibited_predecessor_product_ids = String[])
-    return ProductCategory(id, conflicting_product_ids,
-                           prohibited_predecessor_product_ids)
+function ProductCompatibilityClass(; id = "", conflict_compatib_class_ids = String[],
+                                   prohibited_predecessor_compatib_class_ids = String[])
+    return ProductCompatibilityClass(id, conflict_compatib_class_ids,
+                                     prohibited_predecessor_compatib_class_ids)
 end
 
-function SpecificProduct(
-    ; id = "", product_category_id = "",
-    pickup_availabitilies_at_location_ids = Dict{String,Float64}(),
-    delivery_capacities_at_location_ids = Dict{String,Float64}())
-    return SpecificProduct(id, product_category_id,
-                           pickup_availabitilies_at_location_ids,
-                           delivery_capacities_at_location_ids)
+function ProductSharingClass(; id = "",
+                             pickup_availabitilies_at_location_ids = Dict{String,Float64}(),
+                             delivery_capacities_at_location_ids = Dict{String,Float64}())
+    return ProductSharingClass(id, pickup_availabitilies_at_location_ids,
+                               delivery_capacities_at_location_ids)
 end
 
-function Request(
-    ; id = "", specific_product_id = "",
-    split_fulfillment = false, precedence_status = 0,
-    semi_mantadory = false, product_quantity_range = Range(),
-    shipment_capacity_consumption = Float64[],
-    shipment_property_requirements = Dict{Int,Float64}(),
-    pickup_location_group_id = "", pickup_location_id = "",
-    delivery_location_group_id = "", delivery_location_id = "",
-    pickup_service_time = 0.0, delivery_service_time = 0.0,
-    max_duration = typemax(Int32), duration_unit_cost = 0.0,
-    pickup_time_windows = [Range()], delivery_time_windows = [Range()])
-    return Request(
-        id, specific_product_id, split_fulfillment, precedence_status,
-        semi_mantadory, product_quantity_range, shipment_capacity_consumption,
-        shipment_property_requirements, pickup_location_group_id,
-        pickup_location_id, delivery_location_group_id, delivery_location_id,
-        pickup_service_time, delivery_service_time, max_duration,
-        duration_unit_cost, pickup_time_windows, delivery_time_windows
-    )
+function ProductSpecificationClass(; id = "",
+                                   capacity_consumption = Dict{String,Tuple{Float64,Float64}}(),
+                                   property_requirements = Dict{String,Float64}())
+    return ProductSpecificationClass(id, capacity_consumption, property_requirements)
 end
 
-function VehicleCategory(
-    ; id = "", compartment_capacities = Array{Float64,2}(undef, 0, 0),
-    vehicle_properties = Dict{Int,Float64}(),
-    compartments_properties = Dict{Int,Vector{Float64}}(),
-    energy_interval_lengths = Float64[], loading_option = 0)
-    return VehicleCategory(
-        id, compartment_capacities, vehicle_properties, compartments_properties,
-        energy_interval_lengths, loading_option
-    )
+function Request( ; id = "",
+                  product_Compatibility_class_id = "",
+                  product_sharing_class_id = "",
+                  product_specification_class_id = "",
+                  split_fulfillment = false,
+                  precedence_status = 0,
+                  product_quantity_range = Range(),
+                  pickup_location_group_id = "",
+                  pickup_location_id = "",
+                  delivery_location_group_id = "",
+                  delivery_location_id = "",
+                  pickup_service_time = 0.0,
+                  delivery_service_time = 0.0,
+                  max_duration = typemax(Int32),
+                  duration_unit_cost = 0.0,
+                  pickup_time_windows = [Range()],
+                  delivery_time_windows = [Range()])
+    return Request( id,
+                    product_Compatibility_class_id,
+                    product_sharing_class_id,
+                    product_specification_class_id,
+                    split_fulfillment,
+                    precedence_status,
+                    product_quantity_range,
+                    pickup_location_group_id,
+                    pickup_location_id,
+                    delivery_location_group_id,
+                    delivery_location_id,
+                    pickup_service_time,
+                    delivery_service_time,
+                    max_duration,
+                    duration_unit_cost,
+                    pickup_time_windows,
+                    delivery_time_windows)
 end
 
-function HomogeneousVehicleSet(
-    ; id = "", vehicle_category_id = "", departure_location_group_id = "",
-    departure_location_id = "", arrival_location_group_id = "",
-    arrival_location_id = "", working_time_window = Range(),
-    travel_distance_unit_cost = 0.0, travel_time_unit_cost = 0.0,
-    service_time_unit_cost = 0.0, waiting_time_unit_cost = 0.0,
-    initial_energy_charge = typemax(Int32), nb_of_vehicles_range = Range(),
-    max_working_time = typemax(Int32), max_travel_distance = typemax(Int32),
-    allow_ongoing = false)
+function VehicleCategory( ; id = "",
+                          vehicle_capacities = Dict{String,Float64}(),
+                          compartment_capacities = Dict{String,Dict{String,Float64}}(),
+                          vehicle_properties = Dict{String,Float64} (),
+                          compartments_properties = Dict{String,Dict{String,Float64}}(),
+                          loading_option = 0,
+                          energy_interval_lengths = Float64[])
+    return VehicleCategory(id,
+                          vehicle_capacities ,
+                          compartment_capacities ,
+                          vehicle_properties ,
+                          compartments_properties ,
+                          loading_option ,
+                          energy_interval_lengths)
+end
+
+function HomogeneousVehicleSet(   ; id = "",
+                                  vehicle_category_id = "",
+                                  departure_location_group_id = "",
+                                  departure_location_id = "",
+                                  arrival_location_group_id = "",
+                                  arrival_location_id = "",
+                                  working_time_window = Range(),
+                                  travel_distance_unit_cost = 0.0,
+                                  travel_time_unit_cost = 0.0,
+                                  service_time_unit_cost = 0.0,
+                                  waiting_time_unit_cost = 0.0,
+                                  initial_energy_charge = typemax(Int32),
+                                  nb_of_vehicles_range = Range(),
+                                  max_working_time = typemax(Int32),
+                                  max_travel_distance = typemax(Int32))
     return HomogeneousVehicleSet(
         id, vehicle_category_id, departure_location_group_id,
         departure_location_id, arrival_location_group_id,
         arrival_location_id, working_time_window, travel_distance_unit_cost,
         travel_time_unit_cost, service_time_unit_cost, waiting_time_unit_cost,
         initial_energy_charge, nb_of_vehicles_range, max_working_time,
-        max_travel_distance, allow_ongoing
-    )
+        max_travel_distance)
 end
 
-function RvrpInstance(
-    ; id = "", travel_distance_matrix = Array{Float64,2}(undef,0,0),
-    travel_time_matrix = Array{Float64,2}(undef,0,0),
-    energy_consumption_matrix = Array{Float64,2}(undef,0,0),
-    locations = Location[], location_groups = LocationGroup[],
-    product_categories = ProductCategory[],
-    specific_products = SpecificProduct[], requests = Request[],
-    vehicle_categories = VehicleCategory[],
-    vehicle_sets = HomogeneousVehicleSet[])
-    return RvrpInstance(
-        id, travel_distance_matrix, travel_time_matrix,
-        energy_consumption_matrix, locations, location_groups,
-        product_categories, specific_products, requests, vehicle_categories,
-        vehicle_sets
-    )
+function RvrpInstance( ; id = "",
+                        time_periods = [Range()],
+                       travel_distance_matrix = Array{Float64,2}(undef,0,0),
+                       travel_time_matrix = Array{Int,3}(undef,0,0,0),
+                       energy_consumption_matrix = Array{Float64,2}(undef,0,0),
+                       locations = Location[],
+                       location_groups = LocationGroup[],
+                       product_compatibility_classes = ProductCompatibilityClass[],
+                       product_sharing_classes = ProductSharingClass[],
+                       product_specification_classes= ProductSpecificationClass[],
+                       requests = Request[],
+                       vehicle_categories = VehicleCategory[],
+                       vehicle_sets = HomogeneousVehicleSet[])
+    return RvrpInstance( id,
+                         time_periods,
+                         travel_distance_matrix ,
+                         travel_time_matrix,
+                         energy_consumption_matrix ,
+                         locations,
+                         location_groups ,
+                         product_compatibility_classes,
+                         product_sharing_classes ,
+                         product_specification_classes,
+                         requests ,
+                         vehicle_categories,
+                         vehicle_sets)
 end
