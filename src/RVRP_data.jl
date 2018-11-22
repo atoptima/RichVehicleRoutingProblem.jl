@@ -97,7 +97,7 @@ end
 
 mutable struct RvrpInstance
     id::String
-    time_periods::Vector{Range} # Define  periods of for over the time horizon to refine travel times
+    travel_time_periods::Vector{Range} # Define  periods of for over the time horizon to refine travel times
     travel_distance_matrix::Array{Float64,2}
     travel_time_matrix::Array{Int,3} # for each time preriod index, it provides the travel time in minutes (or any other time unit) for each pair of locations
     energy_consumption_matrix::Array{Float64,2}
