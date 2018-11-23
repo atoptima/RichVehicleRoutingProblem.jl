@@ -9,20 +9,14 @@ struct FlexibilityStatus
     unit_price::Float64 # while respecting the hard value, this represent a cost per unit away from the moninal value, or reward per unit away from the moninal value if the nominal value was optional
 end
 
-struct LowerBoundFlexibility
-    hard_lb::Float64 # hard lower bound
-    status::FlexibilityStatus
-end
 
-struct UpperBoundFlexibility
-    hard_ub::Float64 # hard upper bound
-    status::FlexibilityStatus
-end
 
 struct FlexibleRange
     nominal::Range
-    lb_flex::LowerBoundFlexibility
-    ub_flex::UpperBoundFlexibility
+    hard_lb::Float64 # hard lower bound
+    lb_flex::FlexibilityStatus
+    hard_ub::Float64 # hard upper bound
+    ub_flex::FlexibilityStatus
 end
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
@@ -118,7 +112,6 @@ end
 
 mutable struct RvrpInstance
     id::String
-    working_time_periods::Vector{Range} # Define periods of the planning horizon; vehicles  must return to a depot by the end of each time period if they cannot be ongoing. Route's max_duration and max_distance apply to each time period
     travel_matrix_periods::Vector{Range} # Define  periods of over the time horizon to refine travel times/distances/and Energy consumption.
     period_to_matrix_id::Dict{Range,String} # the dictionnay provides for each travel_time_period, a travel time matrix string id
     travel_time_matrices::Dict{String,Array{Float64,2}}
