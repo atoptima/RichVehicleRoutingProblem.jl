@@ -1,6 +1,28 @@
 struct Range
-    nominal_lb::Float64 # to represent the normal lowerbound
-    nominal_ub::Float64 # to represent the normal upperbound
+    lb::Float64 # to represent the normal lowerbound
+    ub::Float64 # to represent the normal upperbound
+end
+
+struct FlexibilityStatus
+    flexibility_level::Int # in level zero the nominal value is mandatory, in level k the nominal value can unsatisfyied if there was no feasbile solutions to the constraints of level 0 to k-1 that satisfy this level k contraint; a negative level means that the nominal value is optional, i.e. it is statisfyied only it improves the economic value of the solution.
+    fixed_price::Float64 # fixed_cost for not satisfying the nominal value, or fixed reward for satisfying it if it was optional
+    unit_price::Float64 # while respecting the hard value, this represent a cost per unit away from the moninal value, or reward per unit away from the moninal value if the nominal value was optional
+end
+
+struct LowerBoundFlexibility
+    hard_lb::Float64 # hard lower bound
+    status::FlexibilityStatus
+end
+
+struct UpperBoundFlexibility
+    hard_ub::Float64 # hard upper bound
+    status::FlexibilityStatus
+end
+
+struct FlexibleRange
+    nominal::Range
+    lb_flex::LowerBoundFlexibility
+    ub_flex::UpperBoundFlexibility
 end
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
@@ -51,6 +73,7 @@ mutable struct Request # can be
     product_sharing_class_id::String
     product_specification_class_id::string
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
+    request_flexibility::FlexibilityStatus
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     product_quantity_range::Range # of the request
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
@@ -59,8 +82,8 @@ mutable struct Request # can be
     delivery_service_time::Float64 # used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # to enforce a max duration between pickup and delivery
     duration_unit_cost::Float64 # to measure the cost of the time spent between pickup and delivery
-    pickup_time_windows::Vector{Range}
-    delivery_time_windows::Vector{Range}
+    pickup_time_windows::Vector{FlexibleRange}
+    delivery_time_windows::Vector{FlexibleRange}
 end
 
 mutable struct VehicleCategory
@@ -78,23 +101,29 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     vehicle_category_id::String
     departure_location_group_id::String # Vehicle routes start from one of the depot locations in the group
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
-    working_time_window::Range
+    working_time_window::FlexibleRange
     travel_distance_unit_cost::Float64 # may depend on both driver and vehicle
     travel_time_unit_cost::Float64 # may depend on both driver and vehicle
     service_time_unit_cost::Float64
     waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
-    nb_of_vehicles_range::Range
     fixed_cost_per_vehicle::Float64
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
+    nb_of_vehicles_range::Range
+    min_nb_of_vehicles_flexibility::FlexibleLowerBound # for each time period  in its working_time_window
+    max_nb_of_vehicles_flexibility::FlexibleUpperBound # for each time period  in its working_time_window
+    allow_ongoing::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
 end
 
 mutable struct RvrpInstance
     id::String
-    travel_time_matrice::Array{Float64,2}
-    travel_distance_matrix::Array{Float64,2}
-    energy_consumption_matrix::Array{Float64,2}
+    working_time_periods::Vector{Range} # Define periods of the planning horizon; vehicles  must return to a depot by the end of each time period if they cannot be ongoing. Route's max_duration and max_distance apply to each time period
+    travel_matrix_periods::Vector{Range} # Define  periods of over the time horizon to refine travel times/distances/and Energy consumption.
+    period_to_matrix_id::Dict{Range,String} # the dictionnay provides for each travel_time_period, a travel time matrix string id
+    travel_time_matrices::Dict{String,Array{Float64,2}}
+    travel_distance_matrices::Dict{String,Array{Float64,2}}
+    energy_consumption_matrices::Dict{String,Array{Float64,2}}
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
     product_compatibility_classes::Vector{ProductCompatibilityClass}
