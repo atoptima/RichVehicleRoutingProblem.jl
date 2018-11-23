@@ -1,11 +1,6 @@
 struct Range
-    hard_min::Float64
-    soft_min::Float64 # must be greater or equal to the hard_opening; can be undefined
-    soft_max::Float64 # must be greater or equal to the soft_opening; can be undefined
-    hard_max::Float64 # must be greater or equal to the soft_closing
-    nominal_unit_price::Float64 # to measure the cost/reward per unit
-    shortage_extra_unit_price::Float64 # to measure the cost/reward of being below this range's soft_opening
-    excess_extra_unit_price::Float64 # to measure the cost/reward of being above this range's soft_closing
+    nominal_lb::Float64 # to represent the normal lowerbound
+    nominal_ub::Float64 # to represent the normal upperbound
 end
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
@@ -89,15 +84,15 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     service_time_unit_cost::Float64
     waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
-    nb_of_vehicles_range::Range # also includes the fixed cost per vehicle  within each time period (in Range.nominal_unit_price)
+    nb_of_vehicles_range::Range
+    fixed_cost_per_vehicle::Float64
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
 end
 
 mutable struct RvrpInstance
     id::String
-    travel_time_matrices::Dict{String{Array{Float64,2}}}
-    time_interval_to_travel_time_matrix_id::Dict{Tuple{Float64,Float64},String} # For time t s.t. travel_time_separators[i] <= t < travel_time_separators[i+1], use travel_time_matrices[i].
+    travel_time_matrice::Array{Float64,2}
     travel_distance_matrix::Array{Float64,2}
     energy_consumption_matrix::Array{Float64,2}
     locations::Vector{Location}
@@ -111,14 +106,10 @@ mutable struct RvrpInstance
 end
 
 ################ Default-valued constructors #################
-function Range(; hard_min = 0.0, soft_min = 0.0, soft_max = typemax(Int32),
-               hard_max = typemax(Int32), nominal_unit_price = 0.0,
-               shortage_extra_unit_price = 0.0, excess_extra_unit_price = 0.0)
-    return Range(hard_min, soft_min, soft_max, hard_max, nominal_unit_price,
-                 shortage_extra_unit_price, excess_extra_unit_price)
+function Range(; nominal_lb = 0.0,  nominal_ub = typemax(Int32))
+    return Range(nominal_lb, nominal_ub)
 end
-simple_range(v::Real) = Range(v, v, v, v, 0.0, 0.0, 0.0)
-standard_range(l::Real, u::Real, price::Real = 0.0) = Range(l, l, u, u, price, 0.0, 0.0)
+single_val_range(v::Real) = Range(v, v)
 
 function Location(; id = "", index = -1, latitude = -1.0,  longitude = -1.0,
                   opening_time_windows = [Range()])
