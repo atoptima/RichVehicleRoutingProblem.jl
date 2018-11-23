@@ -3,20 +3,17 @@ struct Range
     ub::Float64 # to represent the normal upperbound
 end
 
-struct FlexibilityStatus
+struct Flexibility
     flexibility_level::Int # in level zero the nominal value is mandatory, in level k the nominal value can unsatisfyied if there was no feasbile solutions to the constraints of level 0 to k-1 that satisfy this level k contraint; a negative level means that the nominal value is optional, i.e. it is statisfyied only it improves the economic value of the solution.
     fixed_price::Float64 # fixed_cost for not satisfying the nominal value, or fixed reward for satisfying it if it was optional
     unit_price::Float64 # while respecting the hard value, this represent a cost per unit away from the moninal value, or reward per unit away from the moninal value if the nominal value was optional
 end
 
-
-
 struct FlexibleRange
-    nominal::Range
-    hard_lb::Float64 # hard lower bound
-    lb_flex::FlexibilityStatus
-    hard_ub::Float64 # hard upper bound
-    ub_flex::FlexibilityStatus
+    soft_range::Range
+    hard_range::Range
+    lb_flex::Flexibility
+    ub_flex::Flexibility
 end
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
@@ -67,7 +64,7 @@ mutable struct Request # can be
     product_sharing_class_id::String
     product_specification_class_id::string
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
-    request_flexibility::FlexibilityStatus
+    request_flexibility::Flexibility
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     product_quantity_range::Range # of the request
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
