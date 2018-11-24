@@ -134,18 +134,22 @@ function Flexibility(; flexibility_level = 0,
     return Flexibility(flexibility_level, fixed_price, unit_price)
 end
 
-function FlexibleRange(; nominal=Range(),
-                        hard_lb = 0.0,
+function FlexibleRange(;  soft_range=Range(),
+                       hard_range=Range(),
                         lb_flex = Flexibility(),
-                        hard_ub = typemax(Int32),
                        ub_flex = Flexibility())
-    return FlexibleRange(nominal,hard_lb,lb_flex,hard_ub,ub_flex)
+    return FlexibleRange(soft_range,hard_range,lb_flex,ub_flex)
 end
 
-simpleFlexRange(hard_lb::Float64, nominal_lb::Float64, nominal_ub::Float64, hard_ub::Float64, soft_violation_price::Float64) = 
+simpleFlexRange(hard_lb::Float64,
+                nominal_lb::Float64, 
+                nominal_ub::Float64,
+                hard_ub::Float64,
+                soft_violation_price::Float64) = 
     FlexibleRange(Range(nominal_lb, nominal_ub),
-                  hard_lb, Flexibility(0,0.0,soft_violation_price),
-                  hard_ub, Flexibility(0,0.0,soft_violation_price))
+                  Range(hard_lb, hard_ub),
+                  Flexibility(0,0.0,soft_violation_price),
+                  Flexibility(0,0.0,soft_violation_price))
 
 function Location(; id = "",
                   index = -1,
