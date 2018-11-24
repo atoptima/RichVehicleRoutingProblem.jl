@@ -62,7 +62,7 @@ mutable struct Request # can be
     id::String
     product_Compatibility_class_id::String
     product_sharing_class_id::String
-    product_specification_class_id::string
+    product_specification_class_id::String
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
     request_flexibility::Flexibility
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
