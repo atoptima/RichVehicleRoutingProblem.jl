@@ -1,11 +1,19 @@
 struct Range
-    hard_min::Float64
-    soft_min::Float64 # must be greater or equal to the hard_opening; can be undefined
-    soft_max::Float64 # must be greater or equal to the soft_opening; can be undefined
-    hard_max::Float64 # must be greater or equal to the soft_closing
-    nominal_unit_price::Float64 # to measure the cost/reward per unit
-    shortage_extra_unit_price::Float64 # to measure the cost/reward of being below this range's soft_opening
-    excess_extra_unit_price::Float64 # to measure the cost/reward of being above this range's soft_closing
+    lb::Float64 # to represent the normal lowerbound
+    ub::Float64 # to represent the normal upperbound
+end
+
+struct Flexibility
+    flexibility_level::Int # in level zero the nominal value is mandatory, in level k the nominal value can unsatisfyied if there was no feasbile solutions to the constraints of level 0 to k-1 that satisfy this level k contraint; a negative level means that the nominal value is optional, i.e. it must be statisfyied only it improves the economic value of the solution.
+    fixed_price::Float64 # fixed_cost for not satisfying the nominal value, or fixed reward for satisfying it if it was optional
+    unit_price::Float64 # while respecting the hard value, this represent a cost per unit away from the moninal value, or reward per unit away from the moninal value if the nominal value was optional
+end
+
+struct FlexibleRange
+    soft_range::Range
+    hard_range::Range
+    lb_flex::Flexibility
+    ub_flex::Flexibility
 end
 
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
@@ -56,6 +64,7 @@ mutable struct Request # can be
     product_sharing_class_id::String
     product_specification_class_id::string
     split_fulfillment::Bool  # true if split delivery/pickup is allowed, default is false
+    request_flexibility::Flexibility
     precedence_status::Int # default = 0 = product predecessor restrictions;  1 = after all pickups, 2 =  after all deliveries.
     product_quantity_range::Range # of the request
     pickup_location_group_id::String # empty string for delivery-only requests. LocationGroup representing alternatives for pickup, otherwise.
@@ -64,8 +73,8 @@ mutable struct Request # can be
     delivery_service_time::Float64 # used to measure post-cleaning or unloading time for instance
     max_duration::Float64 # to enforce a max duration between pickup and delivery
     duration_unit_cost::Float64 # to measure the cost of the time spent between pickup and delivery
-    pickup_time_windows::Vector{Range}
-    delivery_time_windows::Vector{Range}
+    pickup_time_windows::Vector{FlexibleRange}
+    delivery_time_windows::Vector{FlexibleRange}
 end
 
 mutable struct VehicleCategory
@@ -83,23 +92,25 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     vehicle_category_id::String
     departure_location_group_id::String # Vehicle routes start from one of the depot locations in the group
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
-    working_time_window::Range
+    working_time_window::FlexibleRange
     travel_distance_unit_cost::Float64 # may depend on both driver and vehicle
     travel_time_unit_cost::Float64 # may depend on both driver and vehicle
     service_time_unit_cost::Float64
     waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
-    nb_of_vehicles_range::Range # also includes the fixed cost per vehicle  within each time period (in Range.nominal_unit_price)
+    fixed_cost_per_vehicle::Float64
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
+    nb_of_vehicles_range::FlexibleRange
 end
 
 mutable struct RvrpInstance
     id::String
-    travel_time_matrices::Dict{String{Array{Float64,2}}}
-    time_interval_to_travel_time_matrix_id::Dict{Tuple{Float64,Float64},String} # For time t s.t. travel_time_separators[i] <= t < travel_time_separators[i+1], use travel_time_matrices[i].
-    travel_distance_matrix::Array{Float64,2}
-    energy_consumption_matrix::Array{Float64,2}
+    travel_matrix_periods::Vector{Range} # Define  periods of over the time horizon to refine travel times/distances/and Energy consumption.
+    period_to_matrix_id::Dict{Range,String} # the dictionnay provides for each travel_time_period, a travel time matrix string id
+    travel_time_matrices::Dict{String,Array{Float64,2}}
+    travel_distance_matrices::Dict{String,Array{Float64,2}}
+    energy_consumption_matrices::Dict{String,Array{Float64,2}}
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
     product_compatibility_classes::Vector{ProductCompatibilityClass}
@@ -111,27 +122,46 @@ mutable struct RvrpInstance
 end
 
 ################ Default-valued constructors #################
-function Range(; hard_min = 0.0, soft_min = 0.0, soft_max = typemax(Int32),
-               hard_max = typemax(Int32), nominal_unit_price = 0.0,
-               shortage_extra_unit_price = 0.0, excess_extra_unit_price = 0.0)
-    return Range(hard_min, soft_min, soft_max, hard_max, nominal_unit_price,
-                 shortage_extra_unit_price, excess_extra_unit_price)
+function Range(; nominal_lb = 0.0,
+               nominal_ub = typemax(Int32))
+    return Range(nominal_lb, nominal_ub)
 end
-simple_range(v::Real) = Range(v, v, v, v, 0.0, 0.0, 0.0)
-standard_range(l::Real, u::Real, price::Real = 0.0) = Range(l, l, u, u, price, 0.0, 0.0)
+single_val_range(v::Real) = Range(v, v)
 
-function Location(; id = "", index = -1, latitude = -1.0,  longitude = -1.0,
+function Flexibility(; flexibility_level = 0,
+                           fixed_price = 0.0,
+                           unit_price = 0.0)
+    return Flexibility(flexibility_level, fixed_price, unit_price)
+end
+
+function FlexibleRange(; nominal=Range(),
+                        hard_lb = 0.0,
+                        lb_flex = Flexibility(),
+                        hard_ub = typemax(Int32),
+                       ub_flex = Flexibility())
+    return FlexibleRange(nominal,hard_lb,lb_flex,hard_ub,ub_flex)
+end
+
+simpleFlexRange(hard_lb::Float64, nominal_lb::Float64, nominal_ub::Float64, hard_ub::Float64, soft_violation_price::Float64) = 
+    FlexibleRange(Range(nominal_lb, nominal_ub),
+                  hard_lb, Flexibility(0,0.0,soft_violation_price),
+                  hard_ub, Flexibility(0,0.0,soft_violation_price))
+
+function Location(; id = "",
+                  index = -1,
+                  latitude = -1.0,
+                  longitude = -1.0, 
                   opening_time_windows = [Range()])
-    return Location(
-        id, index,  latitude, longitude, opening_time_windows
-    )
+    return Location(id, index, latitude, longitude, opening_time_windows)
 end
 
-function LocationGroup(;id = "", location_ids = String[])
+function LocationGroup(;id = "",
+                       location_ids = String[])
     return LocationGroup(id, location_ids)
 end
 
-function ProductCompatibilityClass(; id = "", conflict_compatib_class_ids = String[],
+function ProductCompatibilityClass(; id = "",
+                                   conflict_compatib_class_ids = String[],
                                    prohibited_predecessor_compatib_class_ids = String[])
     return ProductCompatibilityClass(id, conflict_compatib_class_ids,
                                      prohibited_predecessor_compatib_class_ids)
