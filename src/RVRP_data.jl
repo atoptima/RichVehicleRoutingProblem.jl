@@ -4,7 +4,7 @@ struct Range
 end
 
 struct Flexibility
-    flexibility_level::Int # in level zero the nominal value is mandatory, in level k the nominal value can unsatisfyied if there was no feasbile solutions to the constraints of level 0 to k-1 that satisfy this level k contraint; a negative level means that the nominal value is optional, i.e. it is statisfyied only it improves the economic value of the solution.
+    flexibility_level::Int # in level zero the nominal value is mandatory, in level k the nominal value can unsatisfyied if there was no feasbile solutions to the constraints of level 0 to k-1 that satisfy this level k contraint; a negative level means that the nominal value is optional, i.e. it must be statisfyied only it improves the economic value of the solution.
     fixed_price::Float64 # fixed_cost for not satisfying the nominal value, or fixed reward for satisfying it if it was optional
     unit_price::Float64 # while respecting the hard value, this represent a cost per unit away from the moninal value, or reward per unit away from the moninal value if the nominal value was optional
 end
@@ -102,7 +102,6 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
     nb_of_vehicles_range::FlexibleRange
-    allow_ongoing::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
 end
 
 mutable struct RvrpInstance
@@ -123,23 +122,46 @@ mutable struct RvrpInstance
 end
 
 ################ Default-valued constructors #################
-function Range(; nominal_lb = 0.0,  nominal_ub = typemax(Int32))
+function Range(; nominal_lb = 0.0,
+               nominal_ub = typemax(Int32))
     return Range(nominal_lb, nominal_ub)
 end
 single_val_range(v::Real) = Range(v, v)
 
-function Location(; id = "", index = -1, latitude = -1.0,  longitude = -1.0,
-                  opening_time_windows = [Range()])
-    return Location(
-        id, index,  latitude, longitude, opening_time_windows
-    )
+function Flexibility(; flexibility_level = 0,
+                           fixed_price = 0.0,
+                           unit_price = 0.0)
+    return Flexibility(flexibility_level, fixed_price, unit_price)
 end
 
-function LocationGroup(;id = "", location_ids = String[])
+function FlexibleRange(; nominal=Range(),
+                        hard_lb = 0.0,
+                        lb_flex = Flexibility(),
+                        hard_ub = typemax(Int32),
+                       ub_flex = Flexibility())
+    return FlexibleRange(nominal,hard_lb,lb_flex,hard_ub,ub_flex)
+end
+
+simpleFlexRange(hard_lb::Float64, nominal_lb::Float64, nominal_ub::Float64, hard_ub::Float64, soft_violation_price::Float64) = 
+    FlexibleRange(Range(nominal_lb, nominal_ub),
+                  hard_lb, Flexibility(0,0.0,soft_violation_price),
+                  hard_ub, Flexibility(0,0.0,soft_violation_price))
+
+function Location(; id = "",
+                  index = -1,
+                  latitude = -1.0,
+                  longitude = -1.0, 
+                  opening_time_windows = [Range()])
+    return Location(id, index, latitude, longitude, opening_time_windows)
+end
+
+function LocationGroup(;id = "",
+                       location_ids = String[])
     return LocationGroup(id, location_ids)
 end
 
-function ProductCompatibilityClass(; id = "", conflict_compatib_class_ids = String[],
+function ProductCompatibilityClass(; id = "",
+                                   conflict_compatib_class_ids = String[],
                                    prohibited_predecessor_compatib_class_ids = String[])
     return ProductCompatibilityClass(id, conflict_compatib_class_ids,
                                      prohibited_predecessor_compatib_class_ids)
