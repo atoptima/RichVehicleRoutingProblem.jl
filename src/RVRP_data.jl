@@ -101,9 +101,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     fixed_cost_per_vehicle::Float64
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
-    nb_of_vehicles_range::Range
-    min_nb_of_vehicles_flexibility::FlexibleLowerBound # for each time period  in its working_time_window
-    max_nb_of_vehicles_flexibility::FlexibleUpperBound # for each time period  in its working_time_window
+    nb_of_vehicles_range::FlexibleRange
     allow_ongoing::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
 end
 
