@@ -101,7 +101,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     fixed_cost_per_vehicle::Float64
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
-    allow_ongoing::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
+    allow_shipment_on_multiple_work_periods::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
     nb_of_vehicles_range::FlexibleRange
 end
 
@@ -112,7 +112,7 @@ mutable struct RvrpInstance
     travel_time_matrices::Dict{String,Array{Float64,2}}
     travel_distance_matrices::Dict{String,Array{Float64,2}}
     energy_consumption_matrices::Dict{String,Array{Float64,2}}
-    working_time_periods::Vector{Range} # Define periods of the planning horizon; vehicles  must return to a depot by the end of each time period if they cannot be ongoing. Route's max_duration and max_distance apply to each time period
+    work_periods::Vector{Range} # Define periods of the planning horizon; vehicles  must return to a depot by the end of each time period if they cannot be ongoing. Route's max_duration and max_distance apply to each time period
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
     product_compatibility_classes::Vector{ProductCompatibilityClass}
@@ -252,7 +252,7 @@ function HomogeneousVehicleSet(   ; id = "",
                                   initial_energy_charge = typemax(Int32),
                                   max_working_time = typemax(Int32),
                                   max_travel_distance = typemax(Int32),
-                                  allow_ongoing = false,
+                                  allow_shipment_on_multiple_work_periods = false,
                                   nb_of_vehicles_range = Range())
     return HomogeneousVehicleSet(
         id, vehicle_category_id, departure_location_group_id,
@@ -265,6 +265,7 @@ end
 
 function RvrpInstance( ; id = "",
                         time_periods = [Range()],
+                        work_periods = [Range()], 
                        travel_distance_matrix = Array{Float64,2}(undef,0,0),
                        travel_time_matrix = Array{Int,3}(undef,0,0,0),
                        energy_consumption_matrix = Array{Float64,2}(undef,0,0),
