@@ -259,8 +259,8 @@ function HomogeneousVehicleSet(   ; id = "",
         departure_location_id, arrival_location_group_id,
         arrival_location_id, working_time_window, travel_distance_unit_cost,
         travel_time_unit_cost, service_time_unit_cost, waiting_time_unit_cost,
-        initial_energy_charge, max_working_time, max_travel_distance, allow_ongoing,
-        nb_of_vehicles_range)
+        initial_energy_charge, max_working_time, max_travel_distance, 
+        allow_shipment_on_multiple_work_periods, nb_of_vehicles_range)
 end
 
 function RvrpInstance( ; id = "",
@@ -282,6 +282,7 @@ function RvrpInstance( ; id = "",
                          travel_distance_matrix ,
                          travel_time_matrix,
                          energy_consumption_matrix ,
+                         work_periods,                         
                          locations,
                          location_groups ,
                          product_compatibility_classes,
