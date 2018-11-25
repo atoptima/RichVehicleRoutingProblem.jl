@@ -101,6 +101,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     fixed_cost_per_vehicle::Float64
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
+    allow_ongoing::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
     nb_of_vehicles_range::FlexibleRange
 end
 
@@ -111,6 +112,7 @@ mutable struct RvrpInstance
     travel_time_matrices::Dict{String,Array{Float64,2}}
     travel_distance_matrices::Dict{String,Array{Float64,2}}
     energy_consumption_matrices::Dict{String,Array{Float64,2}}
+    working_time_periods::Vector{Range} # Define periods of the planning horizon; vehicles  must return to a depot by the end of each time period if they cannot be ongoing. Route's max_duration and max_distance apply to each time period
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
     product_compatibility_classes::Vector{ProductCompatibilityClass}
@@ -248,16 +250,17 @@ function HomogeneousVehicleSet(   ; id = "",
                                   service_time_unit_cost = 0.0,
                                   waiting_time_unit_cost = 0.0,
                                   initial_energy_charge = typemax(Int32),
-                                  nb_of_vehicles_range = Range(),
                                   max_working_time = typemax(Int32),
-                                  max_travel_distance = typemax(Int32))
+                                  max_travel_distance = typemax(Int32),
+                                  allow_ongoing = false,
+                                  nb_of_vehicles_range = Range())
     return HomogeneousVehicleSet(
         id, vehicle_category_id, departure_location_group_id,
         departure_location_id, arrival_location_group_id,
         arrival_location_id, working_time_window, travel_distance_unit_cost,
         travel_time_unit_cost, service_time_unit_cost, waiting_time_unit_cost,
-        initial_energy_charge, nb_of_vehicles_range, max_working_time,
-        max_travel_distance)
+        initial_energy_charge, max_working_time, max_travel_distance, allow_ongoing,
+        nb_of_vehicles_range)
 end
 
 function RvrpInstance( ; id = "",
