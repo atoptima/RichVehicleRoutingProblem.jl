@@ -95,7 +95,7 @@ JSON2.@format HomogeneousVehicleSet begin
     fixed_cost_per_vehicle => (default=0.0,)
     max_working_time => (default=typemax(Int32),)
     max_travel_distance => (default=typemax(Int32),)
-    allow_shipment_on_multiple_work_periods => (default=false,)
+    allow_shipment_over_multiple_work_periods => (default=false,)
     nb_of_vehicles_range => (default=FlexibleRange(),)
 end
 

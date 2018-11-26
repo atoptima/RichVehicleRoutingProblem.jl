@@ -252,7 +252,7 @@ function HomogeneousVehicleSet(; id = "",
                                fixed_cost_per_vehicle = 0.0,
                                max_working_time = typemax(Int32),
                                max_travel_distance = typemax(Int32),
-                               allow_shipment_on_multiple_work_periods = false,
+                               allow_shipment_over_multiple_work_periods = false,
                                nb_of_vehicles_range = FlexibleRange())
     return HomogeneousVehicleSet(
         id, vehicle_category_id, departure_location_group_id,
@@ -260,7 +260,7 @@ function HomogeneousVehicleSet(; id = "",
         travel_distance_unit_cost, travel_time_unit_cost,
         service_time_unit_cost, waiting_time_unit_cost, initial_energy_charge,
         fixed_cost_per_vehicle, max_working_time, max_travel_distance,
-        allow_shipment_on_multiple_work_periods, nb_of_vehicles_range)
+        allow_shipment_over_multiple_work_periods, nb_of_vehicles_range)
 end
 
 function RvrpInstance(; id = "",

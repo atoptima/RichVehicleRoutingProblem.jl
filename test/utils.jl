@@ -116,7 +116,7 @@ function ==(hvs1::RVRP.HomogeneousVehicleSet, hvs2::RVRP.HomogeneousVehicleSet)
         && hvs1.fixed_cost_per_vehicle == hvs2.fixed_cost_per_vehicle
         && hvs1.max_working_time == hvs2.max_working_time
         && hvs1.max_travel_distance == hvs2.max_travel_distance
-        && hvs1.allow_shipment_on_multiple_work_periods == hvs2.allow_shipment_on_multiple_work_periods
+        && hvs1.allow_shipment_over_multiple_work_periods == hvs2.allow_shipment_on_multiple_work_periods
         && hvs1.nb_of_vehicles_range == hvs2.nb_of_vehicles_range
     )
 end
