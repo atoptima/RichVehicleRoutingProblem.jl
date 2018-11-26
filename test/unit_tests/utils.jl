@@ -36,8 +36,13 @@ function build_computed_data_tests()
         id = string("vc_", i)
     ) for i in 1:9]
     RVRP.set_indices(data)
+    data.location_groups = RVRP.create_default_location_groups(data.locations)
     computed_data = RVRP.build_computed_data(data)
     for (k,v) in computed_data.location_id_2_index
+        @test v >= 1
+        @test v <= 9
+    end
+    for (k,v) in computed_data.location_group_id_2_index
         @test v >= 1
         @test v <= 9
     end

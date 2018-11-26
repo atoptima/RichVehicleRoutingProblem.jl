@@ -19,13 +19,22 @@ function set_indices(data::RvrpInstance)
 end
 
 function build_computed_data(data::RvrpInstance)
-    loc_id_idx = Dict{String,Int}(
+    location_id_2_index = Dict{String,Int}(
         data.locations[i].id => i for i in 1:length(data.locations)
     )
-    vc_id_idx = Dict{String,Int}(
+    location_group_id_2_index = Dict{String,Int}(
+        data.location_groups[i].id => i for i in 1:length(data.location_groups)
+    )
+    product_specification_class_id_2_index = Dict{String,Int}(
+        data.product_specification_classes[i].id => i for i in 1:length(data.product_specification_classes)
+    )
+    vehicle_category_id_2_index = Dict{String,Int}(
         data.vehicle_categories[i].id => i for i in 1:length(data.vehicle_categories)
     )
-    return RvrpComputedData(loc_id_idx, vc_id_idx)
+    return RvrpComputedData(
+        location_id_2_index, location_group_id_2_index,
+        product_specification_class_id_2_index, vehicle_category_id_2_index
+    )
 end
 
 function create_default_location_groups(locations::Vector{Location})
@@ -33,4 +42,15 @@ function create_default_location_groups(locations::Vector{Location})
         id = string(l.id, "_loc_group"),
         location_ids = [l.id]
     ) for l in locations]
+end
+
+function get_capacity_consumptions(req::Request, product_specification_classes::Vector{ProductSpecificationClass}, computed_data::RvrpComputedData)
+    quantity = req.product_quantity_range.ub
+    product_specification_class_id = req.product_specification_class_id
+    product_specification_class = product_specification_classes[computed_data.product_specification_class_id_2_index[product_specification_class_id]]
+    c = [
+        ceil(quantity/v[2]) * v[1]
+        for (k,v) in product_specification_class.capacity_consumptions
+    ]
+    return c
 end
