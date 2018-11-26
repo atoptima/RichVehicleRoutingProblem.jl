@@ -3,7 +3,7 @@ struct Range
     ub::Float64 # to represent the normal upperbound
 end
 
-struct Flexibility
+struct Flexibility # To model flexible bounds (semi-mandatory or optional with reward)
     flexibility_level::Int # in level zero the nominal value is mandatory, in level k the nominal value can unsatisfyied if there was no feasbile solutions to the constraints of level 0 to k-1 that satisfy this level k contraint; a negative level means that the nominal value is optional, i.e. it must be statisfyied only it improves the economic value of the solution.
     fixed_price::Float64 # fixed_cost for not satisfying the nominal value, or fixed reward for satisfying it if it was optional
     unit_price::Float64 # while respecting the hard value, this represent a cost per unit away from the moninal value, or reward per unit away from the moninal value if the nominal value was optional
@@ -264,10 +264,11 @@ function HomogeneousVehicleSet(   ; id = "",
 end
 
 function RvrpInstance( ; id = "",
-                        time_periods = [Range()],
+                       time_periods = [Range()],
                        travel_distance_matrix = Array{Float64,2}(undef,0,0),
                        travel_time_matrix = Array{Int,3}(undef,0,0,0),
                        energy_consumption_matrix = Array{Float64,2}(undef,0,0),
+                       working_time_periods = [Range()],
                        locations = Location[],
                        location_groups = LocationGroup[],
                        product_compatibility_classes = ProductCompatibilityClass[],
@@ -281,6 +282,7 @@ function RvrpInstance( ; id = "",
                          travel_distance_matrix ,
                          travel_time_matrix,
                          energy_consumption_matrix ,
+                         working_time_periods,
                          locations,
                          location_groups ,
                          product_compatibility_classes,
