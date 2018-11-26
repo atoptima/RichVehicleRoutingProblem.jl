@@ -6,9 +6,9 @@ import Scanner
 include("RVRP_data.jl")
 include("RVRP_computed_data.jl")
 include("RVRP_solution.jl")
+include("utils.jl")
 include("parser_json.jl")
 include("parser_cvrplib.jl")
-include("utils.jl")
 
 
 abstract type AbstractSolver end

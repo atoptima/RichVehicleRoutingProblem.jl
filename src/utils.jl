@@ -27,3 +27,10 @@ function build_computed_data(data::RvrpInstance)
     )
     return RvrpComputedData(loc_id_idx, vc_id_idx)
 end
+
+function create_default_location_groups(locations::Vector{Location})
+    return [LocationGroup(
+        id = string(l.id, "_loc_group"),
+        location_ids = [l.id]
+    ) for l in locations]
+end
