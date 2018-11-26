@@ -101,7 +101,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     fixed_cost_per_vehicle::Float64
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
-    allow_shipment_on_multiple_work_periods::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
+    allow_shipment_over_multiple_work_periods::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
     nb_of_vehicles_range::FlexibleRange
 end
 
@@ -277,8 +277,7 @@ function RvrpInstance(; id = "",
                       product_specification_classes = ProductSpecificationClass[],
                       requests = Request[],
                       vehicle_categories = VehicleCategory[],
-                      vehicle_sets = HomogeneousVehicleSet[]
-                      )
+                      vehicle_sets = HomogeneousVehicleSet[])
     return RvrpInstance(id,
                         travel_matrix_periods,
                         period_to_matrix_id,
@@ -293,6 +292,5 @@ function RvrpInstance(; id = "",
                         product_specification_classes,
                         requests,
                         vehicle_categories,
-                        vehicle_sets,
-                        )
+                        vehicle_sets)
 end
