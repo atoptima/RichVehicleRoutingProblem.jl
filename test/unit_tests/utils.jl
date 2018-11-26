@@ -2,6 +2,7 @@ function utils_unit_tests()
     generate_symmetric_distance_matrix_tests()
     set_indices_tests()
     build_computed_data_tests()
+    create_default_location_groups_tests()
 end
 
 function generate_symmetric_distance_matrix_tests()
@@ -43,5 +44,14 @@ function build_computed_data_tests()
     for (k,v) in computed_data.vehicle_category_id_2_index
         @test v >= 1
         @test v <= 9
+    end
+end
+
+function create_default_location_groups_tests()
+    data = RVRP.RvrpInstance()
+    data.locations = [RVRP.Location(index = rand(-100:-1)) for i in 1:10]
+    def_loc_groups = RVRP.create_default_location_groups(data.locations)
+    for i in 1:length(data.locations)
+        @test string(data.locations[i].id, "_loc_group") == def_loc_groups[i].id
     end
 end
