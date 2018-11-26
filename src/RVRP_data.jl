@@ -277,8 +277,7 @@ function RvrpInstance(; id = "",
                       product_specification_classes = ProductSpecificationClass[],
                       requests = Request[],
                       vehicle_categories = VehicleCategory[],
-                      vehicle_sets = HomogeneousVehicleSet[]
-                      )
+                      vehicle_sets = HomogeneousVehicleSet[])
     return RvrpInstance(id,
                         travel_matrix_periods,
                         period_to_matrix_id,
@@ -293,6 +292,5 @@ function RvrpInstance(; id = "",
                         product_specification_classes,
                         requests,
                         vehicle_categories,
-                        vehicle_sets,
-                        )
+                        vehicle_sets)
 end
