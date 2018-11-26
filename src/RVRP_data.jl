@@ -101,7 +101,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     fixed_cost_per_vehicle::Float64
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
-    allow_shipment_on_multiple_work_periods::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
+    allow_shipment_over_multiple_work_periods::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
     nb_of_vehicles_range::FlexibleRange
 end
 
@@ -238,37 +238,37 @@ function VehicleCategory( ; id = "",
                           energy_interval_lengths)
 end
 
-function HomogeneousVehicleSet(   ; id = "",
-                                  vehicle_category_id = "",
-                                  departure_location_group_id = "",
-                                  departure_location_id = "",
-                                  arrival_location_group_id = "",
-                                  arrival_location_id = "",
-                                  working_time_window = Range(),
-                                  travel_distance_unit_cost = 0.0,
-                                  travel_time_unit_cost = 0.0,
-                                  service_time_unit_cost = 0.0,
-                                  waiting_time_unit_cost = 0.0,
-                                  initial_energy_charge = typemax(Int32),
-                                  max_working_time = typemax(Int32),
-                                  max_travel_distance = typemax(Int32),
-                                  allow_shipment_on_multiple_work_periods = false,
-                                  nb_of_vehicles_range = Range())
+function HomogeneousVehicleSet( ; id = "",
+                                vehicle_category_id = "",
+                                departure_location_group_id = "",
+                                departure_location_id = "",
+                                arrival_location_group_id = "",
+                                arrival_location_id = "",
+                                working_time_window = Range(),
+                                travel_distance_unit_cost = 0.0,
+                                travel_time_unit_cost = 0.0,
+                                service_time_unit_cost = 0.0,
+                                waiting_time_unit_cost = 0.0,
+                                initial_energy_charge = typemax(Int32),
+                                max_working_time = typemax(Int32),
+                                max_travel_distance = typemax(Int32),
+                                allow_shipment_over_multiple_work_periods = false,
+                                nb_of_vehicles_range = Range())
     return HomogeneousVehicleSet(
         id, vehicle_category_id, departure_location_group_id,
         departure_location_id, arrival_location_group_id,
         arrival_location_id, working_time_window, travel_distance_unit_cost,
         travel_time_unit_cost, service_time_unit_cost, waiting_time_unit_cost,
         initial_energy_charge, max_working_time, max_travel_distance, 
-        allow_shipment_on_multiple_work_periods, nb_of_vehicles_range)
+        allow_shipment_over_multiple_work_periods, nb_of_vehicles_range)
 end
 
 function RvrpInstance( ; id = "",
-                        time_periods = [Range()],
-                        work_periods = [Range()], 
+                       travel_matrix_periods = [Range()],
                        travel_distance_matrix = Array{Float64,2}(undef,0,0),
                        travel_time_matrix = Array{Int,3}(undef,0,0,0),
                        energy_consumption_matrix = Array{Float64,2}(undef,0,0),
+                       work_periods = [Range()], 
                        locations = Location[],
                        location_groups = LocationGroup[],
                        product_compatibility_classes = ProductCompatibilityClass[],
@@ -278,11 +278,11 @@ function RvrpInstance( ; id = "",
                        vehicle_categories = VehicleCategory[],
                        vehicle_sets = HomogeneousVehicleSet[])
     return RvrpInstance( id,
-                         time_periods,
+                         travel_matrix_periods,
                          travel_distance_matrix ,
                          travel_time_matrix,
                          energy_consumption_matrix ,
-                         work_periods,                         
+                         work_periods,                        
                          locations,
                          location_groups ,
                          product_compatibility_classes,
