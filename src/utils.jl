@@ -37,7 +37,7 @@ function build_computed_data(data::RvrpInstance)
     )
 end
 
-function create_default_location_groups(locations::Vector{Location})
+function create_singleton_location_groups(locations::Vector{Location})
     return [LocationGroup(
         id = string(l.id, "_loc_group"),
         location_ids = [l.id]
@@ -53,4 +53,18 @@ function get_capacity_consumptions(req::Request, product_specification_classes::
         for (k,v) in product_specification_class.capacity_consumptions
     ]
     return c
+end
+
+function preprocess_instance(data::RvrpInstance)
+    # push!(data.locations, Location(id = "default_id"))
+    # push!(data.location_groups, LocationGroup(id = "default_id"))
+    push!(data.product_compatibility_classes,
+          ProductCompatibilityClass(id = "default_id"))
+    push!(data.product_sharing_classes,
+          ProductSharingClass(id = "default_id"))
+    push!(data.product_specification_classes,
+          ProductSpecificationClass(id = "default_id"))
+    # push!(data.requests, Request(id = "default_id"))
+    push!(data.vehicle_categories, VehicleCategory(id = "default_id"))
+    push!(data.vehicle_sets, HomogeneousVehicleSet(id = "default_id"))
 end

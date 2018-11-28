@@ -29,17 +29,14 @@ function parse_cvrplib(file_path::String)
     work_periods = [Range()]
 
     locations = [Location(
-        id = string("loc_", i), index = i, longitude = xs[i], latitude = ys[i]
+        id = string("loc_", i), index = i,
+        longitude = xs[i], latitude = ys[i]
     ) for i in 1:n]
     locations[depot_idx].id = "depot"
-    location_groups = create_default_location_groups(locations)
+    location_groups = create_singleton_location_groups(locations)
 
-    product_compatibility_classes = [ProductCompatibilityClass(
-        id = "unique_p_c_c"
-    )]
-    product_sharing_classes = [ProductSharingClass(
-        id = "unique_p_s_c"
-    )]
+    product_compatibility_classes = ProductCompatibilityClass[]
+    product_sharing_classes = ProductSharingClass[]
     product_specification_classes = [ProductSpecificationClass(
         id = "unique_p_spec_c",
         capacity_consumptions = Dict{String,Tuple{Float64,Float64}}("unique_measure" => (1.0,1.0))
@@ -51,8 +48,6 @@ function parse_cvrplib(file_path::String)
         if i != depot_idx
             req = Request(
                 id = string("req_", req_idx),
-                product_compatibility_class_id = "unique_p_c_c",
-                product_sharing_class_id =  "unique_p_s_c",
                 product_specification_class_id = "unique_p_spec_c",
                 product_quantity_range = single_val_range(demands[i]),
                 pickup_location_group_id = location_groups[i].id
@@ -76,13 +71,15 @@ function parse_cvrplib(file_path::String)
                                              hard_range = Range(0, n-1))
     )]
 
-    return RvrpInstance(
+    data = RvrpInstance(
         id, travel_matrix_periods, period_to_matrix_id, travel_time_matrices,
         travel_distance_matrices, energy_consumption_matrices, work_periods,
         locations, location_groups, product_compatibility_classes,
         product_sharing_classes, product_specification_classes, requests,
         vehicle_categories, vehicle_sets
     )
+    preprocess_instance(data)
+    return data
 
 end
 

@@ -40,6 +40,8 @@ end
 
 mutable struct ProductSharingClass # To define global availabitily restrictions for a product that is shared between different requests
     id::String
+    restricted_pickup_availabitilies::Bool
+    restricted_delivery_availabitilies::Bool
     pickup_availabitilies_at_location_ids::Dict{String,Float64} # defined only if pickup locations have a restricted capacity; provides capcity for each pickup location where the product is avaiblable in restricted capacity
     delivery_capacities_at_location_ids::Dict{String,Float64} # defined only if delivery locations have a restricted capacity; provides capcity for each delivery location where the product can be delivered in restricted capacity
 end
@@ -125,7 +127,7 @@ end
 
 ################ Default-valued constructors #################
 function Range(; lb = 0.0,
-               ub = typemax(Int32))
+               ub = MAXNUMBER)
     return Range(lb, ub)
 end
 single_val_range(v::Real) = Range(v, v)
@@ -136,7 +138,7 @@ function Flexibility(; flexibility_level = 0,
     return Flexibility(flexibility_level, fixed_price, unit_price)
 end
 
-function FlexibleRange(; soft_range=Range(),
+function FlexibleRange(; soft_range = Range(),
                        hard_range=Range(),
                        lb_flex = Flexibility(),
                        ub_flex = Flexibility())
@@ -144,19 +146,20 @@ function FlexibleRange(; soft_range=Range(),
 end
 
 simple_flex_range(hard_lb::Float64,
-                  soft_lb::Float64, 
+                  soft_lb::Float64,
                   soft_ub::Float64,
                   hard_ub::Float64,
-                  soft_violation_price::Float64) = 
+                  soft_violation_price::Float64) =
     FlexibleRange(Range(soft_lb, soft_ub),
                   Range(hard_lb, hard_ub),
                   Flexibility(0,0.0,soft_violation_price),
                   Flexibility(0,0.0,soft_violation_price))
 
-function Location(; id = "",
+function Location(;
+                  id = "",
                   index = -1,
                   latitude = -1.0,
-                  longitude = -1.0, 
+                  longitude = -1.0,
                   opening_time_windows = [Range()],
                   energy_fixed_cost = 0.0,
                   energy_unit_cost = 0.0,
@@ -177,9 +180,13 @@ function ProductCompatibilityClass(; id = "",
 end
 
 function ProductSharingClass(; id = "",
+                             infinite_pickup_availabitilies = true,
+                             infinite_delivery_availabitilies = true,
                              pickup_availabitilies_at_location_ids = Dict{String,Float64}(),
                              delivery_capacities_at_location_ids = Dict{String,Float64}())
-    return ProductSharingClass(id, pickup_availabitilies_at_location_ids,
+    return ProductSharingClass(id, infinite_pickup_availabitilies,
+                               infinite_delivery_availabitilies,
+                               pickup_availabitilies_at_location_ids,
                                delivery_capacities_at_location_ids)
 end
 
@@ -190,18 +197,18 @@ function ProductSpecificationClass(; id = "",
 end
 
 function Request(; id = "",
-                 product_compatibility_class_id = "",
-                 product_sharing_class_id = "",
-                 product_specification_class_id = "",
+                 product_compatibility_class_id = "default_id",
+                 product_sharing_class_id = "default_id",
+                 product_specification_class_id = "default_id",
                  split_fulfillment = false,
                  request_flexibility = Flexibility(),
                  precedence_status = 0,
-                 product_quantity_range = Range(),
-                 pickup_location_group_id = "",
-                 delivery_location_group_id = "",
+                 product_quantity_range = Range(lb = 1, ub = 1),
+                 pickup_location_group_id = "default_id",
+                 delivery_location_group_id = "default_id",
                  pickup_service_time = 0.0,
                  delivery_service_time = 0.0,
-                 max_duration = typemax(Int32),
+                 max_duration = MAXNUMBER,
                  duration_unit_cost = 0.0,
                  pickup_time_windows = [FlexibleRange()],
                  delivery_time_windows = [FlexibleRange()])
@@ -240,18 +247,18 @@ function VehicleCategory(; id = "",
 end
 
 function HomogeneousVehicleSet(; id = "",
-                               vehicle_category_id = "",
                                departure_location_group_id = "",
                                arrival_location_group_id = "",
+                               vehicle_category_id = "default_id",
                                working_time_window = FlexibleRange(),
                                travel_distance_unit_cost = 0.0,
                                travel_time_unit_cost = 0.0,
                                service_time_unit_cost = 0.0,
                                waiting_time_unit_cost = 0.0,
-                               initial_energy_charge = typemax(Int32),
+                               initial_energy_charge = MAXNUMBER,
                                fixed_cost_per_vehicle = 0.0,
-                               max_working_time = typemax(Int32),
-                               max_travel_distance = typemax(Int32),
+                               max_working_time = MAXNUMBER,
+                               max_travel_distance = MAXNUMBER,
                                allow_shipment_over_multiple_work_periods = false,
                                nb_of_vehicles_range = FlexibleRange())
     return HomogeneousVehicleSet(

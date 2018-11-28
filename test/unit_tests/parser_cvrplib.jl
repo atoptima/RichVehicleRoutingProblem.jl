@@ -24,11 +24,12 @@ function parse_cvrplib_tests()
         @test string(data.locations[i].id, "_loc_group") == data.location_groups[i].id
     end
     @test length(data.product_compatibility_classes) == 1
+    @test data.product_compatibility_classes[1].id == "default_id"
     @test length(data.product_sharing_classes) == 1
-    @test length(data.product_specification_classes) == 1
+    @test data.product_sharing_classes[1].id == "default_id"
     @test length(data.requests) == 15
-    @test length(data.vehicle_categories) == 1
-    @test length(data.vehicle_sets) == 1
+    @test length(data.vehicle_categories) == 2
+    @test length(data.vehicle_sets) == 2
     @test data.vehicle_categories[1].id == "unique_vehicle_category"
     @test haskey(data.vehicle_categories[1].vehicle_capacities, "unique_measure")
     @test data.vehicle_categories[1].vehicle_capacities == Dict{String,Float64}("unique_measure" => 35.0)
@@ -44,6 +45,8 @@ function parse_cvrplib_tests()
         req = data.requests[req_idx]
         @test req.product_quantity_range.lb == req.product_quantity_range.ub
         @test req.pickup_location_group_id == data.location_groups[req_idx+1].id
+        @test req.product_sharing_class_id == req.product_compatibility_class_id == "default_id"
+        @test req.product_specification_class_id == "unique_p_spec_c"
     end
 
 end
