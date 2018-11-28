@@ -87,6 +87,5 @@ function preprocess_instance_unit_tests()
     @test length(data.requests) == 0
     @test length(data.vehicle_categories) == 1
     @test data.vehicle_categories[1].id == "default_id"
-    @test length(data.vehicle_sets) == 1
-    @test data.vehicle_sets[1].id == "default_id"
+    @test length(data.vehicle_sets) == 0
 end

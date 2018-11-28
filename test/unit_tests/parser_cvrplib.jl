@@ -1,3 +1,4 @@
+
 function parser_cvrplib_unit_tests()
     parse_cvrplib_tests()
 end
@@ -29,7 +30,7 @@ function parse_cvrplib_tests()
     @test data.product_sharing_classes[1].id == "default_id"
     @test length(data.requests) == 15
     @test length(data.vehicle_categories) == 2
-    @test length(data.vehicle_sets) == 2
+    @test length(data.vehicle_sets) == 1
     @test data.vehicle_categories[1].id == "unique_vehicle_category"
     @test haskey(data.vehicle_categories[1].vehicle_capacities, "unique_measure")
     @test data.vehicle_categories[1].vehicle_capacities == Dict{String,Float64}("unique_measure" => 35.0)

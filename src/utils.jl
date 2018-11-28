@@ -66,5 +66,5 @@ function preprocess_instance(data::RvrpInstance)
           ProductSpecificationClass(id = "default_id"))
     # push!(data.requests, Request(id = "default_id"))
     push!(data.vehicle_categories, VehicleCategory(id = "default_id"))
-    push!(data.vehicle_sets, HomogeneousVehicleSet(id = "default_id"))
+    # push!(data.vehicle_sets, HomogeneousVehicleSet(id = "default_id"))
 end
