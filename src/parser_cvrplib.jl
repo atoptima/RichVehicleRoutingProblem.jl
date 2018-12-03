@@ -21,11 +21,9 @@ function parse_cvrplib(file_path::String)
     ys = [points[i,2] for i in 1:n]
 
     travel_matrix_periods = [Range()]
-    period_to_matrix_id = Dict{Range,String}(travel_matrix_periods[1] => "unique_mat")
+    period_to_matrix_id = Dict{Range,String}(travel_matrix_periods[1] =>
+                                             "unique_mat")
     mat = generate_symmetric_distance_matrix(xs, ys)
-    travel_distance_matrices = Dict{String,Array{Float64,2}}("unique_mat" => mat)
-    travel_time_matrices = Dict{String,Array{Float64,2}}()
-    energy_consumption_matrices = Dict{String,Array{Float64,2}}()
     work_periods = [Range()]
 
     locations = [Location(
@@ -39,7 +37,9 @@ function parse_cvrplib(file_path::String)
     product_sharing_classes = ProductSharingClass[]
     product_specification_classes = [ProductSpecificationClass(
         id = "unique_p_spec_c",
-        capacity_consumptions = Dict{String,Tuple{Float64,Float64}}("unique_measure" => (1.0,1.0))
+        capacity_consumptions =
+                Dict{String,Tuple{Float64,Float64}}("unique_measure" =>
+                                                    (1.0,1.0))
     )]
 
     requests = Request[]
@@ -47,6 +47,7 @@ function parse_cvrplib(file_path::String)
     for i in 1:n
         if i != depot_idx
             req = Request(
+                request_type = 1,
                 id = string("req_", req_idx),
                 product_specification_class_id = "unique_p_spec_c",
                 product_quantity_range = single_val_range(demands[i]),
@@ -71,9 +72,12 @@ function parse_cvrplib(file_path::String)
                                              hard_range = Range(0, n-1))
     )]
 
+    travel_time_categories = [TravelTimeCategory("unique_period_cat",
+            mat, Array{Float64,2}(undef, 0, 0), Array{Float64,2}(undef, 0, 0))]
+    travel_time_periods = [TravelTimePeriod(Range(), "unique_period_cat")]
+
     data = RvrpInstance(
-        id, travel_matrix_periods, period_to_matrix_id, travel_time_matrices,
-        travel_distance_matrices, energy_consumption_matrices, work_periods,
+        id, travel_time_categories, travel_time_periods, work_periods,
         locations, location_groups, product_compatibility_classes,
         product_sharing_classes, product_specification_classes, requests,
         vehicle_categories, vehicle_sets
@@ -82,4 +86,3 @@ function parse_cvrplib(file_path::String)
     return data
 
 end
-

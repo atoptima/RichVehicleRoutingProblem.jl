@@ -12,6 +12,7 @@ include("RVRP_solution.jl")
 include("utils.jl")
 include("parser_json.jl")
 include("parser_cvrplib.jl")
+include("instance_check.jl")
 
 
 abstract type AbstractSolver end
