@@ -9,10 +9,10 @@ function parse_cvrplib_tests()
 
     @test typeof(data) == RVRP.RvrpInstance
     @test data.id == "P-n16-k8"
-    @test data.travel_time_categories[1].id == "unique_period_cat"
-    travel_time_mat = data.travel_time_categories[1].travel_time_matrix
-    travel_distance_mat = data.travel_time_categories[1].travel_distance_matrix
-    energy_consum_mat = data.travel_time_categories[1].energy_consumption_matrix
+    @test data.travel_specifications[1].id == "unique_period_cat"
+    travel_time_mat = data.travel_specifications[1].travel_time_matrix
+    travel_distance_mat = data.travel_specifications[1].travel_distance_matrix
+    energy_consum_mat = data.travel_specifications[1].energy_consumption_matrix
     @test size(travel_time_mat) == (16, 16)
     for i in 1:16
         @test travel_time_mat[i,i] == 0.0

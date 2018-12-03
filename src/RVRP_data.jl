@@ -41,7 +41,7 @@ end
 mutable struct ProductSharingClass # To define global availabitily restrictions for a product that is shared between different requests
     id::String
     restricted_pickup_availabitilies::Bool
-    restricted_delivery_availabitilies::Bool
+    restricted_delivery_capacities::Bool
     pickup_availabitilies_at_location_ids::Dict{String,Float64} # defined only if pickup locations have a restricted capacity; provides capcity for each pickup location where the product is avaiblable in restricted capacity
     delivery_capacities_at_location_ids::Dict{String,Float64} # defined only if delivery locations have a restricted capacity; provides capcity for each delivery location where the product can be delivered in restricted capacity
 end
@@ -85,14 +85,14 @@ mutable struct VehicleCategory
     vehicle_capacities::Dict{String,Float64} # defined only if measured at the vehicle level; for string id key associated with properties capacity measures that need to be checked on the vehicle, as for instance weight, value, volume
     compartment_capacities::Dict{String,Dict{String,Float64}} # defined only if measured at the compartment level; for string id key associated with properties capacity measures that need to be checked on the vehicle, as for instance weight, value, volume, ... For each such property, the Dictionary specifies the capacity for each compartment id key.
     vehicle_properties::Dict{String,Float64} # defined only if measured at the vehicle level; for string id key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
-    compartments_properties::Dict{String,Dict{String,Float64}} #  defined only if measured at the compartment level; for string id key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Dictionary specifies the capacity for each compartment id key.
+    compartment_properties::Dict{String,Dict{String,Float64}} #  defined only if measured at the compartment level; for string id key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Dictionary specifies the capacity for each compartment id key.
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
 end
 
 mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
-    # route_mode::Int # 0 closed at departure and arrival, 1 open at arrival, 2 open at departure, 3 open at both depature and arrival
+    route_mode::Int # 0 closed at departure and arrival, 1 open at arrival, 2 open at departure, 3 open at both depature and arrival
     vehicle_category_id::String
     departure_location_group_id::String # Vehicle routes start from one of the depot locations in the group
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
@@ -109,22 +109,22 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     nb_of_vehicles_range::FlexibleRange
 end
 
-mutable struct TravelTimeCategory
+mutable struct TravelSpecification
    id::String
    travel_time_matrix::Array{Float64,2}
    travel_distance_matrix::Array{Float64,2}
    energy_consumption_matrix::Array{Float64,2}
 end
 
-mutable struct TravelTimePeriod
+mutable struct TravelSpecificationPeriod
    period::Range
-   travel_time_category_id::String
+   travel_specification_id::String
 end
 
 mutable struct RvrpInstance
     id::String
-    travel_time_categories::Vector{TravelTimeCategory}
-    travel_time_periods::Vector{TravelTimePeriod}
+    travel_specifications::Vector{TravelSpecification}
+    travel_specification_periods::Vector{TravelSpecificationPeriod}
     work_periods::Vector{Range} # Define periods of the planning horizon; vehicles  must return to a depot by the end of each time period if they cannot be ongoing. Route's max_duration and max_distance apply to each time period
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
@@ -247,19 +247,20 @@ function VehicleCategory(; id = "",
                          vehicle_capacities = Dict{String,Float64}(),
                          compartment_capacities = Dict{String,Dict{String,Float64}}(),
                          vehicle_properties = Dict{String,Float64}(),
-                         compartments_properties = Dict{String,Dict{String,Float64}}(),
+                         compartment_properties = Dict{String,Dict{String,Float64}}(),
                          loading_option = 0,
                          energy_interval_lengths = Float64[])
     return VehicleCategory(id,
                            vehicle_capacities ,
                            compartment_capacities ,
                            vehicle_properties ,
-                           compartments_properties ,
+                           compartment_properties ,
                            loading_option ,
                            energy_interval_lengths)
 end
 
 function HomogeneousVehicleSet(; id = "",
+                               route_mode = 0,
                                departure_location_group_id = "",
                                arrival_location_group_id = "",
                                vehicle_category_id = "default_id",
@@ -275,7 +276,7 @@ function HomogeneousVehicleSet(; id = "",
                                allow_shipment_over_multiple_work_periods = false,
                                nb_of_vehicles_range = FlexibleRange())
     return HomogeneousVehicleSet(
-        id, vehicle_category_id, departure_location_group_id,
+        id, route_mode, vehicle_category_id, departure_location_group_id,
         arrival_location_group_id, working_time_window,
         travel_distance_unit_cost, travel_time_unit_cost,
         service_time_unit_cost, waiting_time_unit_cost, initial_energy_charge,
@@ -283,25 +284,25 @@ function HomogeneousVehicleSet(; id = "",
         allow_shipment_over_multiple_work_periods, nb_of_vehicles_range)
 end
 
-function TravelTimeCategory(; id = "",
+function TravelSpecification(; id = "",
                             travel_time_matrix = Array{Float64,2}(undef,0,0),
                             travel_distance_matrix = Array{Float64,2}(undef,0,0),
                             energy_consumption_matrix = Array{Float64,2}(undef,0,0))
-    return TravelTimePeriod(id,
+    return TravelSpecification(id,
                             travel_time_matrix,
                             travel_distance_matrix,
                             energy_consumption_matrix)
 end
 
-function TravelTimePeriod(; period = Range(),
-                          travel_time_category_id = "")
-    return TravelTimePeriod(perid,
-                            travel_time_category_id)
+function TravelSpecificationPeriod(; period = Range(),
+                          travel_specification_id = "")
+    return TravelSpecificationPeriod(perid,
+                            travel_specification_id)
 end
 
 function RvrpInstance(; id = "",
-                      travel_time_categories = TravelTimeCategory[],
-                      travel_time_periods = TravelTimePeriod[],
+                      travel_specifications = TravelSpecification[],
+                      travel_specification_periods = TravelSpecificationPeriod[],
                       work_periods = Range[],
                       locations = Location[],
                       location_groups = LocationGroup[],
@@ -312,8 +313,8 @@ function RvrpInstance(; id = "",
                       vehicle_categories = VehicleCategory[],
                       vehicle_sets = HomogeneousVehicleSet[])
     return RvrpInstance(id,
-                        travel_time_categories,
-                        travel_time_periods,
+                        travel_specifications,
+                        travel_specification_periods,
                         work_periods,
                         locations,
                         location_groups,

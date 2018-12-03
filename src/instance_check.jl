@@ -51,11 +51,15 @@ const HAS_FLEXIBLE_NB_VEHICLES_RANGE = 342 #
 const HAS_WORKING_TIME_WINDOW = 343
 const HAS_FLEXIBLE_WORKING_TIME_WINDOWS = 345 #
 const HAS_FIXED_COST_PER_VEHICLE = 346
+const HAS_OPEN_DEPARTURE = 347
+const HAS_OPEN_ARRIVAL = 348
+const HAS_ALTERNATIVE_DEPARTURE_LOCATIONS = 349 #
+const HAS_ALTERNATIVE_ARRIVAL_LOCATIONS = 350 #
 
 # Instance based features
 const HAS_WORK_PERIODS = 447
 const HAS_MUTLIPLE_TRAVEL_TIME_PERIODS = 448
-const HAS_VEHICLE_CATEGORIES = 449
+# const HAS_VEHICLE_CATEGORIES = 449 (not needed, duplicate of caps props)
 const HAS_MULTIPLE_VEHICLE_CATEGORIES = 450
 const HAS_MULTIPLE_VEHICLE_SETS = 451
 const HAS_ENERGY_FEATURES = 452 # to be detailed later as needed #
@@ -162,33 +166,33 @@ function check_vehicle_categories(vehicle_categories::Vector{VehicleCategory},
         if vc.loading_option < 0 || vc.loading_option > 2
             error("VehicleCategory $(vc.id) must have loading_option in",
                   "{0,1,2}")
+        end
 
-            # filling VehicleCategory based features
-            features = computed_data.features
-            if length(vc.vehicle_capacities) > 0
-                union!(features, HAS_VEHICLE_CAPACITIES)
-            end
-            if length(vc.compartment_capacities) > 0
-                union!(features, HAS_COMPARTMENT_CAPACITIES)
-            end
-            if length(vc.vehicle_properties) > 0
-                union!(features, HAS_VEHICLE_PROPERTIES)
-            end
-            if length(vc.compartment_properties) > 0
-                union!(features, HAS_COMPARTMENT_PROPERTIES)
-            end
-            if length(vc.vehicle_capacities) > 1
-                union!(features, HAS_MULTIPLE_VEHICLE_CAPACITIES)
-            end
-            if length(vc.compartment_capacities) > 1
-                union!(features, HAS_MULTIPLE_COMPARTMENT_CAPACITIES)
-            end
-            if length(vc.vehicle_properties) > 1
-                union!(features, HAS_MULTIPLE_VEHICLE_PROPERTIES)
-            end
-            if length(vc.compartment_properties) > 1
-                union!(features, HAS_MULTIPLE_COMPARTMENT_PROPERTIES)
-            end
+        # filling VehicleCategory based features
+        features = computed_data.features
+        if length(vc.vehicle_capacities) > 0
+            union!(features, HAS_VEHICLE_CAPACITIES)
+        end
+        if length(vc.compartment_capacities) > 0
+            union!(features, HAS_COMPARTMENT_CAPACITIES)
+        end
+        if length(vc.vehicle_properties) > 0
+            union!(features, HAS_VEHICLE_PROPERTIES)
+        end
+        if length(vc.compartment_properties) > 0
+            union!(features, HAS_COMPARTMENT_PROPERTIES)
+        end
+        if length(vc.vehicle_capacities) > 1
+            union!(features, HAS_MULTIPLE_VEHICLE_CAPACITIES)
+        end
+        if length(vc.compartment_capacities) > 1
+            union!(features, HAS_MULTIPLE_COMPARTMENT_CAPACITIES)
+        end
+        if length(vc.vehicle_properties) > 1
+            union!(features, HAS_MULTIPLE_VEHICLE_PROPERTIES)
+        end
+        if length(vc.compartment_properties) > 1
+            union!(features, HAS_MULTIPLE_COMPARTMENT_PROPERTIES)
         end
     end
 end
@@ -222,6 +226,12 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
 
         # filling HomogeneousVehicleSet based features
         features = computed_data.features
+        if vs.route_mode in [1,3]
+            union!(features, HAS_OPEN_ARRIVAL)
+        end
+        if vs.route_mode in [1,3]
+            union!(features, HAS_OPEN_DEPARTURE)
+        end
         if vs.travel_time_unit_cost > 0
             union!(features, HAS_TRAVEL_TIME_UNIT_COST)
         end
@@ -255,9 +265,9 @@ end
 
 function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
 
-    tt_period = data.travel_time_periods[1]
-    check_id(computed_data.travel_time_category_id_2_index,
-             tt_period.travel_time_category_id,
+    tt_period = data.travel_specification_periods[1]
+    check_id(computed_data.travel_specification_id_2_index,
+             tt_period.travel_specification_id,
              "TavelTimePeriods[1] : ")
 
     check_locations(data.locations, computed_data)
@@ -268,9 +278,9 @@ function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
 
     # filling Instance based features
     features = computed_data.features
-    if length(data.vehicle_categories) > 0
-        union!(features, HAS_VEHICLE_CATEGORIES)
-    end
+    # if length(data.vehicle_categories) > 0
+    #     union!(features, HAS_VEHICLE_CATEGORIES)
+    # end
     if (length(data.vehicle_categories) == 2 &&
         computed_data.uses_default_vehicle_category) ||
        (length(data.vehicle_categories) > 2)
@@ -283,7 +293,7 @@ function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
     if length(data.work_periods) > 1
         union!(features, HAS_WORK_PERIODS)
     end
-    if length(data.travel_time_periods) > 1
+    if length(data.travel_specification_periods) > 1
         union!(features, HAS_MUTLIPLE_TRAVEL_TIME_PERIODS)
     end
 
@@ -435,9 +445,9 @@ function print_features(features::BitSet)
     if in(HAS_MUTLIPLE_TRAVEL_TIME_PERIODS, features)
         println("HAS_MUTLIPLE_TRAVEL_TIME_PERIODS,")
     end
-    if in(HAS_VEHICLE_CATEGORIES, features)
-        println("HAS_VEHICLE_CATEGORIES,")
-    end
+    # if in(HAS_VEHICLE_CATEGORIES, features)
+    #     println("HAS_VEHICLE_CATEGORIES,")
+    # end
     if in(HAS_MULTIPLE_VEHICLE_CATEGORIES, features)
         println("HAS_MULTIPLE_VEHICLE_CATEGORIES,")
     end
