@@ -62,6 +62,7 @@ mutable struct Request # can be
     # a shipment from any location of a group pickup locations to a given delivery location of a product that is specific to the request, or
     # a shipment from any location of a group pickup locations to any location of a group delivery locations of a product that is specific to the request.
     id::String
+    request_type::Int # 0 : pickup and delivery, 1: pickup only (delivery info is ignored) 2: delivery only (pickup info is ignored)
     product_compatibility_class_id::String
     product_sharing_class_id::String
     product_specification_class_id::String
@@ -91,6 +92,7 @@ end
 
 mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
+    # route_mode::Int # 0 closed at departure and arrival, 1 open at arrival, 2 open at departure, 3 open at both depature and arrival
     vehicle_category_id::String
     departure_location_group_id::String # Vehicle routes start from one of the depot locations in the group
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
@@ -107,13 +109,22 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     nb_of_vehicles_range::FlexibleRange
 end
 
+mutable struct TravelTimeCategory
+   id::String
+   travel_time_matrix::Array{Float64,2}
+   travel_distance_matrix::Array{Float64,2}
+   energy_consumption_matrix::Array{Float64,2}
+end
+
+mutable struct TravelTimePeriod
+   period::Range
+   travel_time_category_id::String
+end
+
 mutable struct RvrpInstance
     id::String
-    travel_matrix_periods::Vector{Range} # Define  periods of over the time horizon to refine travel times/distances/and Energy consumption.
-    period_to_matrix_id::Dict{Range,String} # the dictionnay provides for each travel_time_period, a travel time matrix string id
-    travel_time_matrices::Dict{String,Array{Float64,2}}
-    travel_distance_matrices::Dict{String,Array{Float64,2}}
-    energy_consumption_matrices::Dict{String,Array{Float64,2}}
+    travel_time_categories::Vector{TravelTimeCategory}
+    travel_time_periods::Vector{TravelTimePeriod}
     work_periods::Vector{Range} # Define periods of the planning horizon; vehicles  must return to a depot by the end of each time period if they cannot be ongoing. Route's max_duration and max_distance apply to each time period
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
@@ -197,6 +208,7 @@ function ProductSpecificationClass(; id = "",
 end
 
 function Request(; id = "",
+                 request_type = 0,
                  product_compatibility_class_id = "default_id",
                  product_sharing_class_id = "default_id",
                  product_specification_class_id = "default_id",
@@ -213,6 +225,7 @@ function Request(; id = "",
                  pickup_time_windows = [FlexibleRange()],
                  delivery_time_windows = [FlexibleRange()])
     return Request(id,
+                   request_type,
                    product_compatibility_class_id,
                    product_sharing_class_id,
                    product_specification_class_id,
@@ -270,12 +283,25 @@ function HomogeneousVehicleSet(; id = "",
         allow_shipment_over_multiple_work_periods, nb_of_vehicles_range)
 end
 
+function TravelTimeCategory(; id = "",
+                            travel_time_matrix = Array{Float64,2}(undef,0,0),
+                            travel_distance_matrix = Array{Float64,2}(undef,0,0),
+                            energy_consumption_matrix = Array{Float64,2}(undef,0,0))
+    return TravelTimePeriod(id,
+                            travel_time_matrix,
+                            travel_distance_matrix,
+                            energy_consumption_matrix)
+end
+
+function TravelTimePeriod(; period = Range(),
+                          travel_time_category_id = "")
+    return TravelTimePeriod(perid,
+                            travel_time_category_id)
+end
+
 function RvrpInstance(; id = "",
-                      travel_matrix_periods = Range[],
-                      period_to_matrix_id = Dict{Range,String}(),
-                      travel_time_matrices = Dict{String,Array{Float64,2}}(),
-                      travel_distance_matrices = Dict{String,Array{Float64,2}}(),
-                      energy_consumption_matrices = Dict{String,Array{Float64,2}}(),
+                      travel_time_categories = TravelTimeCategory[],
+                      travel_time_periods = TravelTimePeriod[],
                       work_periods = Range[],
                       locations = Location[],
                       location_groups = LocationGroup[],
@@ -286,11 +312,8 @@ function RvrpInstance(; id = "",
                       vehicle_categories = VehicleCategory[],
                       vehicle_sets = HomogeneousVehicleSet[])
     return RvrpInstance(id,
-                        travel_matrix_periods,
-                        period_to_matrix_id,
-                        travel_time_matrices,
-                        travel_distance_matrices,
-                        energy_consumption_matrices,
+                        travel_time_categories,
+                        travel_time_periods,
                         work_periods,
                         locations,
                         location_groups,
