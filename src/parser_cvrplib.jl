@@ -23,6 +23,11 @@ function parse_cvrplib(file_path::String)
     travel_matrix_periods = [Range()]
     period_to_matrix_id = Dict{Range,String}(travel_matrix_periods[1] => "unique_mat")
     mat = generate_symmetric_distance_matrix(xs, ys)
+    for j in 1:n
+        for i in 1:n
+            mat[i,j] = round(mat[i,j], RoundingMode{:Nearest}())
+        end
+    end
     travel_distance_matrices = Dict{String,Array{Float64,2}}("unique_mat" => mat)
     travel_time_matrices = Dict{String,Array{Float64,2}}()
     energy_consumption_matrices = Dict{String,Array{Float64,2}}()
