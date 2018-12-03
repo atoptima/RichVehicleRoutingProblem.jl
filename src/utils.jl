@@ -12,6 +12,18 @@ function generate_symmetric_distance_matrix(xs::Vector{T},
     return matrix
 end
 
+function is_symetric(mat::Array{Float64,2})
+    @assert size(mat, 1) == size(mat, 2)
+    for j in 1:size(mat, 1)
+        for i in j+1:size(mat, 1)
+            if mat[i,j] != mat[j,i]
+                return false
+            end
+        end
+    end
+    return true
+end
+
 function set_indices(data::RvrpInstance)
     for loc_idx in 1:length(data.locations)
         data.locations[loc_idx].index = loc_idx
