@@ -74,11 +74,11 @@ function parse_cvrplib(file_path::String)
 
     travel_specifications = [TravelSpecification("unique_period_cat",
             mat, Array{Float64,2}(undef, 0, 0), Array{Float64,2}(undef, 0, 0))]
-    travel_specification_periods = [TravelSpecificationPeriod(Range(),
+    travel_periods = [TravelPeriod(Range(),
                                     "unique_period_cat")]
 
     data = RvrpInstance(
-        id, travel_specifications, travel_specification_periods, work_periods,
+        id, travel_specifications, travel_periods, work_periods,
         locations, location_groups, product_compatibility_classes,
         product_sharing_classes, product_specification_classes, requests,
         vehicle_categories, vehicle_sets

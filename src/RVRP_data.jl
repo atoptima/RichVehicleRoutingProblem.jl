@@ -116,7 +116,7 @@ mutable struct TravelSpecification
    energy_consumption_matrix::Array{Float64,2}
 end
 
-mutable struct TravelSpecificationPeriod
+mutable struct TravelPeriod
    period::Range
    travel_specification_id::String
 end
@@ -124,7 +124,7 @@ end
 mutable struct RvrpInstance
     id::String
     travel_specifications::Vector{TravelSpecification}
-    travel_specification_periods::Vector{TravelSpecificationPeriod}
+    travel_periods::Vector{TravelPeriod}
     work_periods::Vector{Range} # Define periods of the planning horizon; vehicles  must return to a depot by the end of each time period if they cannot be ongoing. Route's max_duration and max_distance apply to each time period
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
@@ -294,15 +294,15 @@ function TravelSpecification(; id = "",
                             energy_consumption_matrix)
 end
 
-function TravelSpecificationPeriod(; period = Range(),
+function TravelPeriod(; period = Range(),
                           travel_specification_id = "")
-    return TravelSpecificationPeriod(perid,
+    return TravelPeriod(perid,
                             travel_specification_id)
 end
 
 function RvrpInstance(; id = "",
                       travel_specifications = TravelSpecification[],
-                      travel_specification_periods = TravelSpecificationPeriod[],
+                      travel_periods = TravelPeriod[],
                       work_periods = Range[],
                       locations = Location[],
                       location_groups = LocationGroup[],
@@ -314,7 +314,7 @@ function RvrpInstance(; id = "",
                       vehicle_sets = HomogeneousVehicleSet[])
     return RvrpInstance(id,
                         travel_specifications,
-                        travel_specification_periods,
+                        travel_periods,
                         work_periods,
                         locations,
                         location_groups,

@@ -265,7 +265,7 @@ end
 
 function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
 
-    tt_period = data.travel_specification_periods[1]
+    tt_period = data.travel_periods[1]
     check_id(computed_data.travel_specification_id_2_index,
              tt_period.travel_specification_id,
              "TavelTimePeriods[1] : ")
@@ -293,7 +293,7 @@ function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
     if length(data.work_periods) > 1
         union!(features, HAS_WORK_PERIODS)
     end
-    if length(data.travel_specification_periods) > 1
+    if length(data.travel_periods) > 1
         union!(features, HAS_MUTLIPLE_TRAVEL_TIME_PERIODS)
     end
 
