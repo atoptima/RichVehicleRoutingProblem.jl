@@ -10,6 +10,7 @@ mutable struct RvrpComputedData
     # request_id2Index::Dict{String, Int}
     vehicle_category_id_2_index::Dict{String, Int}
     # vehicle_set_id2Index::Dict{String, Int}
+    capacity_id_2_index::Dict{String, Int}
     travel_specification_id_2_index::Dict{String, Int}
     features::BitSet
     uses_default_vehicle_category::Bool
