@@ -74,10 +74,10 @@ function get_capacity_consumptions(req::Request, product_specification_classes::
     quantity = req.product_quantity_range.ub
     product_specification_class_id = req.product_specification_class_id
     product_specification_class = product_specification_classes[computed_data.product_specification_class_id_2_index[product_specification_class_id]]
-    c = [
-        ceil(quantity/v[2]) * v[1]
+    c = Dict{String,Float64}(
+        k => ceil(quantity/v[2]) * v[1]
         for (k,v) in product_specification_class.capacity_consumptions
-    ]
+    )
     return c
 end
 
