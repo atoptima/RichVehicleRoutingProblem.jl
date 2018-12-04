@@ -51,7 +51,7 @@ function parse_cvrplib(file_path::String)
     )]
 
     requests = Request[]
-    req_idx = 0
+    req_idx = 1
     for i in 1:n
         if i != depot_idx
             req = Request(
