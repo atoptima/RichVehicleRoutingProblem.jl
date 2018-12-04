@@ -38,11 +38,20 @@ function build_computed_data_tests()
     data.vehicle_categories = [RVRP.VehicleCategory(
         id = string("vc_", i)
     ) for i in 1:9]
-    RVRP.set_indices(data)
-    data.location_groups = RVRP.create_singleton_location_groups(data.locations)
     data.product_specification_classes = [RVRP.ProductSpecificationClass(
         id = string("psc_", i)
     ) for i in 1:5]
+    RVRP.set_indices(data)
+    data.location_groups = RVRP.create_singleton_location_groups(data.locations)
+    data.vehicle_categories[1].vehicle_capacities = Dict{String,Float64}(
+        "weird_name_1" => 10, "wolow_34" => 12, "volume" => 15
+    )
+    data.vehicle_categories[2].vehicle_capacities = Dict{String,Float64}(
+        "weird_name_1" => 10, "wolow_34" => 12, "new_name_1" => 15
+    )
+    data.product_specification_classes[1].capacity_consumptions = Dict{String,Tuple{Float64,Float64}}(
+        "weird_name_1" => (1,10), "new_name_2" => (1,12), "wolow_34" => (1,15)
+    )
     computed_data = RVRP.build_computed_data(data)
     for (k,v) in computed_data.location_id_2_index
         @test v >= 1
@@ -57,6 +66,10 @@ function build_computed_data_tests()
         @test v <= 9
     end
     for (k,v) in computed_data.product_specification_class_id_2_index
+        @test v >= 1
+        @test v <= 5
+    end
+    for (k,v) in computed_data.capacity_id_2_index
         @test v >= 1
         @test v <= 5
     end
