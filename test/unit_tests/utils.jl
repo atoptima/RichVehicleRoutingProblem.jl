@@ -52,6 +52,15 @@ function build_computed_data_tests()
     data.product_specification_classes[1].capacity_consumptions = Dict{String,Tuple{Float64,Float64}}(
         "weird_name_1" => (1,10), "new_name_2" => (1,12), "wolow_34" => (1,15)
     )
+    data.vehicle_categories[1].vehicle_properties = Dict{String,Float64}(
+        "prop_1" => 10, "prop_34" => 12, "prop_3" => 15
+    )
+    data.vehicle_categories[2].vehicle_properties = Dict{String,Float64}(
+        "prop_1" => 10, "prop_34" => 12, "new_prop_1" => 15
+    )
+    data.product_specification_classes[1].property_requirements = Dict{String,Float64}(
+        "prop_1" => 10, "new_prop_2" => 12, "prop_34" => 15
+    )
     computed_data = RVRP.build_computed_data(data)
     for (k,v) in computed_data.location_id_2_index
         @test v >= 1
@@ -70,6 +79,10 @@ function build_computed_data_tests()
         @test v <= 5
     end
     for (k,v) in computed_data.capacity_id_2_index
+        @test v >= 1
+        @test v <= 5
+    end
+    for (k,v) in computed_data.property_id_2_index
         @test v >= 1
         @test v <= 5
     end
