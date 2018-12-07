@@ -42,7 +42,7 @@ const HAS_MULTIPLE_COMPARTMENT_PROPERTIES = 231 #
 const HAS_TRAVEL_TIME_UNIT_COST = 333
 const HAS_SERVICE_TIME_UNIT_COST = 334
 const HAS_WAITING_TIME_UNIT_COST = 335
-const HAS_TRAVEL_DISTANCE_UNIT_COST = 339 #
+const HAS_TRAVEL_DISTANCE_UNIT_COST = 339
 const HAS_MAX_WORKING_TIME = 337 #
 const HAS_MAX_TRAVEL_DISTANCE = 338 #
 const HAS_MIN_NB_VEHICLES = 340 #
@@ -53,8 +53,9 @@ const HAS_FLEXIBLE_WORKING_TIME_WINDOWS = 345 #
 const HAS_FIXED_COST_PER_VEHICLE = 346
 const HAS_OPEN_DEPARTURE = 347
 const HAS_OPEN_ARRIVAL = 348
-const HAS_ALTERNATIVE_DEPARTURE_LOCATIONS = 349 #
-const HAS_ALTERNATIVE_ARRIVAL_LOCATIONS = 350 #
+const HAS_ARRIVAL_DIFFERENT_FROM_DEPARTURE = 349
+const HAS_ALTERNATIVE_DEPARTURE_LOCATIONS = 350 #
+const HAS_ALTERNATIVE_ARRIVAL_LOCATIONS = 351 #
 
 # Instance based features
 const HAS_WORK_PERIODS = 447
@@ -238,11 +239,8 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
         if vs.service_time_unit_cost > 0
             union!(features, HAS_SERVICE_TIME_UNIT_COST)
         end
-        if vs.travel_time_unit_cost > 0
+        if vs.waiting_time_unit_cost > 0
             union!(features, HAS_WAITING_TIME_UNIT_COST)
-        end
-        if vs.travel_time_unit_cost > 0
-            union!(features, HAS_TRAVEL_TIME_UNIT_COST)
         end
         if vs.travel_distance_unit_cost > 0
             union!(features, HAS_TRAVEL_DISTANCE_UNIT_COST)
@@ -255,7 +253,7 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
         end
         if vs.working_time_window.soft_range.lb > 0 ||
            vs.working_time_window.soft_range.ub < 10^9
-            union!(features, HAS_PICKUP_TIME_WINDOWS)
+            union!(features, HAS_WORKING_TIME_WINDOW)
         end
         if vs.vehicle_category_id == "default_id"
             computed_data.uses_default_vehicle_category = true
