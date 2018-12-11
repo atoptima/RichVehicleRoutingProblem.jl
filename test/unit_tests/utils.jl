@@ -38,6 +38,9 @@ function build_computed_data_tests()
     data.vehicle_categories = [RVRP.VehicleCategory(
         id = string("vc_", i)
     ) for i in 1:9]
+    data.vehicle_sets = [RVRP.HomogeneousVehicleSet(
+        id = string("vs_", i)
+    ) for i in 1:12]
     data.product_specification_classes = [RVRP.ProductSpecificationClass(
         id = string("psc_", i)
     ) for i in 1:5]
@@ -73,6 +76,10 @@ function build_computed_data_tests()
     for (k,v) in computed_data.vehicle_category_id_2_index
         @test v >= 1
         @test v <= 9
+    end
+    for (k,v) in computed_data.vehicle_set_id_2_index
+        @test v >= 1
+        @test v <= 12
     end
     for (k,v) in computed_data.product_specification_class_id_2_index
         @test v >= 1

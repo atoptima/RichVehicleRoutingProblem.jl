@@ -37,6 +37,10 @@ function build_computed_data(data::RvrpInstance)
         data.travel_specifications[i].id =>
         i for i in 1:length(data.travel_specifications)
     )
+    vehicle_set_id_2_index = Dict{String,Int}(
+        data.vehicle_sets[i].id =>
+        i for i in 1:length(data.vehicle_sets)
+    )
     capacity_id_2_index = Dict{String, Int}()
     property_id_2_index = Dict{String, Int}()
     cap_idx = 1
@@ -72,7 +76,7 @@ function build_computed_data(data::RvrpInstance)
     return RvrpComputedData(
         location_id_2_index, location_group_id_2_index,
         product_specification_class_id_2_index, vehicle_category_id_2_index,
-        capacity_id_2_index, property_id_2_index,
+        vehicle_set_id_2_index, capacity_id_2_index, property_id_2_index,
         travel_specification_id_2_index, BitSet(), false
     )
 end
