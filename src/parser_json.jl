@@ -77,7 +77,7 @@ JSON2.@format VehicleCategory begin
     vehicle_capacities => (default=Dict{String,Float64}(),)
     compartment_capacities => (default=Dict{String,Dict{String,Float64}}(),)
     vehicle_properties => (default=Dict{String,Float64}(),)
-    compartments_properties => (default=Dict{String,Dict{String,Float64}}(),)
+    compartment_properties => (default=Dict{String,Dict{String,Float64}}(),)
     loading_option => (default=0,)
     energy_interval_lengths => (default=Float64[],)
 end

@@ -295,9 +295,9 @@ function TravelSpecification(; id = "",
 end
 
 function TravelPeriod(; period = Range(),
-                          travel_specification_id = "")
-    return TravelPeriod(perid,
-                            travel_specification_id)
+                      travel_specification_id = "")
+    return TravelPeriod(period,
+                        travel_specification_id)
 end
 
 function RvrpInstance(; id = "",
