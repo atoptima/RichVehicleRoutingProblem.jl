@@ -44,6 +44,9 @@ function build_computed_data_tests()
     data.product_specification_classes = [RVRP.ProductSpecificationClass(
         id = string("psc_", i)
     ) for i in 1:5]
+    data.requests = [RVRP.Request(
+        id = string("req_", i)
+    ) for i in 10:13]
     RVRP.set_indices(data)
     data.location_groups = RVRP.create_singleton_location_groups(data.locations)
     data.vehicle_categories[1].vehicle_capacities = Dict{String,Float64}(
@@ -84,6 +87,10 @@ function build_computed_data_tests()
     for (k,v) in computed_data.product_specification_class_id_2_index
         @test v >= 1
         @test v <= 5
+    end
+    for (k,v) in computed_data.request_id_2_index
+        @test v >= 1
+        @test v <= 4
     end
     for (k,v) in computed_data.capacity_id_2_index
         @test v >= 1

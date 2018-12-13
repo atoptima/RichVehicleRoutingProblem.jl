@@ -7,7 +7,7 @@ mutable struct RvrpComputedData
     location_id_2_index::Dict{String, Int}
     location_group_id_2_index::Dict{String, Int}
     product_specification_class_id_2_index::Dict{String, Int}
-    # request_id2Index::Dict{String, Int}
+    request_id_2_index::Dict{String, Int}
     vehicle_category_id_2_index::Dict{String, Int}
     vehicle_set_id_2_index::Dict{String, Int}
     capacity_id_2_index::Dict{String, Int}
