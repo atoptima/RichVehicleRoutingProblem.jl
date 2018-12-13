@@ -4,7 +4,7 @@ mutable struct Action
     id::String
     location_id::String
     request_id::String # if any request is linked to a request the operation
-    operation_type::Int # 0- Depot, 1 - Pickup, 2 - Delivery, 3 - ...otherOperation
+    operation_type::Int  # 0 - Arrival to Location, 1 - Departure from Location, 2 - Pickup, 3 - Delivery
     product_quantity::Float64 # to record the picked/delivered quantity in case of split_fulfillment
 end
 
