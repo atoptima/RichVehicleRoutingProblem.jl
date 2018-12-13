@@ -81,7 +81,7 @@ function parse_cvrplib(file_path::String)
     )]
 
     travel_specifications = [TravelSpecification("unique_period_cat",
-            mat, Array{Float64,2}(undef, 0, 0), Array{Float64,2}(undef, 0, 0))]
+            Array{Float64,2}(undef, 0, 0), mat, Array{Float64,2}(undef, 0, 0))]
     travel_periods = [TravelPeriod(Range(),
                                     "unique_period_cat")]
 

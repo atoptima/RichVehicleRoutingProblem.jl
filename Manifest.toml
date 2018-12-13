@@ -15,7 +15,9 @@ uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[JSON2]]
 deps = ["Dates", "Parsers", "Test"]
-path = "/Users/vitornesello/.julia/dev/JSON2"
+git-tree-sha1 = "ec005c6b062367c46da5e78282e30b06e93563c8"
+repo-rev = "add_support_for_matrix"
+repo-url = "https://github.com/atoptima/JSON2.jl"
 uuid = "2535ab7d-5cd8-5a07-80ac-9b1792aadce3"
 version = "0.2.3+"
 
@@ -50,15 +52,15 @@ version = "1.0.2"
 
 [[Parameters]]
 deps = ["Markdown", "OrderedCollections", "REPL", "Test"]
-git-tree-sha1 = "40f540ec96e50c0b2b9efdb11b5e4d0c63f90923"
+git-tree-sha1 = "eec0fe16344cc14aa2e6251874ab30d62aff4f7c"
 uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
-version = "0.10.1"
+version = "0.10.2"
 
 [[Parsers]]
 deps = ["Dates", "Mmap", "Test", "WeakRefStrings"]
-git-tree-sha1 = "510eba237a97dfb73f8a0c16ed23f68e407885c1"
+git-tree-sha1 = "949ca36d47010bee093254467166487c921d490b"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "0.2.11"
+version = "0.2.14"
 
 [[Printf]]
 deps = ["Unicode"]
@@ -76,7 +78,7 @@ uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 deps = ["Test"]
 git-tree-sha1 = "70d93416475a5db9ef30785bf2b3814f2536d5e5"
 repo-rev = "master"
-repo-url = "https://github.com/atoptima/Scanner.jl.git"
+repo-url = "https://github.com/atoptima/Scanner.jl"
 uuid = "c75548ad-e7e3-5214-b9a0-71e99b6be1af"
 version = "0.0.0"
 

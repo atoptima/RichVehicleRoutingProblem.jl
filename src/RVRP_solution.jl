@@ -1,6 +1,6 @@
 # To use the solution, the input data is required
 
-struct Action
+mutable struct Action
     id::String
     location_id::String
     operation_type::Int # 0- Depot, 1 - Pickup, 2 - Delivery, 3 - otherOperation # should be picked quantity
@@ -8,7 +8,7 @@ struct Action
     scheduled_start_time::Float64 # post-computed
 end
 
-struct Route
+mutable struct Route
     id::String
     vehicle_set_id::String
     sequence::Vector{Action}
@@ -16,7 +16,7 @@ struct Route
     # path::OSRMpath     # TODO: add OSRM path here
 end
 
-struct RvrpSolution
+mutable struct RvrpSolution
     id::String
     instance_id::String
     cost::Float64 # post-compute

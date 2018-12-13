@@ -37,13 +37,25 @@ function build_computed_data(data::RvrpInstance)
         data.travel_specifications[i].id =>
         i for i in 1:length(data.travel_specifications)
     )
+    vehicle_set_id_2_index = Dict{String,Int}(
+        data.vehicle_sets[i].id =>
+        i for i in 1:length(data.vehicle_sets)
+    )
     capacity_id_2_index = Dict{String, Int}()
+    property_id_2_index = Dict{String, Int}()
     cap_idx = 1
+    prop_idx = 1
     for v_cat in data.vehicle_categories
         for (cap_id,v) in v_cat.vehicle_capacities
             if !haskey(capacity_id_2_index, cap_id)
                 capacity_id_2_index[cap_id] = cap_idx
                 cap_idx += 1
+            end
+        end
+        for (prop_id,v) in v_cat.vehicle_properties
+            if !haskey(property_id_2_index, prop_id)
+                property_id_2_index[prop_id] = prop_idx
+                prop_idx += 1
             end
         end
     end
@@ -54,12 +66,18 @@ function build_computed_data(data::RvrpInstance)
                 cap_idx += 1
             end
         end
+        for (prop_id,v) in p_spec_class.property_requirements
+            if !haskey(property_id_2_index, prop_id)
+                property_id_2_index[prop_id] = prop_idx
+                prop_idx += 1
+            end
+        end
     end
     return RvrpComputedData(
         location_id_2_index, location_group_id_2_index,
         product_specification_class_id_2_index, vehicle_category_id_2_index,
-        capacity_id_2_index, travel_specification_id_2_index,
-        BitSet(), false
+        vehicle_set_id_2_index, capacity_id_2_index, property_id_2_index,
+        travel_specification_id_2_index, BitSet(), false
     )
 end
 
@@ -72,8 +90,7 @@ end
 
 function get_capacity_consumptions(req::Request, product_specification_classes::Vector{ProductSpecificationClass}, computed_data::RvrpComputedData)
     quantity = req.product_quantity_range.ub
-    product_specification_class_id = req.product_specification_class_id
-    product_specification_class = product_specification_classes[computed_data.product_specification_class_id_2_index[product_specification_class_id]]
+    product_specification_class = product_specification_classes[computed_data.product_specification_class_id_2_index[req.product_specification_class_id]]
     c = Dict{String,Float64}(
         k => ceil(quantity/v[2]) * v[1]
         for (k,v) in product_specification_class.capacity_consumptions
