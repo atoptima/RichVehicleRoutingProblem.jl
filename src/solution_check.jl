@@ -14,6 +14,9 @@ function check_sequence(route::Route, data::RvrpInstance,
                         complete_req_ids::Set{String},
                         ongoing_req_ids::Set{String})
 
+    travel_times = data.travel_specifications[1].travel_time_matrix
+    act_idx = 1
+    prev_act = route.sequence[1]
     for act in route.sequence
         if act.request_id != "" # Part of a request
             req = data.requests[computed_data.request_id_2_index[act.request_id]]
@@ -50,8 +53,30 @@ function check_sequence(route::Route, data::RvrpInstance,
                       ". \n Starts at time ", act.scheduled_start_time, ".")
             end
         end
+        if act_idx >= 2
+            serv_time = 0.0
+            if prev_act.request_id != ""
+                prev_req = data.requests[computed_data.request_id_2_index[prev_act.request_id]]
+                if prev_act.operation_type == 1
+                    serv_time = prev_req.pickup_service_time
+                elseif prev_act.operation_type == 2
+                    serv_time = prev_req.delivery_service_time
+                end
+            end
+            l_idx_1 = computed_data.location_id_2_index[prev_act.location_id]
+            l_idx_2 = computed_data.location_id_2_index[act.location_id]
+            if travel_times[l_idx_1,l_idx_2] + serv_time > act.scheduled_start_time - prev_act.scheduled_start_time
+                error("The time between start of actions ", act.id, " and ",
+                      prev_act.id, " of route ", route.id,
+                      " is smaller than the minimum transition time between both.",
+                      "\n . Minimum time: ", travel_times[l_idx_1,l_idx_2]
+                      + serv_time, ". Time difference: ",
+                      act.scheduled_start_time - prev_act.scheduled_start_time, ".")
+            end
+        end
+        prev_act = act
+        act_idx += 1
     end
-
     return true
 end
 
@@ -66,7 +91,9 @@ function check_solution(data::RvrpInstance, computed_data::RvrpComputedData,
         v_set = data.vehicle_sets[computed_data.vehicle_set_id_2_index[r.vehicle_set_id]]
         nb_used_vehicles[v_set.id] += 1
         if nb_used_vehicles[v_set.id] > v_set.nb_of_vehicles_range.soft_range.ub
-            error("Solution infeasible: used ",  nb_used_vehicles[v_set.id], ", vehicles of set <", v_set.id, "> . Maximum is ", v_set.nb_of_vehicles_range.soft_range.ub, ".")
+            error("Solution infeasible: used ",  nb_used_vehicles[v_set.id],
+                  ", vehicles of set <", v_set.id, "> . Maximum is ",
+                  v_set.nb_of_vehicles_range.soft_range.ub, ".")
         end
 
         # Check begin
@@ -74,15 +101,21 @@ function check_solution(data::RvrpInstance, computed_data::RvrpComputedData,
         arrival_locs = data.location_groups[computed_data.location_group_id_2_index[v_set.arrival_location_group_id]].location_ids
         route_mode = v_set.route_mode
         if (route_mode in [0, 1]) && !(r.sequence[1].location_id in departure_locs)
-            error("Solution infeasible: Route ", r.id, " does not respect start and end depot constraints of vehicle set ", v_set.id, ".")
+            error("Solution infeasible: Route ", r.id,
+                  " does not respect start and end depot ",
+                  "constraints of vehicle set ", v_set.id, ".")
         end
 
         # Check end
         if r.end_status == 0 && r.sequence[1].location_id != r.sequence[end].location_id
-            error("Solution infeasible: Route ", r.id, " does not respect start and end depot constraints of vehicle set ", v_set.id, ".")
+            error("Solution infeasible: Route ", r.id,
+                  " does not respect start and end depot ",
+                  "constraints of vehicle set ", v_set.id, ".")
         end
         if (route_mode in [0, 2]) && !(r.sequence[1].location_id in arrival_locs)
-            error("Solution infeasible: Route ", r.id, " does not respect start and end depot constraints of vehicle set ", v_set.id, ".")
+            error("Solution infeasible: Route ", r.id,
+                  " does not respect start and end depot ",
+                  "constraints of vehicle set ", v_set.id, ".")
         end
 
         # Check sequence
@@ -92,11 +125,16 @@ function check_solution(data::RvrpInstance, computed_data::RvrpComputedData,
         # Check route time windows
         total_time = r.sequence[end].scheduled_start_time - r.sequence[1].scheduled_start_time
         if total_time > v_set.max_working_time
-            error("Solution infeasible: Route ", r.id, " does not respect max_working_time of vehicle set ", v_set.id, ".")
+            error("Solution infeasible: Route ", r.id,
+                  " does not respect max_working_time ",
+                  "of vehicle set ", v_set.id, ".")
         end
-        if (!check_tw_bounds([v_set.working_time_window.soft_range], r.sequence[1].scheduled_start_time) || !check_tw_bounds([v_set.working_time_window.soft_range], r.sequence[end].scheduled_start_time))
+        if (!check_tw_bounds([v_set.working_time_window.soft_range], r.sequence[1].scheduled_start_time)
+            || !check_tw_bounds([v_set.working_time_window.soft_range], r.sequence[end].scheduled_start_time))
             if total_time > v_set.max_working_time
-                error("Solution infeasible: Route ", r.id, " does not respect working_time_window of vehicle set ", v_set.id, ".")
+                error("Solution infeasible: Route ", r.id,
+                      " does not respect working_time_window ",
+                      "of vehicle set ", v_set.id, ".")
             end
         end
 
