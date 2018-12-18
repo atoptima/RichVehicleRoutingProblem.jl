@@ -17,16 +17,35 @@ function check_sequence(route::Route, data::RvrpInstance,
     travel_times = data.travel_specifications[1].travel_time_matrix
     act_idx = 1
     prev_act = route.sequence[1]
-    for act in route.sequence
+    v_set = data.vehicle_sets[computed_data.vehicle_set_id_2_index[route.vehicle_set_id]]
+    v_category = data.vehicle_categories[computed_data.vehicle_category_id_2_index[v_set.vehicle_category_id]]
+    vehicle_properties = v_category.vehicle_properties
+    vehicle_capacities = v_category.vehicle_capacities
+    used_capacity = Dict{String,Float64}(
+        k => 0.0 for k in keys(vehicle_capacities)
+    )
+
+    for act_idx in 1:length(route.sequence)
+        act = route.sequence[act_idx]
         if (act.operation_type != 0 && act.request_id == ""
             || act.operation_type == 0 && act.request_id != "")
-            error("In action ", act.act_idx, " of route ", route.id,
+            error("In action ", act.id, " of route ", route.id,
                   ": operation type (", act.operation_type, ") and reques id (",
                   act.request_id, " are not consistent.")
         end
 
         if act.operation_type in [1, 2] # Pickup or delivery (has req.id)
             req = data.requests[computed_data.request_id_2_index[act.request_id]]
+            product_specification = data.product_specification_classes[computed_data.product_specification_class_id_2_index[req.product_specification_class_id]]
+            # Check properties
+            for (k,v) in product_specification.property_requirements
+                if v < vehicle_properties[k]
+                    error("In action ", act.id, " of route ", route.id,
+                          ": Uses property (", k, ") that vehicle ",
+                          v_set.id, " does not have. Vehicle properties: ",
+                          vehicle_properties, ".")
+                end
+            end
             if req.request_type == 0 && act.operation_type == 1
                 if in(req.id, complete_req_ids)
                     error("Request ", req.id, " is performed more than once.")
@@ -44,9 +63,33 @@ function check_sequence(route::Route, data::RvrpInstance,
                 push!(complete_req_ids, req.id)
             end
             if act.operation_type == 1
+                # Check capacity
+                for (k,v) in product_specification.capacity_consumptions
+                    used_capacity[k] += (
+                        ceil(req.product_quantity_range.ub/v[2]) * v[1]
+                    )
+                    if used_capacity[k] > vehicle_capacities[k]
+                        error("In action ", act.id, " of route ", route.id,
+                              ": Consumes ", v, " usint of capacity ", k, ", ",
+                              " but vehicle ", v_set.id, " has capacity of ",
+                              " only ", vehicle_capacities[k], " units.")
+                    end
+                end
                 req_tws = [range.soft_range for range in req.pickup_time_windows]
             elseif act.operation_type == 2
-                req_tws = [range.soft_range for range in req.delivery_time_windows]
+                # Check capacity
+                for (k,v) in product_specification.capacity_consumptions
+                    used_capacity[k] -= (
+                        ceil(req.product_quantity_range.ub/v[2]) * v[1]
+                    )
+                    if used_capacity[k] > vehicle_capacities[k]
+                        error("In action ", act.id, " of route ", route.id,
+                              ": Consumes ", v, " usint of capacity ", k, ", ",
+                              " but vehicle ", v_set.id, " has capacity of ",
+                              " only ", vehicle_capacities[k], " units.")
+                    end
+                end
+               req_tws = [range.soft_range for range in req.delivery_time_windows]
             end
             feas_1 = check_range_bounds(req_tws, act.scheduled_start_time)
             loc_tws = data.locations[computed_data.location_id_2_index[act.location_id]].opening_time_windows
@@ -80,7 +123,6 @@ function check_sequence(route::Route, data::RvrpInstance,
             end
         end
         prev_act = act
-        act_idx += 1
     end
     return true
 end
