@@ -36,17 +36,18 @@ function check_sequence(route::Route, data::RvrpInstance,
                 push!(complete_req_ids, req.id)
             end
             if act.operation_type == 1
-                tws = [range.soft_range for range in req.pickup_time_windows]
+                req_tws = [range.soft_range for range in req.pickup_time_windows]
             elseif act.operation_type == 2
-                tws = [range.soft_range for range in req.delivery_time_windows]
+                req_tws = [range.soft_range for range in req.delivery_time_windows]
             end
-            feas_1 = check_tw_bounds(tws, act.scheduled_start_time)
-            tws = data.locations[computed_data.location_id_2_index[act.location_id]].opening_time_windows
-            feas_2 = check_tw_bounds(tws, act.scheduled_start_time)
+            feas_1 = check_tw_bounds(req_tws, act.scheduled_start_time)
+            loc_tws = data.locations[computed_data.location_id_2_index[act.location_id]].opening_time_windows
+            feas_2 = check_tw_bounds(loc_tws, act.scheduled_start_time)
             if !feas_1 || !feas_2
                 error("Action ", act.id, " of route ", route.id,
-                      " does not respect location time windows: ",
-                      tws, ". Starts at time ", act.scheduled_start_time, ".")
+                      " does not respect time windows: \n Request tws: ",
+                      req_tws, ".\n Location tws: ", loc_tws,
+                      ". \n Starts at time ", act.scheduled_start_time, ".")
             end
         end
     end
