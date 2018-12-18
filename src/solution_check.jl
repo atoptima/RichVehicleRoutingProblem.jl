@@ -53,7 +53,7 @@ function check_sequence(route::Route, data::RvrpInstance,
                       ". \n Starts at time ", act.scheduled_start_time, ".")
             end
         end
-        if act_idx >= 2
+        if act_idx >= 2 && !isempty(travel_times)
             serv_time = 0.0
             if prev_act.request_id != ""
                 prev_req = data.requests[computed_data.request_id_2_index[prev_act.request_id]]
