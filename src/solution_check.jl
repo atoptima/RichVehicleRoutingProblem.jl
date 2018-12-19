@@ -57,6 +57,10 @@ function check_sequence(route::Route, data::RvrpInstance,
                 end
                 push!(complete_req_ids, req.id)
             elseif req.request_type in [1, 2]
+                if req.request_type != act.operation_type
+                    error("Action ", act.id, " has operation type ", act.operation_type,
+                          " but is from a request of type ", req.request_type, ".")
+                end                    
                 push!(complete_req_ids, req.id)
             end
             if act.operation_type == 1
