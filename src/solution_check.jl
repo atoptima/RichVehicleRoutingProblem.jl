@@ -46,10 +46,12 @@ function check_sequence(route::Route, data::RvrpInstance,
                           vehicle_properties, ".")
                 end
             end
-            if req.request_type == 0 && act.operation_type == 1
+            if act.operation_type == 1 || act.operation_type == 2
                 if in(req.id, complete_req_ids)
                     error("Request ", req.id, " is performed more than once.")
                 end
+            end
+            if req.request_type == 0 && act.operation_type == 1
                 push!(ongoing_req_ids, req.id)
             elseif req.request_type == 0 && act.operation_type == 2
                 if in(req.id, ongoing_req_ids) == false
@@ -57,9 +59,6 @@ function check_sequence(route::Route, data::RvrpInstance,
                 end
                 push!(complete_req_ids, req.id)
             elseif req.request_type in [1, 2]
-                if in(req.id, complete_req_ids)
-                    error("Request ", req.id, " is performed more than once.")
-                end
                 push!(complete_req_ids, req.id)
             end
             if act.operation_type == 1
