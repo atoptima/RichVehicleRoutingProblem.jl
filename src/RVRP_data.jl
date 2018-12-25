@@ -80,16 +80,16 @@ mutable struct Request # can be
     delivery_time_windows::Vector{FlexibleRange}
 end
 
-mutable struct VehicleCapacity
-    vehicle_capacity_measures::Dict{String,Float64} # defined only if measured at the vehicle level; for string id key associated with properties capacity measures that need to be checked on the vehicle, as for instance weight, value, volume
-    compartment_capacity_measures::Dict{String,Dict{String,Float64}} # defined only if measured at the compartment level; for string id key associated with properties capacity measures that need to be checked on the vehicle, as for instance weight, value, volume, ... For each such property, the Dictionary specifies the capacity for each compartment id key.
-    vehicle_properties::Dict{String,Float64} # defined only if measured at the vehicle level; for string id key associated with properties that need to be checked on the vehicle (such as the same check applies to all the compartments), as for instance to ability to cary liquids or  refrigerated product.
-    compartment_properties::Dict{String,Dict{String,Float64}} #  defined only if measured at the compartment level; for string id key associated with properties that need to be check on the comparments such as  max weight, max length, refrigerated product, .... For each such property, the Dictionary specifies the capacity for each compartment id key.
+mutable struct VehicleCharacteristics
+    of_vehicle::Dict{String,Float64} # defined only if measured at the vehicle level; for string id key associated with properties or capacity measures that need to be checked on the vehicle, as for instance weight, value, volume
+    of_compartments::Dict{String,Dict{String,Float64}}  # defined only if measured at the compartment level; for string id key associated with properties or capacity measures that need to be checked on the vehicle, as for instance weight, value, volume, ... For each such property, the Dictionary specifies the capacity for each compartment id key.
 end
+
 
 mutable struct VehicleCategory
     id::String
-    capacity::VehicleCapacity
+    capacity_measures::VehicleCharacteristics
+    vehicle_properties::VehicleCharacteristics
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
 end
@@ -100,13 +100,13 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     vehicle_category_id::String
     departure_location_group_id::String # Vehicle routes start from one of the depot locations in the group
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
-    working_time_window::FlexibleRange
+    work_periods::Vector{FlexibleRange} # Define the work periods for which vehicles can be used, with some flexibility
     travel_distance_unit_cost::Float64 # may depend on both driver and vehicle
     travel_time_unit_cost::Float64 # may depend on both driver and vehicle
     service_time_unit_cost::Float64
     waiting_time_unit_cost::Float64
     initial_energy_charge::Float64
-    fixed_cost_per_vehicle::Float64
+    fixed_costs_per_vehicle::Vector{Float64} # the fixed_cost must be specified for each work_period; the vector of cost is map with the vector of work_periods
     max_working_time::Float64 # within each time period
     max_travel_distance::Float64 # within each time period
     allow_shipment_over_multiple_work_periods::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
@@ -245,6 +245,12 @@ function Request(; id = "",
                    duration_unit_cost,
                    pickup_time_windows,
                    delivery_time_windows)
+end
+
+function VehicleCharacteristics(;of_vehicle = Dict{String,Float64}(),
+                                of_compartments = Dict{String,Dict{String,Float64}}())
+    return VehicleCharacteristics(of_vehicle,
+                                  of_compartments)
 end
 
 function VehicleCategory(; id = "",
