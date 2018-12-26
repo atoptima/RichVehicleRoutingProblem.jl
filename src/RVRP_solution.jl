@@ -37,12 +37,12 @@ mutable struct Route
     # path::OSRMpath     # TODO: add OSRM path here
 end
 
-mutable struct RvrpSolution
+mutable struct Solution
     id::String
     instance_id::String
     cost::Float64 
     routes::Vector{Route}
-    unassigned_request_ids::Vector{String} # among semi-mandatory or optional request
+    unassigned_request_ids::Vector{String} # among semi-mandatory or optional requests
 end
 
 
