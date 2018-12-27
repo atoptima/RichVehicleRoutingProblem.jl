@@ -12,6 +12,7 @@ function generate_symmetric_distance_matrix(xs::Vector{T},
     return matrix
 end
 
+
 function set_indices(data::RvrpInstance)
     for loc_idx in 1:length(data.locations)
         data.locations[loc_idx].index = loc_idx
