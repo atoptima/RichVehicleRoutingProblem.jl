@@ -19,8 +19,8 @@ end
 mutable struct Location # Location where can be a Depot, Pickup, Delivery, Recharging, ..., or a combination of those services
     id::String
     index::Int # used for matrices such as travel distance, travel time ...
-    latitude::Float64
-    longitude::Float64
+    lat_y::Float64
+    long_x::Float64
     opening_time_windows::Vector{Range}
     energy_fixed_cost::Float64 # an entry fee
     energy_unit_cost::Float64 # recharging cost per unit of energy
@@ -85,7 +85,6 @@ mutable struct VehicleCharacteristics
     of_compartments::Dict{String,Dict{String,Float64}}  # defined only if measured at the compartment level; for string id key associated with properties or capacity measures that need to be checked on the vehicle, as for instance weight, value, volume, ... For each such property, the Dictionary specifies the capacity for each compartment id key.
 end
 
-
 mutable struct VehicleCategory
     id::String
     capacity_measures::VehicleCharacteristics
@@ -94,21 +93,26 @@ mutable struct VehicleCategory
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
 end
 
+mutable struct WorkPeriod
+    id::String
+    active_window::FlexibleRange
+    fixed_cost_per_vehicle::Float64
+    travel_distance_unit_cost::Float64 # may depend on both driver and vehicle
+    travel_time_unit_cost::Float64 # may depend on both driver and vehicle
+    service_time_unit_cost::Float64
+    waiting_time_unit_cost::Float64
+end
+
 mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
     route_mode::Int # 0 closed at departure and arrival, 1 open at arrival, 2 open at departure, 3 open at both depature and arrival
     vehicle_category_id::String
     departure_location_group_id::String # Vehicle routes start from one of the depot locations in the group
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
-    work_periods::Vector{FlexibleRange} # Define the work periods for which vehicles can be used, with some flexibility
-    travel_distance_unit_cost::Float64 # may depend on both driver and vehicle
-    travel_time_unit_cost::Float64 # may depend on both driver and vehicle
-    service_time_unit_cost::Float64
-    waiting_time_unit_cost::Float64
+    work_periods::Vector{WorkPeriod} # Define the work periods for which vehicles can be used, with some flexibility, does not have to be contiguous
     initial_energy_charge::Float64
-    fixed_costs_per_vehicle::Vector{Float64} # the fixed_cost must be specified for each work_period; the vector of cost is map with the vector of work_periods
-    max_working_time::Float64 # within each time period
-    max_travel_distance::Float64 # within each time period
+    max_working_time::Float64 # within each work period
+    max_travel_distance::Float64 # within each work period
     allow_shipment_over_multiple_work_periods::Bool # true if the vehicles do not need to complete all their requests by the end of each time period of the planning
     nb_of_vehicles_range::FlexibleRange
 end
@@ -127,9 +131,10 @@ end
 
 mutable struct RvrpInstance
     id::String
+    distance_mode::Int # 0 (default) - long and lat, 1 - x and y
+    coordinate_mode::Int # 0 (default) user-defined, 1 - euc, 2 - manhattan, 3 - gps
     travel_specifications::Vector{TravelSpecification}
     travel_periods::Vector{TravelPeriod}
-    work_periods::Vector{Range} # Define periods of the planning horizon; vehicles  must return to a depot by the end of each time period if they cannot be ongoing. Route's max_duration and max_distance apply to each time period
     locations::Vector{Location}
     location_groups::Vector{LocationGroup}
     product_compatibility_classes::Vector{ProductCompatibilityClass}
@@ -173,13 +178,13 @@ simple_flex_range(hard_lb::Float64,
 function Location(;
                   id = "",
                   index = -1,
-                  latitude = -1.0,
-                  longitude = -1.0,
+                  lat_y = -1.0,
+                  long_x = -1.0,
                   opening_time_windows = [Range()],
                   energy_fixed_cost = 0.0,
                   energy_unit_cost = 0.0,
                   energy_recharging_speeds = Float64[])
-    return Location(id, index, latitude, longitude, opening_time_windows, energy_fixed_cost, energy_unit_cost, energy_recharging_speeds)
+    return Location(id, index, lat_y, long_x, opening_time_windows, energy_fixed_cost, energy_unit_cost, energy_recharging_speeds)
 end
 
 function LocationGroup(; id = "",
@@ -254,19 +259,27 @@ function VehicleCharacteristics(;of_vehicle = Dict{String,Float64}(),
 end
 
 function VehicleCategory(; id = "",
-                         vehicle_capacities = Dict{String,Float64}(),
-                         compartment_capacities = Dict{String,Dict{String,Float64}}(),
-                         vehicle_properties = Dict{String,Float64}(),
-                         compartment_properties = Dict{String,Dict{String,Float64}}(),
+                         capacity_measures = VehicleCharacteristics(),
+                         vehicle_properties = VehicleCharacteristics(),
                          loading_option = 0,
                          energy_interval_lengths = Float64[])
     return VehicleCategory(id,
-                           vehicle_capacities ,
-                           compartment_capacities ,
-                           vehicle_properties ,
-                           compartment_properties ,
-                           loading_option ,
+                           capacity_measures,
+                           vehicle_properties,
+                           loading_option,
                            energy_interval_lengths)
+end
+
+function WorkPeriod(; id = "",
+                    active_window = FlexibleRange(),
+                    fixed_cost_per_vehicle = 0.0,
+                    travel_distance_unit_cost = 0.0,
+                    travel_time_unit_cost = 0.0,
+                    service_time_unit_cost = 0.0,
+                    waiting_time_unit_cost = 0.0)
+    return WorkPeriod(id, active_window, fixed_cost_per_vehicle,
+                      travel_distance_unit_cost, travel_time_unit_cost,
+                      service_time_unit_cost, waiting_time_unit_cost)
 end
 
 function HomogeneousVehicleSet(; id = "",
@@ -274,23 +287,16 @@ function HomogeneousVehicleSet(; id = "",
                                departure_location_group_id = "",
                                arrival_location_group_id = "",
                                vehicle_category_id = "default_id",
-                               working_time_window = FlexibleRange(),
-                               travel_distance_unit_cost = 0.0,
-                               travel_time_unit_cost = 0.0,
-                               service_time_unit_cost = 0.0,
-                               waiting_time_unit_cost = 0.0,
+                               work_periods = [WorkPeriod()],
                                initial_energy_charge = MAXNUMBER,
-                               fixed_cost_per_vehicle = 0.0,
                                max_working_time = MAXNUMBER,
                                max_travel_distance = MAXNUMBER,
                                allow_shipment_over_multiple_work_periods = false,
                                nb_of_vehicles_range = FlexibleRange())
     return HomogeneousVehicleSet(
         id, route_mode, vehicle_category_id, departure_location_group_id,
-        arrival_location_group_id, working_time_window,
-        travel_distance_unit_cost, travel_time_unit_cost,
-        service_time_unit_cost, waiting_time_unit_cost, initial_energy_charge,
-        fixed_cost_per_vehicle, max_working_time, max_travel_distance,
+        arrival_location_group_id, work_periods, initial_energy_charge,
+        max_working_time, max_travel_distance,
         allow_shipment_over_multiple_work_periods, nb_of_vehicles_range)
 end
 
@@ -311,9 +317,10 @@ function TravelPeriod(; period = Range(),
 end
 
 function RvrpInstance(; id = "",
+                      distance_mode = 0,
+                      coordinate_mode = 0,
                       travel_specifications = TravelSpecification[],
                       travel_periods = TravelPeriod[],
-                      work_periods = Range[],
                       locations = Location[],
                       location_groups = LocationGroup[],
                       product_compatibility_classes = ProductCompatibilityClass[],
@@ -323,9 +330,10 @@ function RvrpInstance(; id = "",
                       vehicle_categories = VehicleCategory[],
                       vehicle_sets = HomogeneousVehicleSet[])
     return RvrpInstance(id,
+                        distance_mode,
+                        coordinate_mode,
                         travel_specifications,
                         travel_periods,
-                        work_periods,
                         locations,
                         location_groups,
                         product_compatibility_classes,

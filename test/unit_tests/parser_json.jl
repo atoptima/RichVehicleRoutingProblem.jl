@@ -10,7 +10,6 @@ function parse_from_json_tests()
     @test data.travel_distance_matrices == Dict{String,Array{Float64,2}}()
     @test data.travel_time_matrices == Dict{String,Array{Float64,2}}()
     @test data.energy_consumption_matrices == Dict{String,Array{Float64,2}}()
-    @test data.work_periods == RVRP.Range[]
     @test data.locations == RVRP.Location[]
     @test data.location_groups == RVRP.LocationGroup[]
     @test data.product_compatibility_classes == RVRP.ProductCompatibilityClass[]

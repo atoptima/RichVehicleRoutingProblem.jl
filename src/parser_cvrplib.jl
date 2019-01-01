@@ -32,11 +32,10 @@ function parse_cvrplib(file_path::String)
     travel_distance_matrices = Dict{String,Array{Float64,2}}("unique_mat" => mat)
     travel_time_matrices = Dict{String,Array{Float64,2}}()
     energy_consumption_matrices = Dict{String,Array{Float64,2}}()
-    work_periods = [Range()]
 
     locations = [Location(
         id = string("loc_", i), index = i,
-        longitude = xs[i], latitude = ys[i]
+        long_x = xs[i], lat_y = ys[i]
     ) for i in 1:n]
     locations[depot_idx].id = "depot"
     location_groups = create_singleton_location_groups(locations)
@@ -68,14 +67,16 @@ function parse_cvrplib(file_path::String)
 
     vehicle_categories = [VehicleCategory(
         id = "unique_vehicle_category",
-        vehicle_capacities = Dict{String,Float64}("unique_measure" => capacity)
+        capacity_measures = VehicleCharacteristics(of_vehicle = Dict{String,Float64}("unique_measure" => capacity))
     )]
+    work_period = WorkPeriod(id = "unique_work_period",
+                             travel_distance_unit_cost = 1.0)
     vehicle_sets = [HomogeneousVehicleSet(
         id = "unique_vehicle_set",
         vehicle_category_id = "unique_vehicle_category",
         departure_location_group_id = "depot_loc_group",
         arrival_location_group_id = "depot_loc_group",
-        travel_distance_unit_cost = 1.0,
+        work_periods = [work_period],
         nb_of_vehicles_range = FlexibleRange(soft_range = Range(0, n-1),
                                              hard_range = Range(0, n-1))
     )]
@@ -85,11 +86,14 @@ function parse_cvrplib(file_path::String)
     travel_periods = [TravelPeriod(Range(),
                                     "unique_period_cat")]
 
+    coordinate_mode = 0
+    distance_mode = 0
     data = RvrpInstance(
-        id, travel_specifications, travel_periods, work_periods,
-        locations, location_groups, product_compatibility_classes,
-        product_sharing_classes, product_specification_classes, requests,
-        vehicle_categories, vehicle_sets
+        id, coordinate_mode, distance_mode, travel_specifications,
+        travel_periods, locations, location_groups,
+        product_compatibility_classes, product_sharing_classes,
+        product_specification_classes, requests, vehicle_categories,
+        vehicle_sets
     )
     preprocess_instance(data)
     return data

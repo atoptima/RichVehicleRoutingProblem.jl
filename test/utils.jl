@@ -92,12 +92,21 @@ end
 function ==(vc1::RVRP.VehicleCategory, vc2::RVRP.VehicleCategory)
     return (
         vc1.id == vc2.id
-        && vc1.vehicle_capacities == vc2.vehicle_capacities
-        && vc1.compartment_capacities == vc2.compartment_capacities
+        && vc1.capacity_measures == vc2.capacity_measures
         && vc1.vehicle_properties == vc2.vehicle_properties
-        && vc1.compartments_properties == vc2.compartments_properties
         && vc1.loading_option == vc2.loading_option
         && vc1.energy_interval_lengths == vc2.energy_interval_lengths
+    )
+end
+
+function ==(wp1::RVRP.WorkPeriod, wp2::RVRP.WorkPeriod)
+    return (
+        && wp1.active_window == wp2.active_window
+        && wp1.travel_distance_unit_cost == wp2.travel_distance_unit_cost
+        && wp1.travel_time_unit_cost == wp2.travel_time_unit_cost
+        && wp1.service_time_unit_cost == wp2.service_time_unit_cost
+        && wp1.waiting_time_unit_cost == wp2.waiting_time_unit_cost
+        && wp1.fixed_cost_per_vehicle == wp2.fixed_cost_per_vehicle
     )
 end
 
@@ -107,13 +116,7 @@ function ==(hvs1::RVRP.HomogeneousVehicleSet, hvs2::RVRP.HomogeneousVehicleSet)
         && hvs1.vehicle_category_id == hvs2.vehicle_category_id
         && hvs1.departure_location_group_id == hvs2.departure_location_group_id
         && hvs1.arrival_location_group_id == hvs2.arrival_location_group_id
-        && hvs1.working_time_window == hvs2.working_time_window
-        && hvs1.travel_distance_unit_cost == hvs2.travel_distance_unit_cost
-        && hvs1.travel_time_unit_cost == hvs2.travel_time_unit_cost
-        && hvs1.service_time_unit_cost == hvs2.service_time_unit_cost
-        && hvs1.waiting_time_unit_cost == hvs2.waiting_time_unit_cost
         && hvs1.initial_energy_charge == hvs2.initial_energy_charge
-        && hvs1.fixed_cost_per_vehicle == hvs2.fixed_cost_per_vehicle
         && hvs1.max_working_time == hvs2.max_working_time
         && hvs1.max_travel_distance == hvs2.max_travel_distance
         && hvs1.allow_shipment_over_multiple_work_periods == hvs2.allow_shipment_on_multiple_work_periods
@@ -124,12 +127,13 @@ end
 function ==(data1::RVRP.RvrpInstance, data2::RVRP.RvrpInstance)
     return (
         data1.id == data2.id
+        && data1.coordinate_mode == data2.coordinate_mode
+        && data1.distance_mode == data2.distance_mode
         && data1.travel_matrix_periods == data2.travel_matrix_periods
         && data1.period_to_matrix_id == data2.period_to_matrix_id
         && data1.travel_time_matrices == data2.travel_time_matrices
         && data1.travel_distance_matrices == data2.travel_distance_matrices
         && data1.energy_consumption_matrices == data2.energy_consumption_matrices
-        && data1.work_periods == data2.work_periods
         && data1.locations == data2.locations
         && data1.location_groups == data2.location_groups
         && data1.product_compatibility_classes == data2.product_compatibility_classes
