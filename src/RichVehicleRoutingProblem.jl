@@ -13,5 +13,6 @@ include("utils.jl")
 include("parser_json.jl")
 include("parser_cvrplib.jl")
 include("instance_check.jl")
+include("solution_check.jl")
 
 end

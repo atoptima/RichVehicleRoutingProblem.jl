@@ -4,7 +4,7 @@ authors = ["Vitor Nesello <vitornesello@gmail.com>"]
 version = "0.1.0"
 
 [deps]
-JSON2 = "2535ab7d-5cd8-5a07-80ac-9b1792aadce3"
+JSON2 = "b8f84f9e-ffe9-11e8-114e-fba34a308d63"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 Scanner = "c75548ad-e7e3-5214-b9a0-71e99b6be1af"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
