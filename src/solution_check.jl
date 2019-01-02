@@ -178,8 +178,8 @@ function check_solution(data::RvrpInstance, computed_data::RvrpComputedData,
                   " does not respect max_working_time ",
                   "of vehicle set ", v_set.id, ".")
         end
-        if (!check_range_bounds([v_set.working_time_window.soft_range], r.sequence[1].scheduled_start_time)
-            || !check_range_bounds([v_set.working_time_window.soft_range], r.sequence[end].scheduled_start_time))
+        if (!check_range_bounds([v_set.work_periods[1].active_window.soft_range], r.sequence[1].scheduled_start_time)
+            || !check_range_bounds([v_set.work_periods[1].active_window.soft_range], r.sequence[end].scheduled_start_time))
             if total_time > v_set.max_working_time
                 error("Solution infeasible: Route ", r.id,
                       " does not respect working_time_window ",
