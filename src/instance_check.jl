@@ -65,6 +65,7 @@ const HAS_MUTLIPLE_TRAVEL_TIME_PERIODS = 448
 const HAS_MULTIPLE_VEHICLE_CATEGORIES = 450
 const HAS_MULTIPLE_VEHICLE_SETS = 451
 const HAS_ENERGY_FEATURES = 452 # to be detailed later as needed #
+const HAS_X_Y = 453
 
 function check_id(id_to_index_dict, key, error_prefix::String)
     if !haskey(id_to_index_dict, key)
@@ -83,19 +84,20 @@ function check_positive_range(range::Range, error_prefix::String)
 end
 
 function check_locations(locations::Vector{Location},
-                         computed_data::RvrpComputedData)
+                         computed_data::RvrpComputedData,
+                         coordinate_mode::Int)
 
     for loc in locations
-
         # If in long_lat mode
-        if loc.lat_y < - 90.0 || loc.lat_y > 90.0
-            error("Location $(loc.id) must have lat_y in [-100.0, +100.0]")
-        elseif loc.long_x < - 180.0 || loc.long_x > 180.0
-            error("Location $(loc.id) must have long_x in [-100.0, +100.0]")
-        end
-
-        if loc.index < 1 || loc.index > length(locations)
-            error("Location $(loc.id) must have index in [1, length(locations)]")
+        if coordinate_mode == 0
+            if loc.lat_y < - 90.0 || loc.lat_y > 90.0
+                error("Location $(loc.id) must have lat_y in [-100.0, +100.0]")
+            elseif loc.long_x < - 180.0 || loc.long_x > 180.0
+                error("Location $(loc.id) must have long_x in [-100.0, +100.0]")
+            end
+            if loc.index < 1 || loc.index > length(locations)
+                error("Location $(loc.id) must have index in [1, length(locations)]")
+            end
         end
     end
 end
@@ -291,11 +293,15 @@ function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
              tt_period.travel_specification_id,
              "TavelTimePeriods[1] : ")
 
-    check_locations(data.locations, computed_data)
+    check_locations(data.locations, computed_data, data.coordinate_mode)
     check_location_groups(data.location_groups, computed_data)
     check_requests(data.requests, computed_data)
     check_vehicle_categories(data.vehicle_categories, computed_data)
     check_vehicle_sets(data.vehicle_sets, computed_data)
+
+    if !(data.coordinate_mode in [0, 1])
+        error("Invalid value for coordinate_mode: $data.coordinate_mode")
+    end
 
     # filling Instance based features
     features = computed_data.features
@@ -313,6 +319,9 @@ function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
     end
     if length(data.travel_periods) > 1
         union!(features, HAS_MUTLIPLE_TRAVEL_TIME_PERIODS)
+    end
+    if data.coordinate_mode == 1
+        union!(features, HAS_X_Y)
     end
 
     # TODO check matrices sizes (based on features)
