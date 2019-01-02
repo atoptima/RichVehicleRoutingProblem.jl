@@ -20,7 +20,7 @@ function check_sequence(route::Route, data::RvrpInstance,
     v_set = data.vehicle_sets[computed_data.vehicle_set_id_2_index[route.vehicle_set_id]]
     v_category = data.vehicle_categories[computed_data.vehicle_category_id_2_index[v_set.vehicle_category_id]]
     vehicle_properties = v_category.vehicle_properties.of_vehicle
-    capacity_measures = v_category.capacity_measures.of_vehicle
+    vehicle_capacities = v_category.capacity_measures.of_vehicle
     used_capacity = Dict{String,Float64}(
         k => 0.0 for k in keys(vehicle_capacities)
     )
