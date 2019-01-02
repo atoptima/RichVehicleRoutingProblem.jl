@@ -72,7 +72,7 @@ JSON2.@format Request begin
     delivery_time_windows => (default=[FlexibleRange()],)
 end
 
-JSON2.@format VehicleCategory begin
+JSON2.@format VehicleCharacteristics begin
     of_vehicle => (default=Dict{String,Float64}(),)
     of_compartments => (default=Dict{String,Dict{String,Float64}}(),)
 end
