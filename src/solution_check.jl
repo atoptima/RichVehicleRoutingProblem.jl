@@ -24,7 +24,6 @@ function check_sequence(route::Route, data::RvrpInstance,
     used_capacity = Dict{String,Float64}(
         k => 0.0 for k in keys(vehicle_capacities)
     )
-
     for act_idx in 1:length(route.sequence)
         act = route.sequence[act_idx]
         if (act.operation_type != 0 && act.request_id == ""

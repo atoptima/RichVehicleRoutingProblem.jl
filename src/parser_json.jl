@@ -73,6 +73,11 @@ JSON2.@format Request begin
 end
 
 JSON2.@format VehicleCategory begin
+    of_vehicle => (default=Dict{String,Float64}(),)
+    of_compartments => (default=Dict{String,Dict{String,Float64}}(),)
+end
+
+JSON2.@format VehicleCategory begin
     # id => (default="",)
     capacity_measures => (default=VehicleCharacteristics(),)
     vehicle_properties => (default=VehicleCharacteristics(),)
