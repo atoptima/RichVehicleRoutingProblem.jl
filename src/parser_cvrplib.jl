@@ -69,14 +69,13 @@ function parse_cvrplib(file_path::String)
         id = "unique_vehicle_category",
         capacity_measures = VehicleCharacteristics(of_vehicle = Dict{String,Float64}("unique_measure" => capacity))
     )]
-    work_period = WorkPeriod(id = "unique_work_period",
-                             travel_distance_unit_cost = 1.0)
+    vehicle_cost = VehicleCost(travel_distance_unit_cost = 1.0)
     vehicle_sets = [HomogeneousVehicleSet(
         id = "unique_vehicle_set",
         vehicle_category_id = "unique_vehicle_category",
+        vehicle_costs = [vehicle_cost],
         departure_location_group_id = "depot_loc_group",
         arrival_location_group_id = "depot_loc_group",
-        work_periods = [work_period],
         nb_of_vehicles_range = FlexibleRange(soft_range = Range(0, n-1),
                                              hard_range = Range(0, n-1))
     )]

@@ -85,13 +85,13 @@ JSON2.@format VehicleCategory begin
     energy_interval_lengths => (default=Float64[],)
 end
 
-JSON2.@format WorkPeriod begin
-    active_window => (default=FlexibleRange(),)
+JSON2.@format VehicleCost begin
+    working_period => (default=Range(),)
     travel_distance_unit_cost => (default=0.0,)
     travel_time_unit_cost => (default=0.0,)
     service_time_unit_cost => (default=0.0,)
     waiting_time_unit_cost => (default=0.0,)
-    fixed_cost_per_vehicle => (default=0.0,)
+    fixed_cost => (default=0.0,)
 end
 
 JSON2.@format HomogeneousVehicleSet begin
@@ -99,7 +99,8 @@ JSON2.@format HomogeneousVehicleSet begin
     vehicle_category_id => (default="default_id",)
     # departure_location_group_id => (default="",)
     # arrival_location_group_id => (default="",)
-    work_periods => (default=[WorkPeriod()],)
+    vehicle_costs => (default=[VehicleCost()],)
+    work_periods => (default=[FlexibleRange()],)
     initial_energy_charge => (default=MAXNUMBER,)
     max_working_time => (default=MAXNUMBER,)
     max_travel_distance => (default=MAXNUMBER,)

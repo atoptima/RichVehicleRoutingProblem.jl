@@ -99,14 +99,14 @@ function ==(vc1::RVRP.VehicleCategory, vc2::RVRP.VehicleCategory)
     )
 end
 
-function ==(wp1::RVRP.WorkPeriod, wp2::RVRP.WorkPeriod)
+function ==(vc1::RVRP.VehicleCost, vc2::RVRP.VehicleCost)
     return (
-        && wp1.active_window == wp2.active_window
-        && wp1.travel_distance_unit_cost == wp2.travel_distance_unit_cost
-        && wp1.travel_time_unit_cost == wp2.travel_time_unit_cost
-        && wp1.service_time_unit_cost == wp2.service_time_unit_cost
-        && wp1.waiting_time_unit_cost == wp2.waiting_time_unit_cost
-        && wp1.fixed_cost_per_vehicle == wp2.fixed_cost_per_vehicle
+        && vc1.work_period == vc2.work_period
+        && vc1.travel_distance_unit_cost == vc2.travel_distance_unit_cost
+        && vc1.travel_time_unit_cost == vc2.travel_time_unit_cost
+        && vc1.service_time_unit_cost == vc2.service_time_unit_cost
+        && vc1.waiting_time_unit_cost == vc2.waiting_time_unit_cost
+        && vc1.fixed_cost == vc2.fixed_cost
     )
 end
 
@@ -114,6 +114,8 @@ function ==(hvs1::RVRP.HomogeneousVehicleSet, hvs2::RVRP.HomogeneousVehicleSet)
     return (
         hvs1.id == hvs2.id
         && hvs1.vehicle_category_id == hvs2.vehicle_category_id
+        && hvs1.vehicle_costs == hvs2.vehicle_costs
+        && hvs1.work_periods == hvs2.work_periods
         && hvs1.departure_location_group_id == hvs2.departure_location_group_id
         && hvs1.arrival_location_group_id == hvs2.arrival_location_group_id
         && hvs1.initial_energy_charge == hvs2.initial_energy_charge
