@@ -93,8 +93,10 @@ mutable struct VehicleCategory
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
 end
 
-mutable struct VehicleCost
-    working_period::Range
+mutable struct CostPeriod
+    period::Range
+
+    # CostSpecification
     fixed_cost::Float64
     travel_distance_unit_cost::Float64 # may depend on both driver and vehicle
     travel_time_unit_cost::Float64 # may depend on both driver and vehicle
@@ -106,7 +108,7 @@ mutable struct HomogeneousVehicleSet # vehicle type in optimization instance.
     id::String
     route_mode::Int # 0 closed at departure and arrival, 1 open at arrival, 2 open at departure, 3 open at both depature and arrival
     vehicle_category_id::String
-    vehicle_costs::Vector{VehicleCost}
+    cost_periods::Vector{CostPeriod}
     departure_location_group_id::String # Vehicle routes start from one of the depot locations in the group
     arrival_location_group_id::String # Vehicle routes end at one of the depot locations in the group
     # work_periods::Vector{WorkPeriod} # Define the work periods for which vehicles can be used, with some flexibility, does not have to be contiguous
@@ -271,13 +273,13 @@ function VehicleCategory(; id = "",
                            energy_interval_lengths)
 end
 
-function VehicleCost(; working_period = Range(),
+function CostPeriod(; period = Range(),
                      fixed_cost = 0.0,
                      travel_distance_unit_cost = 0.0,
                      travel_time_unit_cost = 0.0,
                      service_time_unit_cost = 0.0,
                      waiting_time_unit_cost = 0.0)
-    return VehicleCost(working_period, fixed_cost, travel_distance_unit_cost,
+    return CostPeriod(period, fixed_cost, travel_distance_unit_cost,
                        travel_time_unit_cost, service_time_unit_cost,
                        waiting_time_unit_cost)
 end
@@ -287,7 +289,7 @@ function HomogeneousVehicleSet(; id = "",
                                departure_location_group_id = "",
                                arrival_location_group_id = "",
                                vehicle_category_id = "default_id",
-                               vehicle_costs = [VehicleCost()],
+                               cost_periods = [CostPeriod()],
                                work_periods = [FlexibleRange()],
                                initial_energy_charge = MAXNUMBER,
                                max_working_time = MAXNUMBER,
@@ -295,7 +297,7 @@ function HomogeneousVehicleSet(; id = "",
                                allow_shipment_over_multiple_work_periods = false,
                                nb_of_vehicles_range = FlexibleRange())
     return HomogeneousVehicleSet(
-        id, route_mode, vehicle_category_id, vehicle_costs, departure_location_group_id,
+        id, route_mode, vehicle_category_id, cost_periods, departure_location_group_id,
         arrival_location_group_id, work_periods, initial_energy_charge,
         max_working_time, max_travel_distance,
         allow_shipment_over_multiple_work_periods, nb_of_vehicles_range)

@@ -99,7 +99,7 @@ function ==(vc1::RVRP.VehicleCategory, vc2::RVRP.VehicleCategory)
     )
 end
 
-function ==(vc1::RVRP.VehicleCost, vc2::RVRP.VehicleCost)
+function ==(vc1::RVRP.CostPeriod, vc2::RVRP.CostPeriod)
     return (
         && vc1.work_period == vc2.work_period
         && vc1.travel_distance_unit_cost == vc2.travel_distance_unit_cost
@@ -114,7 +114,7 @@ function ==(hvs1::RVRP.HomogeneousVehicleSet, hvs2::RVRP.HomogeneousVehicleSet)
     return (
         hvs1.id == hvs2.id
         && hvs1.vehicle_category_id == hvs2.vehicle_category_id
-        && hvs1.vehicle_costs == hvs2.vehicle_costs
+        && hvs1.cost_periods == hvs2.cost_periods
         && hvs1.work_periods == hvs2.work_periods
         && hvs1.departure_location_group_id == hvs2.departure_location_group_id
         && hvs1.arrival_location_group_id == hvs2.arrival_location_group_id

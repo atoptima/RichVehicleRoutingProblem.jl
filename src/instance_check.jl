@@ -206,35 +206,35 @@ function check_vehicle_categories(vehicle_categories::Vector{VehicleCategory},
     end
 end
 
-function check_vehicle_cost(vs_id::String, vehicle_cost::VehicleCost,
+function check_vehicle_cost(vs_id::String, cost_period::CostPeriod,
                             computed_data::RvrpComputedData)
-    check_positive_range(vehicle_cost.working_period,
-        "VehicleSet $(vs_id), vehicle_cost.working_period : ")
-    if vehicle_cost.travel_time_unit_cost < 0
+    check_positive_range(cost_period.period,
+        "VehicleSet $(vs_id), cost_period.period : ")
+    if cost_period.travel_time_unit_cost < 0
         error("VehicleSet $(vs_id) must have all travel_time_unit_cost > 0")
-    elseif vehicle_cost.service_time_unit_cost < 0
+    elseif cost_period.service_time_unit_cost < 0
         error("VehicleSet $(vs_id) must have all service_time_unit_cost > 0")
-    elseif vehicle_cost.waiting_time_unit_cost < 0
+    elseif cost_period.waiting_time_unit_cost < 0
         error("VehicleSet $(vs_id) must have all waiting_time_unit_cost > 0")
-    elseif vehicle_cost.fixed_cost < 0
+    elseif cost_period.fixed_cost < 0
         error("VehicleSet $(vs_id) must have all fixed_cost > 0")
     end
 
-    # filling VehicleCost based features
+    # filling CostPeriod based features
     features = computed_data.features
-    if vehicle_cost.travel_time_unit_cost > 0
+    if cost_period.travel_time_unit_cost > 0
         union!(features, HAS_TRAVEL_TIME_UNIT_COST)
     end
-    if vehicle_cost.service_time_unit_cost > 0
+    if cost_period.service_time_unit_cost > 0
         union!(features, HAS_SERVICE_TIME_UNIT_COST)
     end
-    if vehicle_cost.waiting_time_unit_cost > 0
+    if cost_period.waiting_time_unit_cost > 0
         union!(features, HAS_WAITING_TIME_UNIT_COST)
     end
-    if vehicle_cost.travel_distance_unit_cost > 0
+    if cost_period.travel_distance_unit_cost > 0
         union!(features, HAS_TRAVEL_DISTANCE_UNIT_COST)
     end
-    if vehicle_cost.fixed_cost > 0
+    if cost_period.fixed_cost > 0
         union!(features, HAS_FIXED_COST_PER_VEHICLE)
     end
 end    
@@ -258,8 +258,8 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
             check_positive_range(wp.soft_range,
                 "VehicleSet $(vs.id), work_period.soft_range : ")
         end
-        for vehicle_cost in vs.vehicle_costs
-            check_vehicle_cost(vs.id, vehicle_cost, computed_data)
+        for cost_period in vs.cost_periods
+            check_vehicle_cost(vs.id, cost_period, computed_data)
         end
 
         # filling HomogeneousVehicleSet based features
@@ -276,7 +276,7 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
         if length(vs.work_periods) > 1
             union!(features, HAS_MULTIPLE_WORKING_TIME_WINDOWS)
         end
-        if length(vs.vehicle_costs) > 1
+        if length(vs.cost_periods) > 1
             union!(features, HAS_MULTIPLE_COSTS)
         end
         if vs.vehicle_category_id == "default_id"

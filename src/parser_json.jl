@@ -85,8 +85,8 @@ JSON2.@format VehicleCategory begin
     energy_interval_lengths => (default=Float64[],)
 end
 
-JSON2.@format VehicleCost begin
-    working_period => (default=Range(),)
+JSON2.@format CostPeriod begin
+    period => (default=Range(),)
     travel_distance_unit_cost => (default=0.0,)
     travel_time_unit_cost => (default=0.0,)
     service_time_unit_cost => (default=0.0,)
@@ -99,7 +99,7 @@ JSON2.@format HomogeneousVehicleSet begin
     vehicle_category_id => (default="default_id",)
     # departure_location_group_id => (default="",)
     # arrival_location_group_id => (default="",)
-    vehicle_costs => (default=[VehicleCost()],)
+    cost_periods => (default=[CostPeriod()],)
     work_periods => (default=[FlexibleRange()],)
     initial_energy_charge => (default=MAXNUMBER,)
     max_working_time => (default=MAXNUMBER,)
