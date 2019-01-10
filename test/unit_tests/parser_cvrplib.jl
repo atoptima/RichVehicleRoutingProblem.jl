@@ -37,14 +37,16 @@ function parse_cvrplib_tests()
     @test length(data.vehicle_categories) == 2
     @test length(data.vehicle_sets) == 1
     @test data.vehicle_categories[1].id == "unique_vehicle_category"
-    @test haskey(data.vehicle_categories[1].vehicle_capacities, "unique_measure")
-    @test(data.vehicle_categories[1].vehicle_capacities ==
+    @test haskey(data.vehicle_categories[1].capacity_measures.of_vehicle, "unique_measure")
+    @test(data.vehicle_categories[1].capacity_measures.of_vehicle ==
             Dict{String,Float64}("unique_measure" => 35.0))
+    @test length(data.vehicle_sets[1].work_periods) == 1
+    @test length(data.vehicle_sets[1].cost_periods) == 1
+    @test data.vehicle_sets[1].cost_periods[1].travel_distance_unit_cost == 1.0
     @test data.vehicle_sets[1].id == "unique_vehicle_set"
     @test data.vehicle_sets[1].vehicle_category_id == "unique_vehicle_category"
     @test(data.vehicle_sets[1].departure_location_group_id ==
             data.vehicle_sets[1].arrival_location_group_id == "depot_loc_group")
-    @test data.vehicle_sets[1].travel_distance_unit_cost == 1.0
     @test data.vehicle_sets[1].nb_of_vehicles_range == RVRP.FlexibleRange(
         RVRP.Range(0, 15), RVRP.Range(0, 15), RVRP.Flexibility(0, 0.0, 0.0),
         RVRP.Flexibility(0, 0.0, 0.0)

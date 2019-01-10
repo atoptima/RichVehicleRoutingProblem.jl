@@ -19,12 +19,11 @@ function check_sequence(route::Route, data::RvrpInstance,
     prev_act = route.sequence[1]
     v_set = data.vehicle_sets[computed_data.vehicle_set_id_2_index[route.vehicle_set_id]]
     v_category = data.vehicle_categories[computed_data.vehicle_category_id_2_index[v_set.vehicle_category_id]]
-    vehicle_properties = v_category.vehicle_properties
-    vehicle_capacities = v_category.vehicle_capacities
+    vehicle_properties = v_category.vehicle_properties.of_vehicle
+    vehicle_capacities = v_category.capacity_measures.of_vehicle
     used_capacity = Dict{String,Float64}(
         k => 0.0 for k in keys(vehicle_capacities)
     )
-
     for act_idx in 1:length(route.sequence)
         act = route.sequence[act_idx]
         if (act.operation_type != 0 && act.request_id == ""
@@ -179,8 +178,8 @@ function check_solution(data::RvrpInstance, computed_data::RvrpComputedData,
                   " does not respect max_working_time ",
                   "of vehicle set ", v_set.id, ".")
         end
-        if (!check_range_bounds([v_set.working_time_window.soft_range], r.sequence[1].scheduled_start_time)
-            || !check_range_bounds([v_set.working_time_window.soft_range], r.sequence[end].scheduled_start_time))
+        if (!check_range_bounds([v_set.work_periods[1].soft_range], r.sequence[1].scheduled_start_time)
+            || !check_range_bounds([v_set.work_periods[1].soft_range], r.sequence[end].scheduled_start_time))
             if total_time > v_set.max_working_time
                 error("Solution infeasible: Route ", r.id,
                       " does not respect working_time_window ",

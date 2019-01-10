@@ -20,8 +20,8 @@ end
 JSON2.@format Location begin
     # id => (default="",)
     # index => (default=-1,)
-    latitude => (default=MAXNUMBER,)
-    longitude => (default=MAXNUMBER,)
+    lat_y => (default=MAXNUMBER,)
+    long_x => (default=MAXNUMBER,)
     opening_time_windows => (default=[Range()],)
     energy_fixed_cost => (default=0.0,)
     energy_unit_cost => (default=0.0,)
@@ -72,14 +72,26 @@ JSON2.@format Request begin
     delivery_time_windows => (default=[FlexibleRange()],)
 end
 
+JSON2.@format VehicleCharacteristics begin
+    of_vehicle => (default=Dict{String,Float64}(),)
+    of_compartments => (default=Dict{String,Dict{String,Float64}}(),)
+end
+
 JSON2.@format VehicleCategory begin
     # id => (default="",)
-    vehicle_capacities => (default=Dict{String,Float64}(),)
-    compartment_capacities => (default=Dict{String,Dict{String,Float64}}(),)
-    vehicle_properties => (default=Dict{String,Float64}(),)
-    compartment_properties => (default=Dict{String,Dict{String,Float64}}(),)
+    capacity_measures => (default=VehicleCharacteristics(),)
+    vehicle_properties => (default=VehicleCharacteristics(),)
     loading_option => (default=0,)
     energy_interval_lengths => (default=Float64[],)
+end
+
+JSON2.@format CostPeriod begin
+    period => (default=Range(),)
+    travel_distance_unit_cost => (default=0.0,)
+    travel_time_unit_cost => (default=0.0,)
+    service_time_unit_cost => (default=0.0,)
+    waiting_time_unit_cost => (default=0.0,)
+    fixed_cost => (default=0.0,)
 end
 
 JSON2.@format HomogeneousVehicleSet begin
@@ -87,13 +99,9 @@ JSON2.@format HomogeneousVehicleSet begin
     vehicle_category_id => (default="default_id",)
     # departure_location_group_id => (default="",)
     # arrival_location_group_id => (default="",)
-    working_time_window => (default=FlexibleRange(),)
-    travel_distance_unit_cost => (default=0.0,)
-    travel_time_unit_cost => (default=0.0,)
-    service_time_unit_cost => (default=0.0,)
-    waiting_time_unit_cost => (default=0.0,)
+    cost_periods => (default=[CostPeriod()],)
+    work_periods => (default=[FlexibleRange()],)
     initial_energy_charge => (default=MAXNUMBER,)
-    fixed_cost_per_vehicle => (default=0.0,)
     max_working_time => (default=MAXNUMBER,)
     max_travel_distance => (default=MAXNUMBER,)
     allow_shipment_over_multiple_work_periods => (default=true,)
@@ -102,12 +110,13 @@ end
 
 JSON2.@format RvrpInstance begin
     # id => (default="",)
+    distance_mode => (default=0,)
+    coordinate_mode => (default=0,)
     # travel_matrix_periods => (default=[Range()],)
     # period_to_matrix_id => (default=Dict{Range,String}(Range() => "default_mat"),)
     travel_time_matrices => (default=Dict{String,Array{Float64,2}}(),)
     travel_distance_matrices => (default=Dict{String,Array{Float64,2}}(),)
     energy_consumption_matrices => (default=Dict{String,Array{Float64,2}}(),)
-    work_periods => (default=[Range()],)
     locations => (default=Location[],)
     location_groups => (default=LocationGroup[],)
     product_compatibility_classes => (default=ProductCompatibilityClass[],)

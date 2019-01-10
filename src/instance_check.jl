@@ -56,14 +56,17 @@ const HAS_OPEN_ARRIVAL = 348
 const HAS_ARRIVAL_DIFFERENT_FROM_DEPARTURE = 349
 const HAS_ALTERNATIVE_DEPARTURE_LOCATIONS = 350 #
 const HAS_ALTERNATIVE_ARRIVAL_LOCATIONS = 351 #
+const HAS_MULTIPLE_WORKING_TIME_WINDOWS = 352 #
+const HAS_MULTIPLE_COSTS = 353 #
 
 # Instance based features
-const HAS_WORK_PERIODS = 447
+const HAS_WORK_PERIODS = 447 # TO BE REMOVED
 const HAS_MUTLIPLE_TRAVEL_TIME_PERIODS = 448
 # const HAS_VEHICLE_CATEGORIES = 449 (not needed, duplicate of caps props)
 const HAS_MULTIPLE_VEHICLE_CATEGORIES = 450
 const HAS_MULTIPLE_VEHICLE_SETS = 451
 const HAS_ENERGY_FEATURES = 452 # to be detailed later as needed #
+const HAS_X_Y = 453
 
 function check_id(id_to_index_dict, key, error_prefix::String)
     if !haskey(id_to_index_dict, key)
@@ -82,15 +85,20 @@ function check_positive_range(range::Range, error_prefix::String)
 end
 
 function check_locations(locations::Vector{Location},
-                         computed_data::RvrpComputedData)
+                         computed_data::RvrpComputedData,
+                         coordinate_mode::Int)
 
     for loc in locations
-        if loc.latitude < - 100.0 || loc.latitude > 100.0
-            error("Location $(loc.id) must have latitude in [-100.0, +100.0]")
-        elseif loc.longitude < - 100.0 || loc.longitude > 100.0
-            error("Location $(loc.id) must have longitude in [-100.0, +100.0]")
-        elseif loc.index < 1 || loc.index > length(locations)
-            error("Location $(loc.id) must have index in [1, length(locations)]")
+        # If in long_lat mode
+        if coordinate_mode == 0
+            if loc.lat_y < - 90.0 || loc.lat_y > 90.0
+                error("Location $(loc.id) must have lat_y in [-100.0, +100.0]")
+            elseif loc.long_x < - 180.0 || loc.long_x > 180.0
+                error("Location $(loc.id) must have long_x in [-100.0, +100.0]")
+            end
+            if loc.index < 1 || loc.index > length(locations)
+                error("Location $(loc.id) must have index in [1, length(locations)]")
+            end
         end
     end
 end
@@ -171,32 +179,65 @@ function check_vehicle_categories(vehicle_categories::Vector{VehicleCategory},
 
         # filling VehicleCategory based features
         features = computed_data.features
-        if length(vc.vehicle_capacities) > 0
+        if length(vc.capacity_measures.of_vehicle) > 0
             union!(features, HAS_VEHICLE_CAPACITIES)
         end
-        if length(vc.compartment_capacities) > 0
+        if length(vc.capacity_measures.of_compartments) > 0
             union!(features, HAS_COMPARTMENT_CAPACITIES)
         end
-        if length(vc.vehicle_properties) > 0
+        if length(vc.vehicle_properties.of_vehicle) > 0
             union!(features, HAS_VEHICLE_PROPERTIES)
         end
-        if length(vc.compartment_properties) > 0
+        if length(vc.vehicle_properties.of_compartments) > 0
             union!(features, HAS_COMPARTMENT_PROPERTIES)
         end
-        if length(vc.vehicle_capacities) > 1
+        if length(vc.capacity_measures.of_vehicle) > 1
             union!(features, HAS_MULTIPLE_VEHICLE_CAPACITIES)
         end
-        if length(vc.compartment_capacities) > 1
+        if length(vc.capacity_measures.of_compartments) > 1
             union!(features, HAS_MULTIPLE_COMPARTMENT_CAPACITIES)
         end
-        if length(vc.vehicle_properties) > 1
+        if length(vc.vehicle_properties.of_vehicle) > 1
             union!(features, HAS_MULTIPLE_VEHICLE_PROPERTIES)
         end
-        if length(vc.compartment_properties) > 1
+        if length(vc.vehicle_properties.of_compartments) > 1
             union!(features, HAS_MULTIPLE_COMPARTMENT_PROPERTIES)
         end
     end
 end
+
+function check_vehicle_cost(vs_id::String, cost_period::CostPeriod,
+                            computed_data::RvrpComputedData)
+    check_positive_range(cost_period.period,
+        "VehicleSet $(vs_id), cost_period.period : ")
+    if cost_period.travel_time_unit_cost < 0
+        error("VehicleSet $(vs_id) must have all travel_time_unit_cost > 0")
+    elseif cost_period.service_time_unit_cost < 0
+        error("VehicleSet $(vs_id) must have all service_time_unit_cost > 0")
+    elseif cost_period.waiting_time_unit_cost < 0
+        error("VehicleSet $(vs_id) must have all waiting_time_unit_cost > 0")
+    elseif cost_period.fixed_cost < 0
+        error("VehicleSet $(vs_id) must have all fixed_cost > 0")
+    end
+
+    # filling CostPeriod based features
+    features = computed_data.features
+    if cost_period.travel_time_unit_cost > 0
+        union!(features, HAS_TRAVEL_TIME_UNIT_COST)
+    end
+    if cost_period.service_time_unit_cost > 0
+        union!(features, HAS_SERVICE_TIME_UNIT_COST)
+    end
+    if cost_period.waiting_time_unit_cost > 0
+        union!(features, HAS_WAITING_TIME_UNIT_COST)
+    end
+    if cost_period.travel_distance_unit_cost > 0
+        union!(features, HAS_TRAVEL_DISTANCE_UNIT_COST)
+    end
+    if cost_period.fixed_cost > 0
+        union!(features, HAS_FIXED_COST_PER_VEHICLE)
+    end
+end    
 
 function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
                             computed_data::RvrpComputedData)
@@ -211,18 +252,14 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
         check_id(computed_data.location_group_id_2_index,
                  vs.arrival_location_group_id,
                  "VehicleSet $(vs.id), arrival_location_group_id : ")
-        check_positive_range(vs.working_time_window.soft_range,
-                 "VehicleSet $(vs.id), working_time_window[1].soft_range : ")
         check_positive_range(vs.nb_of_vehicles_range.soft_range,
                  "VehicleSet $(vs.id), nb_of_vehicles_range.soft_range : ")
-        if vs.travel_time_unit_cost < 0
-            error("VehicleSet $(vs.id) must have travel_time_unit_cost > 0")
-        elseif vs.service_time_unit_cost < 0
-            error("VehicleSet $(vs.id) must have service_time_unit_cost > 0")
-        elseif vs.waiting_time_unit_cost < 0
-            error("VehicleSet $(vs.id) must have waiting_time_unit_cost > 0")
-        elseif vs.fixed_cost_per_vehicle < 0
-            error("VehicleSet $(vs.id) must have fixed_cost_per_vehicle > 0")
+        for wp in vs.work_periods
+            check_positive_range(wp.soft_range,
+                "VehicleSet $(vs.id), work_period.soft_range : ")
+        end
+        for cost_period in vs.cost_periods
+            check_vehicle_cost(vs.id, cost_period, computed_data)
         end
 
         # filling HomogeneousVehicleSet based features
@@ -233,30 +270,23 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
         if vs.route_mode in [1,3]
             union!(features, HAS_OPEN_DEPARTURE)
         end
-        if vs.travel_time_unit_cost > 0
-            union!(features, HAS_TRAVEL_TIME_UNIT_COST)
-        end
-        if vs.service_time_unit_cost > 0
-            union!(features, HAS_SERVICE_TIME_UNIT_COST)
-        end
-        if vs.waiting_time_unit_cost > 0
-            union!(features, HAS_WAITING_TIME_UNIT_COST)
-        end
-        if vs.travel_distance_unit_cost > 0
-            union!(features, HAS_TRAVEL_DISTANCE_UNIT_COST)
-        end
-        if vs.fixed_cost_per_vehicle > 0
-            union!(features, HAS_FIXED_COST_PER_VEHICLE)
-        end
         if vs.nb_of_vehicles_range.soft_range.ub < 10^9
             union!(features, HAS_MAX_NB_VEHICLES)
         end
-        if vs.working_time_window.soft_range.lb > 0 ||
-           vs.working_time_window.soft_range.ub < 10^9
-            union!(features, HAS_WORKING_TIME_WINDOW)
+        if length(vs.work_periods) > 1
+            union!(features, HAS_MULTIPLE_WORKING_TIME_WINDOWS)
+        end
+        if length(vs.cost_periods) > 1
+            union!(features, HAS_MULTIPLE_COSTS)
         end
         if vs.vehicle_category_id == "default_id"
             computed_data.uses_default_vehicle_category = true
+        end
+        for wp in vs.work_periods
+            if wp.soft_range.lb > 0 ||
+                wp.soft_range.ub < 10^9
+                union!(features, HAS_WORKING_TIME_WINDOW)
+            end
         end
     end
 end
@@ -268,11 +298,15 @@ function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
              tt_period.travel_specification_id,
              "TavelTimePeriods[1] : ")
 
-    check_locations(data.locations, computed_data)
+    check_locations(data.locations, computed_data, data.coordinate_mode)
     check_location_groups(data.location_groups, computed_data)
     check_requests(data.requests, computed_data)
     check_vehicle_categories(data.vehicle_categories, computed_data)
     check_vehicle_sets(data.vehicle_sets, computed_data)
+
+    if !(data.coordinate_mode in [0, 1])
+        error("Invalid value for coordinate_mode: $data.coordinate_mode")
+    end
 
     # filling Instance based features
     features = computed_data.features
@@ -288,11 +322,11 @@ function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
     if length(data.vehicle_sets) > 1
         union!(features, HAS_MULTIPLE_VEHICLE_SETS)
     end
-    if length(data.work_periods) > 1
-        union!(features, HAS_WORK_PERIODS)
-    end
     if length(data.travel_periods) > 1
         union!(features, HAS_MUTLIPLE_TRAVEL_TIME_PERIODS)
+    end
+    if data.coordinate_mode == 1
+        union!(features, HAS_X_Y)
     end
 
     # TODO check matrices sizes (based on features)
