@@ -179,28 +179,28 @@ function check_vehicle_categories(vehicle_categories::Vector{VehicleCategory},
 
         # filling VehicleCategory based features
         features = computed_data.features
-        if length(vc.capacity_measures.of_vehicle) > 0
+        if length(vc.capacities.of_vehicle) > 0
             union!(features, HAS_VEHICLE_CAPACITIES)
         end
-        if length(vc.capacity_measures.of_compartments) > 0
+        if length(vc.capacities.of_compartments) > 0
             union!(features, HAS_COMPARTMENT_CAPACITIES)
         end
-        if length(vc.vehicle_properties.of_vehicle) > 0
+        if length(vc.properties.of_vehicle) > 0
             union!(features, HAS_VEHICLE_PROPERTIES)
         end
-        if length(vc.vehicle_properties.of_compartments) > 0
+        if length(vc.properties.of_compartments) > 0
             union!(features, HAS_COMPARTMENT_PROPERTIES)
         end
-        if length(vc.capacity_measures.of_vehicle) > 1
+        if length(vc.capacities.of_vehicle) > 1
             union!(features, HAS_MULTIPLE_VEHICLE_CAPACITIES)
         end
-        if length(vc.capacity_measures.of_compartments) > 1
+        if length(vc.capacities.of_compartments) > 1
             union!(features, HAS_MULTIPLE_COMPARTMENT_CAPACITIES)
         end
-        if length(vc.vehicle_properties.of_vehicle) > 1
+        if length(vc.properties.of_vehicle) > 1
             union!(features, HAS_MULTIPLE_VEHICLE_PROPERTIES)
         end
-        if length(vc.vehicle_properties.of_compartments) > 1
+        if length(vc.properties.of_compartments) > 1
             union!(features, HAS_MULTIPLE_COMPARTMENT_PROPERTIES)
         end
     end

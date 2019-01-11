@@ -51,13 +51,13 @@ function build_computed_data(data::RvrpInstance)
     cap_idx = 1
     prop_idx = 1
     for v_cat in data.vehicle_categories
-        for (cap_id,v) in v_cat.capacity_measures.of_vehicle
+        for (cap_id,v) in v_cat.capacities.of_vehicle
             if !haskey(capacity_id_2_index, cap_id)
                 capacity_id_2_index[cap_id] = cap_idx
                 cap_idx += 1
             end
         end
-        for (prop_id,v) in v_cat.vehicle_properties.of_vehicle
+        for (prop_id,v) in v_cat.properties.of_vehicle
             if !haskey(property_id_2_index, prop_id)
                 property_id_2_index[prop_id] = prop_idx
                 prop_idx += 1

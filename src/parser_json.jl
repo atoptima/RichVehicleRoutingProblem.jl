@@ -79,8 +79,8 @@ end
 
 JSON2.@format VehicleCategory begin
     # id => (default="",)
-    capacity_measures => (default=VehicleCharacteristics(),)
-    vehicle_properties => (default=VehicleCharacteristics(),)
+    capacities => (default=VehicleCharacteristics(),)
+    properties => (default=VehicleCharacteristics(),)
     loading_option => (default=0,)
     energy_interval_lengths => (default=Float64[],)
 end

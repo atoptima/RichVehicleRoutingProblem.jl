@@ -92,8 +92,8 @@ end
 function ==(vc1::RVRP.VehicleCategory, vc2::RVRP.VehicleCategory)
     return (
         vc1.id == vc2.id
-        && vc1.capacity_measures == vc2.capacity_measures
-        && vc1.vehicle_properties == vc2.vehicle_properties
+        && vc1.capacities == vc2.capacities
+        && vc1.properties == vc2.properties
         && vc1.loading_option == vc2.loading_option
         && vc1.energy_interval_lengths == vc2.energy_interval_lengths
     )
