@@ -247,5 +247,20 @@ function check_solution(data::RvrpInstance, computed_data::RvrpComputedData,
         end
 
     end
+ 
+    if length(complete_req_ids) + length(solution.unassigned_request_ids) != length(data.requests)
+        error("Some requests were not treated: ",
+              "Not present in either unassigned_request_ids",
+              " or complete_req_ids")
+    end
+
+    if length(solution.unassigned_request_ids) > 0
+        return SolutionStatus(
+            0,
+            string("Some requests were not completed: ",
+                   soltion.unassigned_request_ids, ".")
+        )
+    end
+
     return SolutionStatus(1, "")
 end
