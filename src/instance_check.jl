@@ -92,15 +92,26 @@ function check_locations(locations::Vector{Location},
         # If in long_lat mode
         if coordinate_mode == 0
             if loc.lat_y < - 90.0 || loc.lat_y > 90.0
-                error("Location $(loc.id) must have lat_y in [-100.0, +100.0]")
+                error("Location $(loc.id) must have lat_y in [-90.0, +90.0]")
             elseif loc.long_x < - 180.0 || loc.long_x > 180.0
-                error("Location $(loc.id) must have long_x in [-100.0, +100.0]")
-            end
-            if loc.index < 1 || loc.index > length(locations)
-                error("Location $(loc.id) must have index in [1, length(locations)]")
+                error("Location $(loc.id) must have long_x in [-180.0, +180.0]")
             end
         end
+        if loc.index < 1 || loc.index > length(locations)
+            error("Location $(loc.id) must have index in [1, length(locations)]")
+        end
     end
+
+    # filling LOCATION based features
+    for loc in locations
+        if loc.opening_time_windows != [Range()]
+            union!(features, HAS_OPENING_TIME_WINDOWS)
+        end
+        if length(loc.opening_time_windows) > 1
+            union!(features, HAS_MULTIPLE_OPENING_TIME_WINDOWS)
+        end
+    end
+
 end
 
 function check_location_groups(location_groups::Vector{LocationGroup},
@@ -154,15 +165,15 @@ function check_requests(requests::Vector{Request},
         elseif req.request_type == 0
             union!(features, HAS_DELIVERYONLY_REQUESTS)
         end
-        if req.max_duration > 0
+        if req.max_duration < MAXNUMBER
             union!(features, HAS_MAX_DURATION)
         end
         if req.pickup_time_windows[1].soft_range.lb > 0 ||
-           req.pickup_time_windows[1].soft_range.ub < 10^9
+           req.pickup_time_windows[1].soft_range.ub < MAXNUMBER
             union!(features, HAS_PICKUP_TIME_WINDOWS)
         end
         if req.delivery_time_windows[1].soft_range.lb > 0 ||
-           req.delivery_time_windows[1].soft_range.ub < 10^9
+           req.delivery_time_windows[1].soft_range.ub < MAXNUMBER
             union!(features, HAS_DELIVERY_TIME_WINDOWS)
         end
     end
@@ -270,7 +281,7 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
         if vs.route_mode in [1,3]
             union!(features, HAS_OPEN_DEPARTURE)
         end
-        if vs.nb_of_vehicles_range.soft_range.ub < 10^9
+        if vs.nb_of_vehicles_range.soft_range.ub < MAXNUMBER
             union!(features, HAS_MAX_NB_VEHICLES)
         end
         if length(vs.work_periods) > 1
@@ -284,7 +295,7 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
         end
         for wp in vs.work_periods
             if wp.soft_range.lb > 0 ||
-                wp.soft_range.ub < 10^9
+                wp.soft_range.ub < MAXNUMBER
                 union!(features, HAS_WORKING_TIME_WINDOW)
             end
         end
