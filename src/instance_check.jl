@@ -96,7 +96,7 @@ end
 
 function check_locations(locations::Vector{Location},
                          computed_data::RvrpComputedData,
-                         coordinate_mode::Int)
+                         coordinate_mode::Int, features::BitSet)
 
     for loc in locations
         # If in long_lat mode
@@ -125,7 +125,7 @@ function check_locations(locations::Vector{Location},
 end
 
 function check_location_groups(location_groups::Vector{LocationGroup},
-                               computed_data::RvrpComputedData, features::BitSet)
+                               computed_data::RvrpComputedData)
 
     for grp in location_groups
         for loc_id in grp.location_ids
