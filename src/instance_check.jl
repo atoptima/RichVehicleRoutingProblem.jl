@@ -125,7 +125,7 @@ function check_locations(locations::Vector{Location},
 end
 
 function check_location_groups(location_groups::Vector{LocationGroup},
-                               computed_data::RvrpComputedData)
+                               computed_data::RvrpComputedData, features::BitSet)
 
     for grp in location_groups
         for loc_id in grp.location_ids
@@ -319,7 +319,8 @@ function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
              tt_period.travel_specification_id,
              "TavelTimePeriods[1] : ")
 
-    check_locations(data.locations, computed_data, data.coordinate_mode)
+    features = computed_data.features
+    check_locations(data.locations, computed_data, data.coordinate_mode, features)
     check_location_groups(data.location_groups, computed_data)
     check_requests(data.requests, computed_data)
     check_vehicle_categories(data.vehicle_categories, computed_data)
@@ -330,7 +331,6 @@ function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
     end
 
     # filling Instance based features
-    features = computed_data.features
     # if length(data.vehicle_categories) > 0
     #     union!(features, HAS_VEHICLE_CATEGORIES)
     # end
