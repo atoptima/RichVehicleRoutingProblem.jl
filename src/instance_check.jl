@@ -71,8 +71,8 @@ const HAS_X_Y = 453
 function check_if_supports(supported_vec::Vector{BitSet},
                            instance_features::BitSet)
     for supported in supported_vec
-        if issubset(computed_data.features, supported)
-            return ture
+        if issubset(instance_features, supported)
+            return true
         end            
     end
     return false
