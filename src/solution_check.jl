@@ -258,7 +258,7 @@ function check_solution(data::RvrpInstance, computed_data::RvrpComputedData,
         return SolutionStatus(
             0,
             string("Some requests were not completed: ",
-                   soltion.unassigned_request_ids, ".")
+                   solution.unassigned_request_ids, ".")
         )
     end
 
