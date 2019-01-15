@@ -4,7 +4,8 @@ include("RVRP_solution.jl")
 include("utils.jl")
 include("parser_cvrplib.jl")
 include("instance_check.jl")
-# include("parser_json.jl")
+include("parser_json.jl")
+include("solution_check.jl")
 
 function unit_tests()
     @testset "RVRP_data.jl" begin
@@ -22,7 +23,10 @@ function unit_tests()
     @testset "instance_check.jl" begin
         instance_check_unit_tests()
     end
-    # @testset "parser_json.jl" begin
-    #     parser_json_unit_tests()
-    # end
+    @testset "parser_json.jl" begin
+        parser_json_unit_tests()
+    end
+    @testset "solution_check.jl" begin
+        solution_check_unit_tests()
+    end
 end
