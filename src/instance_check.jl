@@ -68,6 +68,16 @@ const HAS_MULTIPLE_VEHICLE_SETS = 451
 const HAS_ENERGY_FEATURES = 452 # to be detailed later as needed #
 const HAS_X_Y = 453
 
+function check_if_supports(supported_vec::Vector{BitSet},
+                           instance_features::BitSet)
+    for supported in supported_vec
+        if issubset(computed_data.features, supported)
+            return ture
+        end            
+    end
+    return false
+end
+
 function check_id(id_to_index_dict, key, error_prefix::String)
     if !haskey(id_to_index_dict, key)
         error(error_prefix, "There is no object with id $key")
