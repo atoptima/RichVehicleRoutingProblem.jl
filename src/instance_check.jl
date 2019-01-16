@@ -94,6 +94,17 @@ function check_positive_range(range::Range, error_prefix::String)
     end
 end
 
+function check_time_windows(tws::Vector{Range}, error_prefix::String)
+    check_positive_range(tws[1], "Time window ")
+    for idx in 2:length(tws)
+        check_positive_range(tws[idx], "Time window ")
+        if (tws[idx-1].lb > tws[idx].lb || tws[idx-1].ub > tws[idx].ub
+            || tws[idx-1].ub > tws[idx].lb)
+            error(error_prefix, "must not intersect and must be increasing: ", tws)
+        end
+    end
+end
+
 function check_locations(locations::Vector{Location},
                          computed_data::RvrpComputedData,
                          coordinate_mode::Int, features::BitSet)
@@ -110,6 +121,8 @@ function check_locations(locations::Vector{Location},
         if loc.index < 1 || loc.index > length(locations)
             error("Location $(loc.id) must have index in [1, length(locations)]")
         end
+        check_time_windows(loc.opening_time_windows,
+                           string("Time windows of location ", loc.id, " "))
     end
 
     # filling LOCATION based features
@@ -165,6 +178,10 @@ function check_requests(requests::Vector{Request},
         elseif req.duration_unit_cost < 0
             error("Request $(req.id) must have duration_unit_cost > 0")
         end
+        check_time_windows([tw.soft_range for tw in req.pickup_time_windows],
+            string("Time windows of pickup of request ", req.id, " "))
+        check_time_windows([tw.soft_range for tw in req.delivery_time_windows],
+            string("Time windows of delivery of request ", req.id, " "))
 
         # filling REQUEST based features
         features = computed_data.features
@@ -275,6 +292,8 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
                  "VehicleSet $(vs.id), arrival_location_group_id : ")
         check_positive_range(vs.nb_of_vehicles_range.soft_range,
                  "VehicleSet $(vs.id), nb_of_vehicles_range.soft_range : ")
+        check_time_windows([tw.soft_range for tw in vs.work_periods],
+            string("Work periods of HomogeneousVehicleSet ", vs.id, " "))
         for wp in vs.work_periods
             check_positive_range(wp.soft_range,
                 "VehicleSet $(vs.id), work_period.soft_range : ")

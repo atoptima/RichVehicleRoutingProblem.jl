@@ -12,6 +12,26 @@ function generate_symmetric_distance_matrix(xs::Vector{T},
     return matrix
 end
 
+function intersect(tw1::Range, tw2::Range)
+    if max(tw1.lb,tw2.lb) > min(tw1.ub,tw2.ub)
+        return nothing
+    else
+        return Range(max(tw1.lb,tw2.lb), min(tw1.ub,tw2.ub))
+    end
+end
+
+function ranges_intersection(tws_1::Vector{Range}, tws_2::Vector{Range})
+    intersection_vec = Range[]
+    for tw1 in tws_1
+        for tw2 in tws_2
+            intersection = intersect(tw1, tw2)
+            if intersection != nothing
+                push!(intersection_vec, intersection)
+            end
+        end
+    end
+    return intersection_vec
+end
 
 function set_indices(data::RvrpInstance)
     for loc_idx in 1:length(data.locations)

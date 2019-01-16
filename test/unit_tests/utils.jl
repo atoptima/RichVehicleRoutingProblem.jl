@@ -4,6 +4,19 @@ function utils_unit_tests()
     build_computed_data_tests()
     create_singleton_location_groups_tests()
     preprocess_instance_unit_tests()
+    create_intersection_tws_tests()
+end
+
+function create_intersection_tws_tests()
+    tws_1 = [RVRP.Range(10.0, 20.0), RVRP.Range(35.0, 40.0)]
+    tws_2 = [RVRP.Range(15.0, 25.0), RVRP.Range(28.0, 36.0)]
+    intersection = RVRP.ranges_intersection(tws_1, tws_2)
+    @test intersection == [RVRP.Range(15.0, 20.0), RVRP.Range(35.0, 36.0)]
+
+    tws_1 = [RVRP.Range(10.0, 100.0), RVRP.Range(110.0, 130.0)]
+    tws_2 = [RVRP.Range(9.0, 25.0), RVRP.Range(28.0, 36.0), RVRP.Range(88.0, 120.0)]
+    intersection = RVRP.ranges_intersection(tws_1, tws_2)
+    @test intersection == [RVRP.Range(10.0, 25.0), RVRP.Range(28.0, 36.0), RVRP.Range(88.0, 100.0), RVRP.Range(110.0, 120.0)]
 end
 
 function generate_symmetric_distance_matrix_tests()

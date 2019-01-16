@@ -2,6 +2,7 @@ function instance_check_unit_tests()
 
     check_if_supports_tests()
     check_positive_range_tests()
+    check_time_windows_tests()
 
 end
 
@@ -28,4 +29,14 @@ function check_positive_range_tests()
 
     range = RVRP.Range(100.0, 10.0)
     @test_throws ErrorException RVRP.check_positive_range(range, "")
+end
+
+function check_time_windows_tests()
+
+    tws = [RVRP.Range(10.0, 20.0), RVRP.Range(15.0, 20)]
+    @test_throws ErrorException RVRP.check_time_windows(tws, "")
+
+    tws = [RVRP.Range(10.0, 20.0), RVRP.Range(0.0, 5.0)]
+    @test_throws ErrorException RVRP.check_time_windows(tws, "")
+
 end
