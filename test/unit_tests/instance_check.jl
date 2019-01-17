@@ -3,7 +3,15 @@ function instance_check_unit_tests()
     check_if_supports_tests()
     check_positive_range_tests()
     check_time_windows_tests()
+    check_repeated_ids_tests()
 
+end
+
+function check_repeated_ids_tests()
+    data = RVRP.RvrpInstance()
+    data.locations = [RVRP.Location(;id = "repeated_id"),
+                      RVRP.Location(;id = "repeated_id")]
+    @test_throws ErrorException RVRP.check_repeated_ids(data)
 end
 
 function check_if_supports_tests()

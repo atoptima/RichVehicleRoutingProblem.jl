@@ -380,7 +380,38 @@ function check_product_specification_classes(
 
 end
 
+function check_ids_in_vector(vec::Vector{T}) where T <: Union{
+    Location, TravelSpecification, LocationGroup,
+    ProductSharingClass, ProductSpecificationClass,
+    ProductCompatibilityClass, Request, VehicleCategory,
+    HomogeneousVehicleSet}
+    all_ids = Set{String}()
+    for obj in vec
+        if obj.id in all_ids
+            error("Id ", obj.id, " is used more that ",
+                  "once in vector of ", Symbol(eltype(vec)))
+        end
+        push!(all_ids, obj.id)
+    end
+end
+
+function check_repeated_ids(data::RvrpInstance)
+
+    check_ids_in_vector(data.locations)
+    check_ids_in_vector(data.travel_specifications)
+    check_ids_in_vector(data.location_groups)
+    check_ids_in_vector(data.product_compatibility_classes)
+    check_ids_in_vector(data.product_specification_classes)
+    check_ids_in_vector(data.product_sharing_classes)
+    check_ids_in_vector(data.requests)
+    check_ids_in_vector(data.vehicle_categories)
+    check_ids_in_vector(data.vehicle_sets)
+
+end
+
 function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
+
+    check_repeated_ids(data)
 
     tt_period = data.travel_periods[1]
     check_id(computed_data.travel_specification_id_2_index,
