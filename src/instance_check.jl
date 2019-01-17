@@ -11,6 +11,10 @@ const HAS_PRODUCT_PROHIBITED_PREDECESSOR_CLASSES = 5
 const HAS_PRODUCT_PICKUPONLY_SHARING_CLASSES = 6
 const HAS_PRODUCT_DELIVERYONLY_SHARING_CLASSES = 7
 const HAS_PRODUCT_SHIPMENT_SHARING_CLASSES = 8
+const HAS_PRODUCT_CAPACITY_CONSUMPTIONS = 9
+const HAS_PRODUCT_PROPERTIES_REQUIREMENTS = 10
+const HAS_MULTIPLE_PRODUCT_CAPACITY_CONSUMPTIONS = 11
+const HAS_MULTIPLE_PRODUCT_PROPERTIES_REQUIREMENTS = 12
 
 # Request based features
 const HAS_SHIPMENT_REQUESTS = 109
@@ -331,6 +335,51 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
     end
 end
 
+function check_product_specification_classes(
+    product_specification_classes::Vector{ProductSpecificationClass},
+    computed_data::RvrpComputedData)
+
+    features = computed_data.features
+
+    for prod_spec_class in product_specification_classes
+        for (k,v) in prod_spec_class.capacity_consumptions
+            if v[1] < 0.0 || v[2] < 0.0
+                error("Product ", prod_spec_class.id,
+                      " must have a non-negative consumption of all ",
+                      "of all capacity measures.",
+                      " Consumption is ", v[1], " per lot of ", v[2])
+            end
+        end
+        for (k,v) in prod_spec_class.property_requirements
+            if v < 0.0
+                error("Product ", prod_spec_class.id,
+                      " must have a non-negative requirement for all properties.",
+                      " Requirement is ", v[1])
+            end
+        end
+    end
+
+    nb_capacities_specificartions = 0
+    nb_properties_requirements = 0
+    for prod_spec_class in product_specification_classes
+        if !isempty(prod_spec_class.capacity_consumptions)
+            union!(features, HAS_PRODUCT_CAPACITY_CONSUMPTIONS)
+            nb_capacities_specificartions += 1
+        end
+        if !isempty(prod_spec_class.property_requirements)
+            union!(features, HAS_PRODUCT_PROPERTIES_REQUIREMENTS)
+            nb_properties_requirements += 1
+        end
+    end
+    if nb_capacities_specificartions > 1
+        union!(features, HAS_MULTIPLE_PRODUCT_CAPACITY_CONSUMPTIONS)
+    end
+    if nb_properties_requirements > 1
+        union!(features, HAS_MULTIPLE_PRODUCT_PROPERTIES_REQUIREMENTS)
+    end
+
+end
+
 function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
 
     tt_period = data.travel_periods[1]
@@ -344,9 +393,25 @@ function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
     check_requests(data.requests, computed_data)
     check_vehicle_categories(data.vehicle_categories, computed_data)
     check_vehicle_sets(data.vehicle_sets, computed_data)
+    check_product_specification_classes(data.product_specification_classes, computed_data)
 
     if !(data.coordinate_mode in [0, 1])
         error("Invalid value for coordinate_mode: $data.coordinate_mode")
+    end
+
+    features = computed_data.features
+
+    if (in(HAS_PRODUCT_CAPACITY_CONSUMPTIONS, features) &&
+        !in(HAS_VEHICLE_CAPACITIES, features))
+        error("Instance is inconsistent. It features produtct capacity",
+              " consumptions, but does not feature vehicles with capacity",
+              " specifications")
+    end
+    if (in(HAS_PRODUCT_PROPERTIES_REQUIREMENTS, features) &&
+        !in(HAS_VEHICLE_PROPERTIES, features))
+        error("Instance is inconsistent. It features produtct property",
+              " requirements, but does not feature vehicles property",
+              " specifications")
     end
 
     # filling Instance based features
@@ -400,6 +465,18 @@ function print_features(features::BitSet)
     end
     if in(HAS_PRODUCT_SHIPMENT_SHARING_CLASSES, features)
         println("HAS_PRODUCT_SHIPMENT_SHARING_CLASSES,")
+    end
+    if in(HAS_PRODUCT_CAPACITY_CONSUMPTIONS, features)
+        println("HAS_PRODUCT_CAPACITY_CONSUMPTIONS,")
+    end
+    if in(HAS_PRODUCT_PROPERTIES_REQUIREMENTS, features)
+        println("HAS_PRODUCT_PROPERTIES_REQUIREMENTS,")
+    end
+    if in(HAS_MULTIPLE_PRODUCT_CAPACITY_CONSUMPTIONS, features)
+        println("HAS_MULTIPLE_PRODUCT_CAPACITY_CONSUMPTIONS,")
+    end
+    if in(HAS_MULTIPLE_PRODUCT_PROPERTIES_REQUIREMENTS, features)
+        println("HAS_MULTIPLE_PRODUCT_PROPERTIES_REQUIREMENTS,")
     end
 
     # Request based features
