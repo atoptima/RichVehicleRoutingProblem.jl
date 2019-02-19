@@ -64,9 +64,7 @@ function vroom_create_input(data::RvrpInstance,
     @assert status == 0
 
     # only one matrix is supported
-    # k = collect(keys(data.travel_distance_matrices))
-    # mat = data.travel_distance_matrices[k[1]]
-    mat = data.travel_specifications[1].travel_distance_matrix    
+    mat = data.travel_specifications[1].travel_distance_matrix
     # Distance matrix: vroom does not support floats
     mat_size = size(mat, 1)
     array::Vector{Int32} = reshape(mat, (mat_size*mat_size))
@@ -199,7 +197,7 @@ function vroom_transform_solution(data::RvrpInstance,
         solver::VroomSolver,computed_data::RvrpComputedData,
         sol_ptr::Ptr{Cvoid})
 
-    id = string(data.id, "_RVRPSOL_", rand(1:1000))
+    id = string(data.id, "_vroom_SOL_", rand(1:10000))
     problem_id = data.id
     cost = @vroom_ccall get_sol_cost Cint (Ptr{Cvoid},) sol_ptr
     routes = vroom_build_routes(data, solver, computed_data, sol_ptr)
@@ -219,6 +217,10 @@ end
 ########################################################
 
 function solve(data::RvrpInstance, solver::VroomSolver)
+    if !check_initial_feasibility(data)
+        id = string(data.id, "_vroom_SOL_", rand(1:10000))
+        return build_empty_sol(data, id)
+    end
     computed_data = build_computed_data(data)
     # check_data(data, solver)
     vroom_ptr = vroom_create_input(data, computed_data, solver.with_tw)
@@ -230,16 +232,16 @@ end
 function supported_features(::Type{VroomSolver})
     pickonly_features = BitSet()
 
+    # Product features
+    union!(pickonly_features, HAS_PRODUCT_CAPACITY_CONSUMPTIONS)
+
     # Request based features
     union!(pickonly_features, HAS_PICKUPONLY_REQUESTS)
-    union!(pickonly_features, HAS_MAX_DURATION)
     union!(pickonly_features, HAS_PICKUP_TIME_WINDOWS)
     union!(pickonly_features, HAS_MULTIPLE_PICKUP_TIME_WINDOWS)
 
     # VehicleCategory based features
     union!(pickonly_features, HAS_VEHICLE_CAPACITIES)
-    union!(pickonly_features, HAS_VEHICLE_PROPERTIES)
-    union!(pickonly_features, HAS_MULTIPLE_VEHICLE_PROPERTIES)
 
     # HomogeneousVehicleSet based features
     union!(pickonly_features, HAS_MAX_NB_VEHICLES)
@@ -254,16 +256,16 @@ function supported_features(::Type{VroomSolver})
     #TODO support these features with a transformation
     deliveronly_features = BitSet()
 
+    # Product features
+    union!(pickonly_features, HAS_PRODUCT_CAPACITY_CONSUMPTIONS)
+
     # Request based features
     union!(deliveronly_features, HAS_DELIVERYONLY_REQUESTS)
-    union!(deliveronly_features, HAS_MAX_DURATION)
     union!(deliveronly_features, HAS_DELIVERY_TIME_WINDOWS)
     union!(deliveronly_features, HAS_MULTIPLE_DELIVERY_TIME_WINDOWS)
 
     # VehicleCategory based features
     union!(deliveronly_features, HAS_VEHICLE_CAPACITIES)
-    union!(deliveronly_features, HAS_VEHICLE_PROPERTIES)
-    union!(deliveronly_features, HAS_MULTIPLE_VEHICLE_PROPERTIES)
 
     # HomogeneousVehicleSet based features
     union!(deliveronly_features, HAS_MAX_NB_VEHICLES)

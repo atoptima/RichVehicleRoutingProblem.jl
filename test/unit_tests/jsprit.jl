@@ -142,11 +142,10 @@ function jsprit_transform_solution_tests()
 end
 
 function rvrp_jsprit_solve_tests()
-    solver = RVRP.JspritSolver()
     data = RVRP.parse_cvrplib(dirname(@__FILE__)* "/../../data/cvrplib/P/P\\P-n16-k8.vrp")
     computed_data = RVRP.build_computed_data(data)
     jsp_types = RVRP.JspritJavaTypes()
-    rvrp_sol = RVRP.solve(data, solver)
+    rvrp_sol = RVRP.solve(data, RVRP.JspritSolver())
     @test typeof(rvrp_sol) == RVRP.RvrpSolution
     @test rvrp_sol.cost == 450
     @test length(rvrp_sol.routes) == 8
@@ -154,6 +153,13 @@ function rvrp_jsprit_solve_tests()
         @test r.sequence[1].location_id == r.sequence[end].location_id
     end
     @test length(rvrp_sol.unassigned_request_ids) == 0
+
+    # Empty instance
+    data = RVRP.RvrpInstance()
+    rvrp_sol = RVRP.solve(data, RVRP.JspritSolver())
+    @test rvrp_sol.cost == 0.0
+    @test rvrp_sol.routes == RVRP.Route[]
+    @test rvrp_sol.unassigned_request_ids == String[]
 end
 
 function rvrp_jsprit_supported_features_tests()

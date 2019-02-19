@@ -116,19 +116,6 @@ function check_if_feasible(req::Request, cur_state::CurentState,
 
 end
 
-function check_initial_feasibility(v_sets::Vector{HomogeneousVehicleSet},
-                                   nb_reqs::Int)
-    nb_vehicles = 0
-    for v_set in v_sets
-        nb_vehicles += v_set.nb_of_vehicles_range.soft_range.ub
-    end
-    if nb_vehicles == 0 && nb_reqs > 0
-        return false
-    else
-        return true
-    end
-end
-
 function build_routes(data::RvrpInstance, solver::MockSolver,
                       computed_data::RvrpComputedData)
     unassigned = String[]
@@ -183,11 +170,8 @@ end
 function solve(data::RvrpInstance, solver::MockSolver)
 
     id = string(data.id, "_mock_SOL_", rand(1:10000))
-    if !check_initial_feasibility(data.vehicle_sets, length(data.requests))
-        unassigned = [req.id for req in data.requests]
-        problem_id = data.id
-        sol = RvrpSolution(id, problem_id, -1.0, Route[], unassigned)
-        return sol
+    if !check_initial_feasibility(data)
+        return build_empty_sol(data, id)
     end
     computed_data = build_computed_data(data)
     routes, unassigned =  build_routes(data, solver, computed_data)

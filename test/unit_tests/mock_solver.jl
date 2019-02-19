@@ -26,4 +26,11 @@ function mock_tests()
     @test rvrp_sol.routes == RVRP.Route[]
     @test rvrp_sol.unassigned_request_ids == ["req_1", "req_2", "req_3", "req_4", "req_5", "req_6", "req_7", "req_8", "req_9", "req_10", "req_11", "req_12", "req_13", "req_14", "req_15"]
 
+    # Empty instance
+    data = RVRP.RvrpInstance()
+    rvrp_sol = RVRP.solve(data, RVRP.MockSolver())
+    @test rvrp_sol.cost == 0.0
+    @test rvrp_sol.routes == RVRP.Route[]
+    @test rvrp_sol.unassigned_request_ids == String[]
+
 end

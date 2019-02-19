@@ -143,6 +143,13 @@ function rvrp_vroom_solve_tests()
                == route.sequence[end].operation_type == 0)
     end
     @test length(rvrp_sol.unassigned_request_ids) == 0
+
+    data = RVRP.RvrpInstance()
+    rvrp_sol = RVRP.solve(data, RVRP.VroomSolver(;with_tw = true))
+    @test rvrp_sol.cost == 0.0
+    @test rvrp_sol.routes == RVRP.Route[]
+    @test rvrp_sol.unassigned_request_ids == String[]
+
 end
 
 function rvrp_vroom_supported_features_tests()

@@ -560,6 +560,10 @@ end
 ############################ RVRP SOLVER functions #########################
 
 function solve(data::RvrpInstance, solver::JspritSolver)
+    if !check_initial_feasibility(data)
+        id = string(data.id, "_jsprit_SOL_", rand(1:10000))
+        return build_empty_sol(data, id)
+    end
     if !JavaCall.isloaded()
         setup_jvm()
     end
