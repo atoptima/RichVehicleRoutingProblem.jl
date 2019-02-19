@@ -11,6 +11,10 @@ const HAS_PRODUCT_PROHIBITED_PREDECESSOR_CLASSES = 5
 const HAS_PRODUCT_PICKUPONLY_SHARING_CLASSES = 6
 const HAS_PRODUCT_DELIVERYONLY_SHARING_CLASSES = 7
 const HAS_PRODUCT_SHIPMENT_SHARING_CLASSES = 8
+const HAS_PRODUCT_CAPACITY_CONSUMPTIONS = 9
+const HAS_PRODUCT_PROPERTIES_REQUIREMENTS = 10
+const HAS_MULTIPLE_PRODUCT_CAPACITY_CONSUMPTIONS = 11
+const HAS_MULTIPLE_PRODUCT_PROPERTIES_REQUIREMENTS = 12
 
 # Request based features
 const HAS_SHIPMENT_REQUESTS = 109
@@ -68,6 +72,16 @@ const HAS_MULTIPLE_VEHICLE_SETS = 451
 const HAS_ENERGY_FEATURES = 452 # to be detailed later as needed #
 const HAS_X_Y = 453
 
+function check_if_supports(supported_vec::Vector{BitSet},
+                           instance_features::BitSet)
+    for supported in supported_vec
+        if issubset(instance_features, supported)
+            return true
+        end            
+    end
+    return false
+end
+
 function check_id(id_to_index_dict, key, error_prefix::String)
     if !haskey(id_to_index_dict, key)
         error(error_prefix, "There is no object with id $key")
@@ -84,23 +98,47 @@ function check_positive_range(range::Range, error_prefix::String)
     end
 end
 
+function check_time_windows(tws::Vector{Range}, error_prefix::String)
+    check_positive_range(tws[1], "Time window ")
+    for idx in 2:length(tws)
+        check_positive_range(tws[idx], "Time window ")
+        if (tws[idx-1].lb > tws[idx].lb || tws[idx-1].ub > tws[idx].ub
+            || tws[idx-1].ub > tws[idx].lb)
+            error(error_prefix, "must not intersect and must be increasing: ", tws)
+        end
+    end
+end
+
 function check_locations(locations::Vector{Location},
                          computed_data::RvrpComputedData,
-                         coordinate_mode::Int)
+                         coordinate_mode::Int, features::BitSet)
 
     for loc in locations
         # If in long_lat mode
         if coordinate_mode == 0
             if loc.lat_y < - 90.0 || loc.lat_y > 90.0
-                error("Location $(loc.id) must have lat_y in [-100.0, +100.0]")
+                error("Location $(loc.id) must have lat_y in [-90.0, +90.0]")
             elseif loc.long_x < - 180.0 || loc.long_x > 180.0
-                error("Location $(loc.id) must have long_x in [-100.0, +100.0]")
-            end
-            if loc.index < 1 || loc.index > length(locations)
-                error("Location $(loc.id) must have index in [1, length(locations)]")
+                error("Location $(loc.id) must have long_x in [-180.0, +180.0]")
             end
         end
+        if loc.index < 1 || loc.index > length(locations)
+            error("Location $(loc.id) must have index in [1, length(locations)]")
+        end
+        check_time_windows(loc.opening_time_windows,
+                           string("Time windows of location ", loc.id, " "))
     end
+
+    # filling LOCATION based features
+    for loc in locations
+        if loc.opening_time_windows != [Range()]
+            union!(features, HAS_OPENING_TIME_WINDOWS)
+        end
+        if length(loc.opening_time_windows) > 1
+            union!(features, HAS_MULTIPLE_OPENING_TIME_WINDOWS)
+        end
+    end
+
 end
 
 function check_location_groups(location_groups::Vector{LocationGroup},
@@ -144,6 +182,10 @@ function check_requests(requests::Vector{Request},
         elseif req.duration_unit_cost < 0
             error("Request $(req.id) must have duration_unit_cost > 0")
         end
+        check_time_windows([tw.soft_range for tw in req.pickup_time_windows],
+            string("Time windows of pickup of request ", req.id, " "))
+        check_time_windows([tw.soft_range for tw in req.delivery_time_windows],
+            string("Time windows of delivery of request ", req.id, " "))
 
         # filling REQUEST based features
         features = computed_data.features
@@ -154,15 +196,15 @@ function check_requests(requests::Vector{Request},
         elseif req.request_type == 0
             union!(features, HAS_DELIVERYONLY_REQUESTS)
         end
-        if req.max_duration > 0
+        if req.max_duration < MAXNUMBER
             union!(features, HAS_MAX_DURATION)
         end
         if req.pickup_time_windows[1].soft_range.lb > 0 ||
-           req.pickup_time_windows[1].soft_range.ub < 10^9
+           req.pickup_time_windows[1].soft_range.ub < MAXNUMBER
             union!(features, HAS_PICKUP_TIME_WINDOWS)
         end
         if req.delivery_time_windows[1].soft_range.lb > 0 ||
-           req.delivery_time_windows[1].soft_range.ub < 10^9
+           req.delivery_time_windows[1].soft_range.ub < MAXNUMBER
             union!(features, HAS_DELIVERY_TIME_WINDOWS)
         end
     end
@@ -179,28 +221,28 @@ function check_vehicle_categories(vehicle_categories::Vector{VehicleCategory},
 
         # filling VehicleCategory based features
         features = computed_data.features
-        if length(vc.capacity_measures.of_vehicle) > 0
+        if length(vc.capacities.of_vehicle) > 0
             union!(features, HAS_VEHICLE_CAPACITIES)
         end
-        if length(vc.capacity_measures.of_compartments) > 0
+        if length(vc.capacities.of_compartments) > 0
             union!(features, HAS_COMPARTMENT_CAPACITIES)
         end
-        if length(vc.vehicle_properties.of_vehicle) > 0
+        if length(vc.properties.of_vehicle) > 0
             union!(features, HAS_VEHICLE_PROPERTIES)
         end
-        if length(vc.vehicle_properties.of_compartments) > 0
+        if length(vc.properties.of_compartments) > 0
             union!(features, HAS_COMPARTMENT_PROPERTIES)
         end
-        if length(vc.capacity_measures.of_vehicle) > 1
+        if length(vc.capacities.of_vehicle) > 1
             union!(features, HAS_MULTIPLE_VEHICLE_CAPACITIES)
         end
-        if length(vc.capacity_measures.of_compartments) > 1
+        if length(vc.capacities.of_compartments) > 1
             union!(features, HAS_MULTIPLE_COMPARTMENT_CAPACITIES)
         end
-        if length(vc.vehicle_properties.of_vehicle) > 1
+        if length(vc.properties.of_vehicle) > 1
             union!(features, HAS_MULTIPLE_VEHICLE_PROPERTIES)
         end
-        if length(vc.vehicle_properties.of_compartments) > 1
+        if length(vc.properties.of_compartments) > 1
             union!(features, HAS_MULTIPLE_COMPARTMENT_PROPERTIES)
         end
     end
@@ -254,6 +296,8 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
                  "VehicleSet $(vs.id), arrival_location_group_id : ")
         check_positive_range(vs.nb_of_vehicles_range.soft_range,
                  "VehicleSet $(vs.id), nb_of_vehicles_range.soft_range : ")
+        check_time_windows([tw.soft_range for tw in vs.work_periods],
+            string("Work periods of HomogeneousVehicleSet ", vs.id, " "))
         for wp in vs.work_periods
             check_positive_range(wp.soft_range,
                 "VehicleSet $(vs.id), work_period.soft_range : ")
@@ -270,7 +314,7 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
         if vs.route_mode in [1,3]
             union!(features, HAS_OPEN_DEPARTURE)
         end
-        if vs.nb_of_vehicles_range.soft_range.ub < 10^9
+        if vs.nb_of_vehicles_range.soft_range.ub < MAXNUMBER
             union!(features, HAS_MAX_NB_VEHICLES)
         end
         if length(vs.work_periods) > 1
@@ -284,32 +328,124 @@ function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
         end
         for wp in vs.work_periods
             if wp.soft_range.lb > 0 ||
-                wp.soft_range.ub < 10^9
+                wp.soft_range.ub < MAXNUMBER
                 union!(features, HAS_WORKING_TIME_WINDOW)
             end
         end
     end
 end
 
+function check_product_specification_classes(
+    product_specification_classes::Vector{ProductSpecificationClass},
+    computed_data::RvrpComputedData)
+
+    features = computed_data.features
+
+    for prod_spec_class in product_specification_classes
+        for (k,v) in prod_spec_class.capacity_consumptions
+            if v[1] < 0.0 || v[2] < 0.0
+                error("Product ", prod_spec_class.id,
+                      " must have a non-negative consumption of all ",
+                      "of all capacity measures.",
+                      " Consumption is ", v[1], " per lot of ", v[2])
+            end
+        end
+        for (k,v) in prod_spec_class.property_requirements
+            if v < 0.0
+                error("Product ", prod_spec_class.id,
+                      " must have a non-negative requirement for all properties.",
+                      " Requirement is ", v[1])
+            end
+        end
+    end
+
+    nb_capacities_specificartions = 0
+    nb_properties_requirements = 0
+    for prod_spec_class in product_specification_classes
+        if !isempty(prod_spec_class.capacity_consumptions)
+            union!(features, HAS_PRODUCT_CAPACITY_CONSUMPTIONS)
+            nb_capacities_specificartions += 1
+        end
+        if !isempty(prod_spec_class.property_requirements)
+            union!(features, HAS_PRODUCT_PROPERTIES_REQUIREMENTS)
+            nb_properties_requirements += 1
+        end
+    end
+    if nb_capacities_specificartions > 1
+        union!(features, HAS_MULTIPLE_PRODUCT_CAPACITY_CONSUMPTIONS)
+    end
+    if nb_properties_requirements > 1
+        union!(features, HAS_MULTIPLE_PRODUCT_PROPERTIES_REQUIREMENTS)
+    end
+
+end
+
+function check_ids_in_vector(vec::Vector{T}) where T <: Union{
+    Location, TravelSpecification, LocationGroup,
+    ProductSharingClass, ProductSpecificationClass,
+    ProductCompatibilityClass, Request, VehicleCategory,
+    HomogeneousVehicleSet}
+    all_ids = Set{String}()
+    for obj in vec
+        if obj.id in all_ids
+            error("Id ", obj.id, " is used more that ",
+                  "once in vector of ", Symbol(eltype(vec)))
+        end
+        push!(all_ids, obj.id)
+    end
+end
+
+function check_repeated_ids(data::RvrpInstance)
+
+    check_ids_in_vector(data.locations)
+    check_ids_in_vector(data.travel_specifications)
+    check_ids_in_vector(data.location_groups)
+    check_ids_in_vector(data.product_compatibility_classes)
+    check_ids_in_vector(data.product_specification_classes)
+    check_ids_in_vector(data.product_sharing_classes)
+    check_ids_in_vector(data.requests)
+    check_ids_in_vector(data.vehicle_categories)
+    check_ids_in_vector(data.vehicle_sets)
+
+end
+
 function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
+
+    check_repeated_ids(data)
 
     tt_period = data.travel_periods[1]
     check_id(computed_data.travel_specification_id_2_index,
              tt_period.travel_specification_id,
              "TavelTimePeriods[1] : ")
 
-    check_locations(data.locations, computed_data, data.coordinate_mode)
+    features = computed_data.features
+    check_locations(data.locations, computed_data, data.coordinate_mode, features)
     check_location_groups(data.location_groups, computed_data)
     check_requests(data.requests, computed_data)
     check_vehicle_categories(data.vehicle_categories, computed_data)
     check_vehicle_sets(data.vehicle_sets, computed_data)
+    check_product_specification_classes(data.product_specification_classes, computed_data)
 
     if !(data.coordinate_mode in [0, 1])
         error("Invalid value for coordinate_mode: $data.coordinate_mode")
     end
 
-    # filling Instance based features
     features = computed_data.features
+
+    if (in(HAS_PRODUCT_CAPACITY_CONSUMPTIONS, features) &&
+        !in(HAS_VEHICLE_CAPACITIES, features))
+        error("Instance is inconsistent. It features produtct capacity",
+              " consumptions, but does not feature vehicles with capacity",
+              " specifications")
+    end
+    if (in(HAS_PRODUCT_PROPERTIES_REQUIREMENTS, features) &&
+        !in(HAS_VEHICLE_PROPERTIES, features))
+        error("Instance is inconsistent. It features produtct property",
+              " requirements, but does not feature vehicles property",
+              " specifications")
+    end
+
+    # filling Instance based features
     # if length(data.vehicle_categories) > 0
     #     union!(features, HAS_VEHICLE_CATEGORIES)
     # end
@@ -360,6 +496,18 @@ function print_features(features::BitSet)
     end
     if in(HAS_PRODUCT_SHIPMENT_SHARING_CLASSES, features)
         println("HAS_PRODUCT_SHIPMENT_SHARING_CLASSES,")
+    end
+    if in(HAS_PRODUCT_CAPACITY_CONSUMPTIONS, features)
+        println("HAS_PRODUCT_CAPACITY_CONSUMPTIONS,")
+    end
+    if in(HAS_PRODUCT_PROPERTIES_REQUIREMENTS, features)
+        println("HAS_PRODUCT_PROPERTIES_REQUIREMENTS,")
+    end
+    if in(HAS_MULTIPLE_PRODUCT_CAPACITY_CONSUMPTIONS, features)
+        println("HAS_MULTIPLE_PRODUCT_CAPACITY_CONSUMPTIONS,")
+    end
+    if in(HAS_MULTIPLE_PRODUCT_PROPERTIES_REQUIREMENTS, features)
+        println("HAS_MULTIPLE_PRODUCT_PROPERTIES_REQUIREMENTS,")
     end
 
     # Request based features

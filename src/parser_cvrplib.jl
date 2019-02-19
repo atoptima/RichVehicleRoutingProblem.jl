@@ -67,7 +67,7 @@ function parse_cvrplib(file_path::String)
 
     vehicle_categories = [VehicleCategory(
         id = "unique_vehicle_category",
-        capacity_measures = VehicleCharacteristics(of_vehicle = Dict{String,Float64}("unique_measure" => capacity))
+        capacities = VehicleCharacteristics(of_vehicle = Dict{String,Float64}("unique_measure" => capacity))
     )]
     vehicle_cost = CostPeriod(travel_distance_unit_cost = 1.0)
     vehicle_sets = [HomogeneousVehicleSet(

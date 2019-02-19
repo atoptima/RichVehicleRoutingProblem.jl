@@ -87,8 +87,8 @@ end
 
 mutable struct VehicleCategory
     id::String
-    capacity_measures::VehicleCharacteristics
-    vehicle_properties::VehicleCharacteristics
+    capacities::VehicleCharacteristics
+    properties::VehicleCharacteristics
     loading_option::Int # 0 = no restriction (=default), 1 = one request per compartment, 2 = removable compartment separation (note that product conflicts are measured within a compartment)
     energy_interval_lengths::Vector{Float64} # at index i, the length of the i-th energy interval. empty if no recharging.
 end
@@ -262,13 +262,13 @@ function VehicleCharacteristics(;of_vehicle = Dict{String,Float64}(),
 end
 
 function VehicleCategory(; id = "",
-                         capacity_measures = VehicleCharacteristics(),
-                         vehicle_properties = VehicleCharacteristics(),
+                         capacities = VehicleCharacteristics(),
+                         properties = VehicleCharacteristics(),
                          loading_option = 0,
                          energy_interval_lengths = Float64[])
     return VehicleCategory(id,
-                           capacity_measures,
-                           vehicle_properties,
+                           capacities,
+                           properties,
                            loading_option,
                            energy_interval_lengths)
 end

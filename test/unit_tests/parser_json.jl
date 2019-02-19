@@ -5,11 +5,6 @@ end
 function parse_from_json_tests()
     data = RVRP.parse_from_json_string("{\"id\":\"wololo\"}\n")
     @test typeof(data) == RVRP.RvrpInstance
-    @test data.travel_matrix_periods == RVRP.Range[]
-    @test data.period_to_matrix_id == Dict{RVRP.Range,String}()
-    @test data.travel_distance_matrices == Dict{String,Array{Float64,2}}()
-    @test data.travel_time_matrices == Dict{String,Array{Float64,2}}()
-    @test data.energy_consumption_matrices == Dict{String,Array{Float64,2}}()
     @test data.locations == RVRP.Location[]
     @test data.location_groups == RVRP.LocationGroup[]
     @test data.product_compatibility_classes == RVRP.ProductCompatibilityClass[]

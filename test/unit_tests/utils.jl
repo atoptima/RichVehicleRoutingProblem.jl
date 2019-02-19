@@ -4,6 +4,19 @@ function utils_unit_tests()
     build_computed_data_tests()
     create_singleton_location_groups_tests()
     preprocess_instance_unit_tests()
+    create_intersection_tws_tests()
+end
+
+function create_intersection_tws_tests()
+    tws_1 = [RVRP.Range(10.0, 20.0), RVRP.Range(35.0, 40.0)]
+    tws_2 = [RVRP.Range(15.0, 25.0), RVRP.Range(28.0, 36.0)]
+    intersection = RVRP.ranges_intersection(tws_1, tws_2)
+    @test intersection == [RVRP.Range(15.0, 20.0), RVRP.Range(35.0, 36.0)]
+
+    tws_1 = [RVRP.Range(10.0, 100.0), RVRP.Range(110.0, 130.0)]
+    tws_2 = [RVRP.Range(9.0, 25.0), RVRP.Range(28.0, 36.0), RVRP.Range(88.0, 120.0)]
+    intersection = RVRP.ranges_intersection(tws_1, tws_2)
+    @test intersection == [RVRP.Range(10.0, 25.0), RVRP.Range(28.0, 36.0), RVRP.Range(88.0, 100.0), RVRP.Range(110.0, 120.0)]
 end
 
 function generate_symmetric_distance_matrix_tests()
@@ -49,19 +62,19 @@ function build_computed_data_tests()
     ) for i in 10:13]
     RVRP.set_indices(data)
     data.location_groups = RVRP.create_singleton_location_groups(data.locations)
-    data.vehicle_categories[1].capacity_measures.of_vehicle = Dict{String,Float64}(
+    data.vehicle_categories[1].capacities.of_vehicle = Dict{String,Float64}(
         "weird_name_1" => 10, "wolow_34" => 12, "volume" => 15
     )
-    data.vehicle_categories[2].capacity_measures.of_vehicle = Dict{String,Float64}(
+    data.vehicle_categories[2].capacities.of_vehicle = Dict{String,Float64}(
         "weird_name_1" => 10, "wolow_34" => 12, "new_name_1" => 15
     )
     data.product_specification_classes[1].capacity_consumptions = Dict{String,Tuple{Float64,Float64}}(
         "weird_name_1" => (1,10), "new_name_2" => (1,12), "wolow_34" => (1,15)
     )
-    data.vehicle_categories[1].vehicle_properties.of_vehicle = Dict{String,Float64}(
+    data.vehicle_categories[1].properties.of_vehicle = Dict{String,Float64}(
         "prop_1" => 10, "prop_34" => 12, "prop_3" => 15
     )
-    data.vehicle_categories[2].vehicle_properties.of_vehicle = Dict{String,Float64}(
+    data.vehicle_categories[2].properties.of_vehicle = Dict{String,Float64}(
         "prop_1" => 10, "prop_34" => 12, "new_prop_1" => 15
     )
     data.product_specification_classes[1].property_requirements = Dict{String,Float64}(

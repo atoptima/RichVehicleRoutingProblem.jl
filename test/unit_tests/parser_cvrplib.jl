@@ -37,8 +37,8 @@ function parse_cvrplib_tests()
     @test length(data.vehicle_categories) == 2
     @test length(data.vehicle_sets) == 1
     @test data.vehicle_categories[1].id == "unique_vehicle_category"
-    @test haskey(data.vehicle_categories[1].capacity_measures.of_vehicle, "unique_measure")
-    @test(data.vehicle_categories[1].capacity_measures.of_vehicle ==
+    @test haskey(data.vehicle_categories[1].capacities.of_vehicle, "unique_measure")
+    @test(data.vehicle_categories[1].capacities.of_vehicle ==
             Dict{String,Float64}("unique_measure" => 35.0))
     @test length(data.vehicle_sets[1].work_periods) == 1
     @test length(data.vehicle_sets[1].cost_periods) == 1
