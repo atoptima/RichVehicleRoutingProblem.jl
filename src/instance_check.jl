@@ -412,7 +412,7 @@ end
 function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
 
     if data.id == ""
-        error("Id ", data.id, " is an invalid instance id.")
+        error("Invalid instance id: ", data.id)
     end
     check_repeated_ids(data)
 
