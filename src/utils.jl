@@ -137,3 +137,25 @@ function preprocess_instance(data::RvrpInstance)
     push!(data.vehicle_categories, VehicleCategory(id = "default_id"))
     # push!(data.vehicle_sets, HomogeneousVehicleSet(id = "default_id"))
 end
+
+function check_initial_feasibility(data::RvrpInstance)
+    v_sets = data.vehicle_sets
+    nb_vehicles = 0
+    for v_set in v_sets
+        nb_vehicles += v_set.nb_of_vehicles_range.soft_range.ub
+    end
+    if (nb_vehicles == 0
+        || length(data.requests) == 0
+        || length(data.travel_specifications) == 0)
+        return false
+    else
+        return true
+    end
+end
+
+function build_empty_sol(data::RvrpInstance, id::String)
+    unassigned = [req.id for req in data.requests]
+    problem_id = data.id
+    sol = RvrpSolution(id, problem_id, 0.0, Route[], unassigned)
+    return sol
+end

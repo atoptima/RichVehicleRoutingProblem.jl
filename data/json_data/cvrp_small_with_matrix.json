@@ -1,0 +1,1776 @@
+{
+  "id": "P-n16-k8",
+  "travel_specifications": [
+    {
+      "id": "unique_period_cat",
+      "travel_time_matrix": {
+        "dims": [
+          0,
+          0
+        ],
+        "array": []
+      },
+      "travel_distance_matrix": {
+        "dims": [
+          16,
+          16
+        ],
+        "array": [
+          0,
+          14,
+          21,
+          33,
+          22,
+          23,
+          12,
+          22,
+          32,
+          32,
+          21,
+          28,
+          30,
+          29,
+          31,
+          30,
+          14,
+          0,
+          12,
+          19,
+          12,
+          24,
+          12,
+          19,
+          21,
+          27,
+          7,
+          19,
+          16,
+          21,
+          33,
+          17,
+          21,
+          12,
+          0,
+          15,
+          22,
+          16,
+          11,
+          9,
+          12,
+          15,
+          11,
+          29,
+          19,
+          9,
+          24,
+          23,
+          33,
+          19,
+          15,
+          0,
+          21,
+          31,
+          25,
+          23,
+          8,
+          24,
+          12,
+          25,
+          9,
+          17,
+          37,
+          16,
+          22,
+          12,
+          22,
+          21,
+          0,
+          36,
+          24,
+          30,
+          26,
+          37,
+          12,
+          7,
+          13,
+          30,
+          44,
+          9,
+          23,
+          24,
+          16,
+          31,
+          36,
+          0,
+          13,
+          8,
+          25,
+          13,
+          26,
+          43,
+          35,
+          16,
+          8,
+          39,
+          12,
+          12,
+          11,
+          25,
+          24,
+          13,
+          0,
+          10,
+          23,
+          20,
+          16,
+          31,
+          26,
+          17,
+          21,
+          28,
+          22,
+          19,
+          9,
+          23,
+          30,
+          8,
+          10,
+          0,
+          18,
+          10,
+          19,
+          37,
+          28,
+          9,
+          15,
+          32,
+          32,
+          21,
+          12,
+          8,
+          26,
+          25,
+          23,
+          18,
+          0,
+          17,
+          15,
+          32,
+          17,
+          10,
+          31,
+          23,
+          32,
+          27,
+          15,
+          24,
+          37,
+          13,
+          20,
+          10,
+          17,
+          0,
+          25,
+          44,
+          31,
+          7,
+          16,
+          37,
+          21,
+          7,
+          11,
+          12,
+          12,
+          26,
+          16,
+          19,
+          15,
+          25,
+          0,
+          19,
+          10,
+          18,
+          34,
+          13,
+          28,
+          19,
+          29,
+          25,
+          7,
+          43,
+          31,
+          37,
+          32,
+          44,
+          19,
+          0,
+          16,
+          37,
+          51,
+          10,
+          30,
+          16,
+          19,
+          9,
+          13,
+          35,
+          26,
+          28,
+          17,
+          31,
+          10,
+          16,
+          0,
+          24,
+          43,
+          6,
+          29,
+          21,
+          9,
+          17,
+          30,
+          16,
+          17,
+          9,
+          10,
+          7,
+          18,
+          37,
+          24,
+          0,
+          21,
+          30,
+          31,
+          33,
+          24,
+          37,
+          44,
+          8,
+          21,
+          15,
+          31,
+          16,
+          34,
+          51,
+          43,
+          21,
+          0,
+          47,
+          30,
+          17,
+          23,
+          16,
+          9,
+          39,
+          28,
+          32,
+          23,
+          37,
+          13,
+          10,
+          6,
+          30,
+          47,
+          0
+        ]
+      },
+      "energy_consumption_matrix": {
+        "dims": [
+          0,
+          0
+        ],
+        "array": []
+      }
+    }
+  ],
+  "travel_periods": [
+    {
+      "period": {
+        "lb": 0,
+        "ub": 1000000000
+      },
+      "travel_specification_id": "unique_period_cat"
+    }
+  ],
+  "work_periods": [
+    {
+      "lb": 0,
+      "ub": 1000000000
+    }
+  ],
+  "locations": [
+    {
+      "id": "depot",
+      "index": 1,
+      "latitude": 40,
+      "longitude": 30,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_2",
+      "index": 2,
+      "latitude": 52,
+      "longitude": 37,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_3",
+      "index": 3,
+      "latitude": 49,
+      "longitude": 49,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_4",
+      "index": 4,
+      "latitude": 64,
+      "longitude": 52,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_5",
+      "index": 5,
+      "latitude": 62,
+      "longitude": 31,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_6",
+      "index": 6,
+      "latitude": 33,
+      "longitude": 52,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_7",
+      "index": 7,
+      "latitude": 41,
+      "longitude": 42,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_8",
+      "index": 8,
+      "latitude": 41,
+      "longitude": 52,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_9",
+      "index": 9,
+      "latitude": 58,
+      "longitude": 57,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_10",
+      "index": 10,
+      "latitude": 42,
+      "longitude": 62,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_11",
+      "index": 11,
+      "latitude": 57,
+      "longitude": 42,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_12",
+      "index": 12,
+      "latitude": 68,
+      "longitude": 27,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_13",
+      "index": 13,
+      "latitude": 67,
+      "longitude": 43,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_14",
+      "index": 14,
+      "latitude": 48,
+      "longitude": 58,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_15",
+      "index": 15,
+      "latitude": 27,
+      "longitude": 58,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    },
+    {
+      "id": "loc_16",
+      "index": 16,
+      "latitude": 69,
+      "longitude": 37,
+      "opening_time_windows": [
+        {
+          "lb": 0,
+          "ub": 1000000000
+        }
+      ],
+      "energy_fixed_cost": 0,
+      "energy_unit_cost": 0,
+      "energy_recharging_speeds": []
+    }
+  ],
+  "location_groups": [
+    {
+      "id": "depot_loc_group",
+      "location_ids": [
+        "depot"
+      ]
+    },
+    {
+      "id": "loc_2_loc_group",
+      "location_ids": [
+        "loc_2"
+      ]
+    },
+    {
+      "id": "loc_3_loc_group",
+      "location_ids": [
+        "loc_3"
+      ]
+    },
+    {
+      "id": "loc_4_loc_group",
+      "location_ids": [
+        "loc_4"
+      ]
+    },
+    {
+      "id": "loc_5_loc_group",
+      "location_ids": [
+        "loc_5"
+      ]
+    },
+    {
+      "id": "loc_6_loc_group",
+      "location_ids": [
+        "loc_6"
+      ]
+    },
+    {
+      "id": "loc_7_loc_group",
+      "location_ids": [
+        "loc_7"
+      ]
+    },
+    {
+      "id": "loc_8_loc_group",
+      "location_ids": [
+        "loc_8"
+      ]
+    },
+    {
+      "id": "loc_9_loc_group",
+      "location_ids": [
+        "loc_9"
+      ]
+    },
+    {
+      "id": "loc_10_loc_group",
+      "location_ids": [
+        "loc_10"
+      ]
+    },
+    {
+      "id": "loc_11_loc_group",
+      "location_ids": [
+        "loc_11"
+      ]
+    },
+    {
+      "id": "loc_12_loc_group",
+      "location_ids": [
+        "loc_12"
+      ]
+    },
+    {
+      "id": "loc_13_loc_group",
+      "location_ids": [
+        "loc_13"
+      ]
+    },
+    {
+      "id": "loc_14_loc_group",
+      "location_ids": [
+        "loc_14"
+      ]
+    },
+    {
+      "id": "loc_15_loc_group",
+      "location_ids": [
+        "loc_15"
+      ]
+    },
+    {
+      "id": "loc_16_loc_group",
+      "location_ids": [
+        "loc_16"
+      ]
+    }
+  ],
+  "product_compatibility_classes": [
+    {
+      "id": "default_id",
+      "conflict_compatib_class_ids": [],
+      "prohibited_predecessor_compatib_class_ids": []
+    }
+  ],
+  "product_sharing_classes": [
+    {
+      "id": "default_id",
+      "restricted_pickup_availabitilies": true,
+      "restricted_delivery_capacities": true,
+      "pickup_availabitilies_at_location_ids": {},
+      "delivery_capacities_at_location_ids": {}
+    }
+  ],
+  "product_specification_classes": [
+    {
+      "id": "unique_p_spec_c",
+      "capacity_consumptions": {
+        "unique_measure": [
+          1,
+          1
+        ]
+      },
+      "property_requirements": {}
+    },
+    {
+      "id": "default_id",
+      "capacity_consumptions": {},
+      "property_requirements": {}
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_1",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 19,
+        "ub": 19
+      },
+      "pickup_location_group_id": "loc_2_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_2",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 30,
+        "ub": 30
+      },
+      "pickup_location_group_id": "loc_3_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_3",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 16,
+        "ub": 16
+      },
+      "pickup_location_group_id": "loc_4_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_4",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 23,
+        "ub": 23
+      },
+      "pickup_location_group_id": "loc_5_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_5",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 11,
+        "ub": 11
+      },
+      "pickup_location_group_id": "loc_6_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_6",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 31,
+        "ub": 31
+      },
+      "pickup_location_group_id": "loc_7_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_7",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 15,
+        "ub": 15
+      },
+      "pickup_location_group_id": "loc_8_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_8",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 28,
+        "ub": 28
+      },
+      "pickup_location_group_id": "loc_9_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_9",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 8,
+        "ub": 8
+      },
+      "pickup_location_group_id": "loc_10_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_10",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 8,
+        "ub": 8
+      },
+      "pickup_location_group_id": "loc_11_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_11",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 7,
+        "ub": 7
+      },
+      "pickup_location_group_id": "loc_12_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_12",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 14,
+        "ub": 14
+      },
+      "pickup_location_group_id": "loc_13_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_13",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 6,
+        "ub": 6
+      },
+      "pickup_location_group_id": "loc_14_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_14",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 19,
+        "ub": 19
+      },
+      "pickup_location_group_id": "loc_15_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "req_15",
+      "request_type": 1,
+      "product_compatibility_class_id": "default_id",
+      "product_sharing_class_id": "default_id",
+      "product_specification_class_id": "unique_p_spec_c",
+      "split_fulfillment": false,
+      "request_flexibility": {
+        "flexibility_level": 0,
+        "fixed_price": 0,
+        "unit_price": 0
+      },
+      "precedence_status": 0,
+      "product_quantity_range": {
+        "lb": 11,
+        "ub": 11
+      },
+      "pickup_location_group_id": "loc_16_loc_group",
+      "delivery_location_group_id": "default_id",
+      "pickup_service_time": 0,
+      "delivery_service_time": 0,
+      "max_duration": 1000000000,
+      "duration_unit_cost": 0,
+      "pickup_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ],
+      "delivery_time_windows": [
+        {
+          "soft_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "hard_range": {
+            "lb": 0,
+            "ub": 1000000000
+          },
+          "lb_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          },
+          "ub_flex": {
+            "flexibility_level": 0,
+            "fixed_price": 0,
+            "unit_price": 0
+          }
+        }
+      ]
+    }
+  ],
+  "vehicle_categories": [
+    {
+      "id": "unique_vehicle_category",
+      "vehicle_capacities": {
+        "unique_measure": 35
+      },
+      "compartment_capacities": {},
+      "properties": {},
+      "compartment_properties": {},
+      "loading_option": 0,
+      "energy_interval_lengths": []
+    },
+    {
+      "id": "default_id",
+      "vehicle_capacities": {},
+      "compartment_capacities": {},
+      "properties": {},
+      "compartment_properties": {},
+      "loading_option": 0,
+      "energy_interval_lengths": []
+    }
+  ],
+  "vehicle_sets": [
+    {
+      "id": "unique_vehicle_set",
+      "route_mode": 0,
+      "vehicle_category_id": "unique_vehicle_category",
+      "departure_location_group_id": "depot_loc_group",
+      "arrival_location_group_id": "depot_loc_group",
+      "working_time_window": {
+        "soft_range": {
+          "lb": 0,
+          "ub": 1000000000
+        },
+        "hard_range": {
+          "lb": 0,
+          "ub": 1000000000
+        },
+        "lb_flex": {
+          "flexibility_level": 0,
+          "fixed_price": 0,
+          "unit_price": 0
+        },
+        "ub_flex": {
+          "flexibility_level": 0,
+          "fixed_price": 0,
+          "unit_price": 0
+        }
+      },
+      "travel_distance_unit_cost": 1,
+      "travel_time_unit_cost": 0,
+      "service_time_unit_cost": 0,
+      "waiting_time_unit_cost": 0,
+      "initial_energy_charge": 1000000000,
+      "fixed_cost_per_vehicle": 0,
+      "max_working_time": 1000000000,
+      "max_travel_distance": 1000000000,
+      "allow_shipment_over_multiple_work_periods": false,
+      "nb_of_vehicles_range": {
+        "soft_range": {
+          "lb": 0,
+          "ub": 15
+        },
+        "hard_range": {
+          "lb": 0,
+          "ub": 15
+        },
+        "lb_flex": {
+          "flexibility_level": 0,
+          "fixed_price": 0,
+          "unit_price": 0
+        },
+        "ub_flex": {
+          "flexibility_level": 0,
+          "fixed_price": 0,
+          "unit_price": 0
+        }
+      }
+    }
+  ]
+}

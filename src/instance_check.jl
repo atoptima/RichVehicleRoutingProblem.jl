@@ -77,7 +77,7 @@ function check_if_supports(supported_vec::Vector{BitSet},
     for supported in supported_vec
         if issubset(instance_features, supported)
             return true
-        end            
+        end
     end
     return false
 end
@@ -279,7 +279,7 @@ function check_vehicle_cost(vs_id::String, cost_period::CostPeriod,
     if cost_period.fixed_cost > 0
         union!(features, HAS_FIXED_COST_PER_VEHICLE)
     end
-end    
+end
 
 function check_vehicle_sets(vehicle_sets::Vector{HomogeneousVehicleSet},
                             computed_data::RvrpComputedData)
@@ -411,6 +411,9 @@ end
 
 function check_instance(data::RvrpInstance, computed_data::RvrpComputedData)
 
+    if data.id == ""
+        error("Invalid instance id: ", data.id)
+    end
     check_repeated_ids(data)
 
     tt_period = data.travel_periods[1]

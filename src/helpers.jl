@@ -46,3 +46,14 @@ function get_delivery_locations(req::Request,
     return get_locations_from_group_id(req.delivery_location_group_id,
                                        data, computed_data)
 end
+
+function get_closest_tw(tws::Vector{Range}, target_time::Float64)
+    for tw in tws
+        if target_time <= tw.ub
+            return tw
+        end
+    end
+    @show tws
+    @show target_time
+    error("No feasible time windows for target ", target_time, ". Time windows are : ", tws)
+end
