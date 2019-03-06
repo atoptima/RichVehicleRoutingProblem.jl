@@ -57,7 +57,7 @@ function parse_cvrplib(file_path::String)
                 request_type = 1,
                 id = string("req_", req_idx),
                 product_specification_class_id = "unique_p_spec_c",
-                product_quantity_range = single_val_range(demands[i]),
+                product_quantity_range = Range(demands[i]),
                 pickup_location_group_id = location_groups[i].id
             )
             push!(requests, req)
