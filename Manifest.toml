@@ -89,12 +89,11 @@ deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[Scanner]]
-deps = ["Test"]
-git-tree-sha1 = "059d3581bf76d79aad49a5415fc947383eaa267d"
+git-tree-sha1 = "f4c92a2647c504cb240e7e823c152059f7ec63f7"
 repo-rev = "master"
-repo-url = "https://github.com/atoptima/Scanner.jl"
-uuid = "c75548ad-e7e3-5214-b9a0-71e99b6be1af"
-version = "0.0.0"
+repo-url = "https://github.com/realopt/Scanner.jl"
+uuid = "d6431348-6a76-11e9-1721-dff2f7d1e522"
+version = "0.1.0"
 
 [[Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
