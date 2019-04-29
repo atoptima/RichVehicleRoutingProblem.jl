@@ -89,7 +89,8 @@ deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[Scanner]]
-git-tree-sha1 = "f4c92a2647c504cb240e7e823c152059f7ec63f7"
+deps = ["Test"]
+git-tree-sha1 = "6092ba90204b92161375cedd5fee76ed994a3664"
 repo-rev = "master"
 repo-url = "https://github.com/realopt/Scanner.jl"
 uuid = "d6431348-6a76-11e9-1721-dff2f7d1e522"
