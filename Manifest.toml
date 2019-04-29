@@ -22,11 +22,11 @@ deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[JSON2]]
-deps = ["Dates", "Test"]
-git-tree-sha1 = "77168ef8b94d12d9b36d780cfecec0423629a53f"
-repo-rev = "atoptima_branch"
+deps = ["Dates", "Parsers", "Test"]
+git-tree-sha1 = "b638a3cad2b0e40fa0e07501b506f0c32e0e4bda"
+repo-rev = "master"
 repo-url = "https://github.com/atoptima/JSON2.jl"
-uuid = "b8f84f9e-ffe9-11e8-114e-fba34a308d63"
+uuid = "90288d12-6a70-11e9-1cf5-d7a38088a206"
 version = "0.1.0"
 
 [[JavaCall]]
@@ -38,6 +38,10 @@ version = "0.7.1"
 [[Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 
+[[LinearAlgebra]]
+deps = ["Libdl"]
+uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
@@ -45,17 +49,32 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
+[[Missings]]
+deps = ["Dates", "InteractiveUtils", "SparseArrays", "Test"]
+git-tree-sha1 = "d1d2585677f2bd93a97cfeb8faa7a0de0f982042"
+uuid = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
+version = "0.4.0"
+
+[[Mmap]]
+uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+
 [[OrderedCollections]]
 deps = ["Random", "Serialization", "Test"]
-git-tree-sha1 = "85619a3f3e17bb4761fe1b1fd47f0e979f964d5b"
+git-tree-sha1 = "c4c13474d23c60d20a67b217f1d7f22a40edf8f1"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.0.2"
+version = "1.1.0"
 
 [[Parameters]]
 deps = ["Markdown", "OrderedCollections", "REPL", "Test"]
 git-tree-sha1 = "70bdbfb2bceabb15345c0b54be4544813b3444e4"
 uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 version = "0.10.3"
+
+[[Parsers]]
+deps = ["Dates", "Mmap", "Test", "WeakRefStrings"]
+git-tree-sha1 = "d4e634c9cab597f0ec8f5a1d62c0787e98602c55"
+uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
+version = "0.2.22"
 
 [[Printf]]
 deps = ["Unicode"]
@@ -71,7 +90,7 @@ uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[Scanner]]
 deps = ["Test"]
-git-tree-sha1 = "70d93416475a5db9ef30785bf2b3814f2536d5e5"
+git-tree-sha1 = "059d3581bf76d79aad49a5415fc947383eaa267d"
 repo-rev = "master"
 repo-url = "https://github.com/atoptima/Scanner.jl"
 uuid = "c75548ad-e7e3-5214-b9a0-71e99b6be1af"
@@ -83,12 +102,22 @@ uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 [[Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
+[[SparseArrays]]
+deps = ["LinearAlgebra", "Random"]
+uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+
 [[Test]]
 deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+
+[[WeakRefStrings]]
+deps = ["Missings", "Random", "Test"]
+git-tree-sha1 = "960639a12ffd223ee463e93392aeb260fa325566"
+uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
+version = "0.5.8"
 
 [[WinReg]]
 deps = ["Test"]
